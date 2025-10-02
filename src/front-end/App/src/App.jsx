@@ -1,5 +1,6 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import LoginPage from "./pages/Login";
 import RegistrationForm from "./pages/Registration";
 import Vehicles from "./pages/Vehicles";
 import Vehicle from "./pages/Vehicle";
@@ -10,6 +11,15 @@ export default function App() {
     <BrowserRouter>
 
       <Routes>
+        <Route
+          path="/login"
+          element={
+            <>
+              <h2 style={{ textAlign: "center" }}>Đăng nhập</h2>
+              <LoginPage />
+            </>
+          }
+        />
         <Route path="/newContract" element={<NewContract />} />
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/vehicles" element={< Vehicles />} />
