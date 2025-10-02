@@ -5,6 +5,7 @@ import RegistrationForm from "./pages/Registration";
 import Vehicles from "./pages/Vehicles";
 import Vehicle from "./pages/Vehicle";
 import NewContract from "./pages/NewContract";
+import CostDetail from "./pages/Cost";
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/vehicles" element={< Vehicles />} />
         <Route path="/vehicle/:id" element={<Vehicle />} />
+        <Route path="/vehicle/:id/costs" element={<CostDetail />} />
       </Routes>
     </BrowserRouter>
   );

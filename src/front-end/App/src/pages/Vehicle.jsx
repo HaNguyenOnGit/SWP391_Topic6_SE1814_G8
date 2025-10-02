@@ -7,9 +7,9 @@ export default function Vehicle() {
 
     // Mock data (sau này thay bằng API)
     const vehicles = [
-        { id: 1, name: "Xe Honda City", plate: "59D3 - AA 23456", status: "Đang sử dụng" },
-        { id: 2, name: "Xe Toyota Vios", plate: "60A - BB 6789", status: "Đang trống" },
-        { id: 3, name: "Xe Ford Ranger", plate: "61C - CC 1122", status: "Chưa kích hoạt hợp đồng" },
+        { id: 1, name: "Xe Honda City", plate: "59D3 - 23456", status: "Đang sử dụng" },
+        { id: 2, name: "Xe Toyota Vios", plate: "60A - 56789", status: "Đang trống" },
+        { id: 3, name: "Xe Ford Ranger", plate: "61C - 11122", status: "Chưa kích hoạt hợp đồng" },
     ];
 
     const vehicle = vehicles.find((v) => v.id.toString() === id);
@@ -57,7 +57,6 @@ export default function Vehicle() {
             <div style={{ marginTop: "20px" }}>
                 <Link to={`/vehicle/${id}/contract`}>Xem hợp đồng →</Link>
             </div>
-
             <div style={{ marginTop: "30px", border: "1px solid black", padding: "15px" }}>
                 {actions.map((action, idx) => (
                     <div key={idx} style={{ marginBottom: "10px" }}>
