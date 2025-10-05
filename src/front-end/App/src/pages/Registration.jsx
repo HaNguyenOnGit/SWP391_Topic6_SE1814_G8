@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function RegistrationForm() {
   const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ export default function RegistrationForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Validation rules
   const validateField = (name, value) => {
@@ -114,6 +116,7 @@ export default function RegistrationForm() {
       bankNumber: "",
     });
     setErrors({});
+    navigate("/login");
   };
 
   return (
