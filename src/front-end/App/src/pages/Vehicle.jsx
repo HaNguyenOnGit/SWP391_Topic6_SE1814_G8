@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../NavBar";
 import { useParams, Link } from "react-router-dom";
+import VehicleInfo from "../VehicleInfo";
 
 export default function Vehicle() {
     const { id } = useParams();
@@ -18,7 +19,7 @@ export default function Vehicle() {
 
     const actions = [
         { name: "Đặt lịch", path: `/vehicle/${id}/schedule` },
-        { name: "Check-in/out", path: `/vehicle/${id}/checkin` },
+        { name: "Check-in/out", path: `/vehicle/${id}/checkinHistory` },
         { name: "Thông tin chi phí", path: `/vehicle/${id}/costs` },
         { name: "Đề xuất khoản chi", path: `/vehicle/${id}/proposal` },
         { name: "Thanh toán", path: `/vehicle/${id}/payment` },
@@ -36,27 +37,8 @@ export default function Vehicle() {
         <div>
             <Navbar username="Username" />
 
-            <h2>{vehicle.name}</h2>
-            <p>{vehicle.plate}</p>
-            <p>
-                <span style={{ color: getStatusColor(vehicle.status) }}>●</span>{" "}
-                {vehicle.status}
-            </p>
+            <VehicleInfo vehicle={vehicle} />
 
-            <h4>Người đồng sở hữu</h4>
-            <div>
-                <input type="radio" name="coowner" /> username1 - <span style={{ color: "blue" }}>40%</span>
-            </div>
-            <div>
-                <input type="radio" name="coowner" /> username2 - <span style={{ color: "blue" }}>30%</span>
-            </div>
-            <div>
-                <input type="radio" name="coowner" /> username3 - <span style={{ color: "blue" }}>30%</span>
-            </div>
-
-            <div style={{ marginTop: "20px" }}>
-                <Link to={`/vehicle/${id}/contract`}>Xem hợp đồng →</Link>
-            </div>
             <div style={{ marginTop: "30px", border: "1px solid black", padding: "15px" }}>
                 {actions.map((action, idx) => (
                     <div key={idx} style={{ marginBottom: "10px" }}>
@@ -65,9 +47,6 @@ export default function Vehicle() {
                 ))}
             </div>
 
-            <div style={{ marginTop: "20px" }}>
-                <Link to="/vehicles">← Quay lại danh sách</Link>
-            </div>
         </div>
     );
 }

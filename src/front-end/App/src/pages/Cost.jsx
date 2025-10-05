@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../NavBar";
+import VehicleInfo from "../VehicleInfo";
 
 export default function CostDetail() {
     const { id } = useParams();
@@ -27,36 +28,12 @@ export default function CostDetail() {
 
     if (!vehicle) return <h2>Không tìm thấy phương tiện</h2>;
 
-    const getStatusColor = (status) => {
-        if (status === "Đang sử dụng") return "green";
-        if (status === "Đang trống") return "orange";
-        if (status === "Chưa kích hoạt hợp đồng") return "red";
-        return "black";
-    };
-
     return (
         <div>
             <Navbar username="Username" />
             <div className="p-6">
-                <h2 className="text-xl font-bold">{vehicle.name}</h2>
-                <p>{vehicle.plate}</p>
-                <span style={{ color: getStatusColor(vehicle.status) }}>●</span>{" "}
-                {vehicle.status}
 
-                <h4>Người đồng sở hữu</h4>
-                <div>
-                    <input type="radio" name="coowner" /> username1 - <span style={{ color: "blue" }}>40%</span>
-                </div>
-                <div>
-                    <input type="radio" name="coowner" /> username2 - <span style={{ color: "blue" }}>30%</span>
-                </div>
-                <div>
-                    <input type="radio" name="coowner" /> username3 - <span style={{ color: "blue" }}>30%</span>
-                </div>
-
-                <div style={{ marginTop: "20px" }}>
-                    <Link to={`/vehicle/${id}/contract`}>Xem hợp đồng →</Link>
-                </div>
+            <VehicleInfo vehicle={vehicle} />
 
                 <h3 className="mt-4 font-semibold">Thông tin chi phí</h3>
 
@@ -113,9 +90,6 @@ export default function CostDetail() {
                     </div>
                 )}
 
-                <Link to={`/vehicle/${id}`} className="text-blue-500 mt-6 block">
-                    ← Quay lại phương tiện
-                </Link>
             </div>
         </div>
     );
