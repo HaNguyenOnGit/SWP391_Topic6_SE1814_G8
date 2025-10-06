@@ -8,6 +8,7 @@ import NewContract from "./pages/NewContract";
 import CostDetail from "./pages/Cost";
 import CheckInOutHistory from "./pages/CheckinHistory";
 import Checkin from "./pages/Checkin";
+import PaymentHistory from "./pages/PaymentHistory";
 
 export default function App() {
   return (
@@ -30,6 +31,7 @@ export default function App() {
         <Route path="/vehicle/:id/costs" element={<CostDetail />} />
         <Route path="/vehicle/:id/checkinHistory" element={<CheckInOutHistory />} />
         <Route path="/vehicle/:id/checkin" element={<Checkin />} />
+        <Route path="/vehicle/:id/history" element={<PaymentHistory />} />
       </Routes>
     </BrowserRouter>
   );
