@@ -9,6 +9,8 @@ import CostDetail from "./pages/Cost";
 import CheckInOutHistory from "./pages/CheckinHistory";
 import Checkin from "./pages/Checkin";
 import PaymentHistory from "./pages/PaymentHistory";
+import Schedule from "./pages/Schedule";
+import Booking from "./pages/Booking";
 
 export default function App() {
   return (
@@ -32,6 +34,8 @@ export default function App() {
         <Route path="/vehicle/:id/checkinHistory" element={<CheckInOutHistory />} />
         <Route path="/vehicle/:id/checkin" element={<Checkin />} />
         <Route path="/vehicle/:id/history" element={<PaymentHistory />} />
+        <Route path="/schedule" element={<Schedule />} />
+        <Route path="/vehicle/:id/schedule" element={<Booking />} />
       </Routes>
     </BrowserRouter>
   );
