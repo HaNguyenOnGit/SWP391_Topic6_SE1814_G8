@@ -1,4 +1,5 @@
-﻿using BusinessLogicLayer.Services;
+﻿using BusinessLogicLayer.Others;
+using BusinessLogicLayer.Services;
 using DataAccessLayer.Entities;
 using MailKit;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +17,11 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _us = new UserService();
         }
 
-        [HttpGet("{fullName}/{password}")]
-        public ActionResult<User> GetUser([FromRoute] string fullName, [FromRoute] string password)
+        [HttpPost("login")]
+        public ActionResult<User> GetUser([FromBody] LoginRequest request)
         {
+            string fullName = request.FullName;
+            string password = request.Password;
             var user = _us.GetUser(fullName, password);
             if (user == null)
             {
@@ -27,7 +30,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
+        [HttpPost("add")]
         public IActionResult AddUser([FromBody] User user)
         {
             _us.AddUser(
