@@ -41,5 +41,9 @@ namespace BusinessLogicLayer.Services
             };
             _ur.AddUser(user);
         }
+        public User? GetUserByEmail(string email)
+        {
+            return _ur.GetUserByEmail(email);
+        }
     }
 }
