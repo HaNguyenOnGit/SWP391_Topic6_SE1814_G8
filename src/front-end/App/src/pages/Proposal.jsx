@@ -41,9 +41,14 @@ export default function Proposal() {
   };
 
   const handleSubmit = () => {
-    if (method === "Góp quỹ") setStage("detail");
-    else setStage("success");
+    if (method === "Góp quỹ" || method === "Theo tỉ lệ sở hữu") {
+      setStage("detail");
+    } else if (method === "Tự chi trả") {
+      handleFinalSubmit(); // chuyển luôn sang submit
+    }
   };
+
+
 
   const handleFinalSubmit = () => setStage("success");
 
@@ -96,8 +101,10 @@ export default function Proposal() {
             <h3>{expenseName}</h3>
             <h3>Tỉ lệ chi phí</h3>
             <p>{total.toLocaleString("vi-VN")}đ</p>
+
             {contributions.map((c, i) => {
               const pay = Math.round((c.percent / 100) * total);
+              const isFixed = method === "Theo tỉ lệ sở hữu";
               return (
                 <div key={i}>
                   <p>{c.username}</p>
@@ -108,16 +115,19 @@ export default function Proposal() {
                     max="100"
                     value={c.percent}
                     onChange={(e) => handleSlider(i, e.target.value)}
+                    disabled={isFixed}
                   />
                   <input
                     type="number"
                     value={c.percent}
                     onChange={(e) => handleSlider(i, e.target.value)}
+                    disabled={isFixed}
                     style={{ width: 60, marginLeft: 8 }}
                   /> %
                 </div>
               );
             })}
+
             <button onClick={() => setStage("form")}>Hủy</button>
             <button onClick={handleFinalSubmit}>Đề xuất</button>
           </div>
