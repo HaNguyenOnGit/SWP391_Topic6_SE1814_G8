@@ -11,6 +11,7 @@ import Checkin from "./pages/Checkin";
 import PaymentHistory from "./pages/PaymentHistory";
 import Schedule from "./pages/Schedule";
 import Booking from "./pages/Booking";
+import Proposal from "./pages/Proposal";
 
 export default function App() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/vehicle/:id/history" element={<PaymentHistory />} />
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/vehicle/:id/schedule" element={<Booking />} />
+        <Route path="/vehicle/:id/proposal" element={<Proposal />} />
       </Routes>
     </BrowserRouter>
   );
