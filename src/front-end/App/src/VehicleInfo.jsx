@@ -1,7 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 export default function VehicleInfo({ vehicle }) {
+    const [coowners, setCoowners] = useState([]);
+
+    useEffect(() => {
+        if (!vehicle?.id) return;
+
+        // Simulate API call
+        const fetchData = async () => {
+            // const res = await fetch(`/api/vehicle/${vehicle.id}/coowners`);
+            // const data = await res.json();
+            // setCoowners(data);
+
+            // Mock data
+            setTimeout(() => {
+                setCoowners([
+                    { username: "username1", share: 40 },
+                    { username: "username2", share: 30 },
+                    { username: "username3", share: 30 },
+                ]);
+            }, 300);
+        };
+
+        fetchData();
+    }, [vehicle]);
+
     if (!vehicle) return null;
 
     const getStatusColor = (status) => {
@@ -12,49 +36,44 @@ export default function VehicleInfo({ vehicle }) {
     };
 
     return (
-        <div className="mb-6 bg-gray-100 p-4 rounded">
-            {/* Tên + biển số */}
-            <h2 className="text-xl font-bold">{vehicle.name}</h2>
-            <p className="text-gray-700">{vehicle.plate}</p>
+        <div>
+            {/* Vehicle name + plate */}
+            <h2>{vehicle.name}</h2>
+            <p>{vehicle.plate}</p>
 
-            {/* Trạng thái */}
-            <div className="mt-1">
-                <span style={{ color: getStatusColor(vehicle.status) }}>●</span>{" "}
-                <span style={{ color: getStatusColor(vehicle.status) }}>
-                    {vehicle.status}
+            {/* Status */}
+            <div>
+                <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
+                    ● {vehicle.status}
                 </span>
             </div>
 
-            {/* ← Quay lại phương tiện */}
-            <div className="mt-2">
+            {/* Co-owners */}
+            <h4>Người đồng sở hữu</h4>
+            {coowners.length > 0 ? (
+                coowners.map((c, index) => (
+                    <div key={index}>
+                        <input type="radio" name="coowner" aria-label={c.username} />{" "}
+                        {c.username}{" "}
+                        <span style={{ color: "blue" }}>{c.share}%</span>
+                    </div>
+                ))
+            ) : (
+                <p>Đang tải...</p>
+            )}
+
+            {/* Navigation links */}
+            <div>
                 <Link
                     to={`/vehicle/${vehicle.id}`}
-                    className="text-purple-500 hover:text-purple-600"
+                    style={{ color: "purple", textDecoration: "none" }}
                 >
                     ← Quay lại phương tiện
                 </Link>
-            </div>
-
-            {/* Người đồng sở hữu */}
-            <h4 className="mt-4 font-semibold">Người đồng sở hữu</h4>
-            <div>
-                <input type="radio" name="coowner" /> username1{" "}
-                <span style={{ color: "blue" }}>40%</span>
-            </div>
-            <div>
-                <input type="radio" name="coowner" /> username2{" "}
-                <span style={{ color: "blue" }}>30%</span>
-            </div>
-            <div>
-                <input type="radio" name="coowner" /> username3{" "}
-                <span style={{ color: "blue" }}>30%</span>
-            </div>
-
-            {/* Xem hợp đồng */}
-            <div className="mt-3">
+                <br></br>
                 <Link
                     to={`/vehicle/${vehicle.id}/contract`}
-                    className="text-orange-500 hover:text-orange-600"
+                    style={{ color: "orange", textDecoration: "none" }}
                 >
                     Xem hợp đồng →
                 </Link>
@@ -62,3 +81,4 @@ export default function VehicleInfo({ vehicle }) {
         </div>
     );
 }
+
