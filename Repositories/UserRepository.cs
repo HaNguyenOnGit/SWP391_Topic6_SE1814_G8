@@ -49,5 +49,26 @@ namespace DataAccessLayer.Repositories
             _context.Users.Update(user);
             _context.SaveChanges();
         }
+        public void ConfirmEmail(string email, string code)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            if (user.EmailConfirmationCode != code)
+                throw new Exception("Invalid confirmation code");
+
+            if (user.IsEmailConfirmed == true)
+                throw new Exception("Email already confirmed");
+
+            // Nếu đúng code thì xác nhận email
+            user.IsEmailConfirmed = true;
+            user.EmailConfirmationCode = null; // clear code sau khi xác thực
+            user.EmailConfirmationExpiry = null;
+
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
     }
 }
