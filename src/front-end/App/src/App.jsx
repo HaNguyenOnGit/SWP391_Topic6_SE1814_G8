@@ -9,6 +9,7 @@ import CostDetail from "./pages/Cost";
 import CheckInOutHistory from "./pages/CheckinHistory";
 import Checkin from "./pages/Checkin";
 import PaymentHistory from "./pages/PaymentHistory";
+import Payment from "./pages/Payment";
 
 export default function App() {
   return (
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/vehicle/:id/checkinHistory" element={<CheckInOutHistory />} />
         <Route path="/vehicle/:id/checkin" element={<Checkin />} />
         <Route path="/vehicle/:id/history" element={<PaymentHistory />} />
+        <Route path="/vehicle/:id/payment" element={<Payment />} />
       </Routes>
     </BrowserRouter>
   );
