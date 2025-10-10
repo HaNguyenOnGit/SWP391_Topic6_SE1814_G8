@@ -1,5 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+
 import LoginPage from "./pages/Login";
 import RegistrationForm from "./pages/Registration";
 import Vehicles from "./pages/Vehicles";
@@ -13,12 +14,14 @@ import Payment from "./pages/Payment";
 import Schedule from "./pages/Schedule";
 import Booking from "./pages/Booking";
 import Proposal from "./pages/Proposal";
+import RegistrationPending from "./pages/RegistrationPending";
 
 export default function App() {
   return (
     <BrowserRouter>
 
       <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route
           path="/login"
           element={
@@ -40,6 +43,7 @@ export default function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/vehicle/:id/schedule" element={<Booking />} />
         <Route path="/vehicle/:id/proposal" element={<Proposal />} />
+        <Route path="/registrationpending" element={<RegistrationPending />} />
       </Routes>
     </BrowserRouter>
   );
