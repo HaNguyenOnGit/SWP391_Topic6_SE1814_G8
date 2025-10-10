@@ -92,7 +92,7 @@ export default function PaymentHistory() {
             {step === "form" && selectedPayment && (
                 <div>
                     <div>
-                        <div><b>{selectedPayment.name}</div>
+                        <div>{selectedPayment.name}</div>
                         <div><b>Tổng:</b> {selectedPayment.total}</div>
                         <div><b>Số tiền cần trả:</b> {selectedPayment.total}</div>
                         <div>
