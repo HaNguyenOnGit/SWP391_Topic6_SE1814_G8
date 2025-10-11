@@ -16,6 +16,7 @@ import Booking from "./pages/Booking";
 import Proposal from "./pages/Proposal";
 import RegistrationPending from "./pages/RegistrationPending";
 import UserProfile from "./pages/UserProfile";
+import ContractDetails from "./pages/ContractDetails";
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/schedule" element={<Schedule />} />
         <Route path="/vehicle/:id/schedule" element={<Booking />} />
         <Route path="/vehicle/:id/proposal" element={<Proposal />} />
+        <Route path="/vehicle/:id/contract" element={<ContractDetails />} />
         <Route path="/registrationpending" element={<RegistrationPending />} />
         <Route path="/profile" element={<UserProfile />} />
       </Routes>
