@@ -15,6 +15,7 @@ import Schedule from "./pages/Schedule";
 import Booking from "./pages/Booking";
 import Proposal from "./pages/Proposal";
 import RegistrationPending from "./pages/RegistrationPending";
+import UserProfile from "./pages/UserProfile";
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
         <Route path="/vehicle/:id/schedule" element={<Booking />} />
         <Route path="/vehicle/:id/proposal" element={<Proposal />} />
         <Route path="/registrationpending" element={<RegistrationPending />} />
+        <Route path="/profile" element={<UserProfile />} />
       </Routes>
     </BrowserRouter>
   );
