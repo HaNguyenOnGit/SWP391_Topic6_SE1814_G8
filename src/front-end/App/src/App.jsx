@@ -18,22 +18,14 @@ import RegistrationPending from "./pages/RegistrationPending";
 import UserProfile from "./pages/UserProfile";
 import ContractDetails from "./pages/ContractDetails";
 import UserManagement from "./AdminPages/UserManagement";
+import ProposalList from "./pages/ProposalList";
 
 export default function App() {
   return (
     <BrowserRouter>
 
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route
-          path="/login"
-          element={
-            <>
-              <h2 style={{ textAlign: "center" }}>Đăng nhập</h2>
-              <LoginPage />
-            </>
-          }
-        />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/newContract" element={<NewContract />} />
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/vehicles" element={< Vehicles />} />
@@ -50,6 +42,9 @@ export default function App() {
         <Route path="/registrationpending" element={<RegistrationPending />} />
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/admin/userMng" element={<UserManagement />} />
+
+        <Route path="/proposals" element={<ProposalList />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -76,6 +76,7 @@ export default function LoginPage({ apiUrl }) {
 
     return (
         <form onSubmit={handleSubmit} noValidate>
+            <h2>Đăng Nhập</h2>
             {message && <p>{message}</p>}
 
             <div style={{ marginBottom: "10px" }}>
