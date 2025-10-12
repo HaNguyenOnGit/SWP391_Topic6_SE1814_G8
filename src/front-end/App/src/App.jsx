@@ -17,6 +17,7 @@ import Proposal from "./pages/Proposal";
 import RegistrationPending from "./pages/RegistrationPending";
 import UserProfile from "./pages/UserProfile";
 import ContractDetails from "./pages/ContractDetails";
+import UserManagement from "./AdminPages/UserManagement";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/vehicle/:id/contract" element={<ContractDetails />} />
         <Route path="/registrationpending" element={<RegistrationPending />} />
         <Route path="/profile" element={<UserProfile />} />
+        <Route path="/admin/userMng" element={<UserManagement />} />
       </Routes>
     </BrowserRouter>
   );
