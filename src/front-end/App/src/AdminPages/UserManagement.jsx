@@ -47,7 +47,7 @@ export default function UserManagement() {
         {
             id: 3,
             fullName: "Le Van C",
-            phone: "0911222333",
+            phone: "0907654321",
             email: "levanc@example.com",
             cccd: "112233445566",
             license: "A1",

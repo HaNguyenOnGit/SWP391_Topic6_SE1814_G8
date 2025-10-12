@@ -18,6 +18,7 @@ import RegistrationPending from "./pages/RegistrationPending";
 import UserProfile from "./pages/UserProfile";
 import ContractDetails from "./pages/ContractDetails";
 import UserManagement from "./AdminPages/UserManagement";
+import AdminContracts from "./AdminPages/AdminContract";
 import ProposalList from "./pages/ProposalList";
 
 export default function App() {
@@ -41,7 +42,8 @@ export default function App() {
         <Route path="/vehicle/:id/contract" element={<ContractDetails />} />
         <Route path="/registrationpending" element={<RegistrationPending />} />
         <Route path="/profile" element={<UserProfile />} />
-        <Route path="/admin/userMng" element={<UserManagement />} />
+        <Route path="/admin/users" element={<UserManagement />} />
+        <Route path="/admin/contracts" element={<AdminContracts />} />
 
         <Route path="/proposals" element={<ProposalList />} />
 
