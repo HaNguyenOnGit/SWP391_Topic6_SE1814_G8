@@ -3,42 +3,9 @@ import AdminNavbar from "./ANavbar";
 
 export default function AdminContracts() {
     const users = [
-        {
-            id: 1,
-            fullName: "Nguyen Van A",
-            phone: "0901234567",
-            email: "nguyenvana@example.com",
-            cccd: "123456789012",
-            license: "B2",
-            bankName: "Vietcombank",
-            bankNumber: "0123456789",
-            registerDate: "2025-09-20",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 2,
-            fullName: "Tran Thi B",
-            phone: "0987654321",
-            email: "tranthib@example.com",
-            cccd: "987654321098",
-            license: "C",
-            bankName: "Techcombank",
-            bankNumber: "5678901234",
-            registerDate: "2025-09-25",
-            status: "Chờ phê duyệt",
-        },
-        {
-            id: 3,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
+        { id: 1, fullName: "Nguyen Van A", phone: "0901234567" },
+        { id: 2, fullName: "Tran Thi B", phone: "0987654321" },
+        { id: 3, fullName: "Le Van C", phone: "0907654321" },
     ];
 
     const [contracts, setContracts] = useState([
@@ -59,6 +26,12 @@ export default function AdminContracts() {
             setContracts((prev) =>
                 prev.map((c) => (c.id === id ? { ...c, status: "Đã kết thúc" } : c))
             );
+        }
+    };
+
+    const handleDeleteContract = (id) => {
+        if (window.confirm("Bạn có chắc muốn xóa hợp đồng này?")) {
+            setContracts((prev) => prev.filter((c) => c.id !== id));
         }
     };
 
@@ -92,14 +65,38 @@ export default function AdminContracts() {
                             </span>
                         </p>
 
-                        {c.status === "Đang hoạt động" && (
+                        {/* --- Các nút thao tác theo yêu cầu --- */}
+                        <div className="flex gap-2 mt-2">
+                            {c.status === "Đang hoạt động" && (
+                                <button
+                                    onClick={() => handleEndContract(c.id)}
+                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
+                                >
+                                    Ngừng hợp đồng
+                                </button>
+                            )}
+
                             <button
-                                onClick={() => handleEndContract(c.id)}
-                                className="mt-2 bg-red-500 text-white px-3 py-1 rounded"
+                                onClick={() => alert("Tính năng trích xuất chi tiêu đang phát triển!")}
+                                className="bg-blue-500 text-white px-3 py-1 rounded"
                             >
-                                Chấm dứt
+                                Trích xuất chi tiêu
                             </button>
-                        )}
+
+                            <button
+                                onClick={() => alert("Tính năng chỉnh sửa thành viên đang phát triển!")}
+                                className="bg-green-500 text-white px-3 py-1 rounded"
+                            >
+                                Chỉnh sửa thành viên
+                            </button>
+
+                            <button
+                                onClick={() => handleDeleteContract(c.id)}
+                                className="bg-red-700 text-white px-3 py-1 rounded"
+                            >
+                                Xóa
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
