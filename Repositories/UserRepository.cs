@@ -21,10 +21,6 @@ namespace DataAccessLayer.Repositories
         public User GetUser(string fullName, string password)
         {
             var user = _context.Users.FirstOrDefault(x => x.FullName == fullName && x.Password == password);
-            if (user == null)
-            {
-                return null;
-            }
             return user;
         }
 
@@ -32,6 +28,11 @@ namespace DataAccessLayer.Repositories
         {
             _context.Users.Add(user);
             _context.SaveChanges();
+        }
+
+        public User? GetUserByPhone(string phoneNumber)
+        {
+            return _context.Users.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
         }
 
         public User? GetUserByEmail(string email)

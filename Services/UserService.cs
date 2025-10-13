@@ -19,11 +19,24 @@ namespace BusinessLogicLayer.Services
         {
             _ur = new UserRepository();
         }
-        public User GetUser(string fullName, string password)
+
+        public User GetUser(string fullName, string email)
         {
-            return _ur.GetUser(fullName, password);
+            return _ur.GetUser(fullName, email);
         }
-        public void AddUser(string fullName, string email, string citizenId, string drivingLicenseId, string bankName, string bankAccount, string role,
+
+        public User? GetUserByEmail(string email)
+        {
+            return _ur.GetUserByEmail(email);
+        }
+
+        public User? GetUserByPhone(string phoneNumber)
+        {
+            return _ur.GetUserByPhone(phoneNumber);
+        }
+
+        public void AddUser(string fullName, string email, string citizenId, string drivingLicenseId,
+                            string bankName, string bankAccount, string role,
                             string phoneNumber, string password, string frontIdImage, string backIdImage, string frontLicenseImage, string backLicenseImage)
         {
             // ✅ Validate Gmail format
@@ -115,9 +128,6 @@ namespace BusinessLogicLayer.Services
 
             _ur.UpdateUser(user);
         }
-        public User? GetUserByEmail(string email)
-        {
-            return _ur.GetUserByEmail(email);
-        }
+        
     }
 }

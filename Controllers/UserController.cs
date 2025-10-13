@@ -30,6 +30,17 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
             return Ok(user);
         }
+        //API nay chi dung de kiem tra so dien thoai da duoc dang ky chua
+        [HttpGet("phone/{phoneNumber}")]
+        public ActionResult<User> GetUserByPhone(string phoneNumber)
+        {
+            var user = _us.GetUserByPhone(phoneNumber);
+            if (user == null)
+            {
+                return NotFound($"User with phone number {phoneNumber} not found");
+            }
+            return Ok();
+        }
 
         [HttpPost("confirm-email")]
         public IActionResult ConfirmEmail([FromQuery] string email, [FromQuery] string code)
@@ -45,7 +56,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-    [HttpPost]
+    [HttpPost("add")]
         public IActionResult AddUser([FromBody] User user)
         {
             _us.AddUser(
@@ -57,7 +68,11 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 user.BankAccount,
                 user.Role,
                 user.PhoneNumber,
-                user.Password
+                user.Password,
+                user.FrontIdImage, 
+                user.BackIdImage, 
+                user.FrontLicenseImage, 
+                user.BackLicenseImage
             );
 
             // Gửi mã xác nhận luôn

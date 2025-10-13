@@ -15,6 +15,8 @@ public partial class Contract
 
     public string Status { get; set; } = null!;
 
+    public string? VehicleName { get; set; }
+
     public virtual ICollection<ContractMember> ContractMembers { get; set; } = new List<ContractMember>();
 
     public virtual ICollection<ExpenseProposal> ExpenseProposals { get; set; } = new List<ExpenseProposal>();
