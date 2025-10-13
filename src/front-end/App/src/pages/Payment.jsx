@@ -91,10 +91,9 @@ export default function PaymentHistory() {
 
             {step === "form" && selectedPayment && (
                 <div>
-                    <h3>Thanh toán khoản phí</h3>
                     <div>
-                        <div><b>Loại phí:</b> {selectedPayment.name}</div>
-                        <div><b>Tổng số tiền:</b> {selectedPayment.total}</div>
+                        <div>{selectedPayment.name}</div>
+                        <div><b>Tổng:</b> {selectedPayment.total}</div>
                         <div><b>Số tiền cần trả:</b> {selectedPayment.total}</div>
                         <div>
                             <b>Hình thức thanh toán:</b>
@@ -104,10 +103,9 @@ export default function PaymentHistory() {
                                 style={{ marginLeft: 5 }}
                             >
                                 <option>chuyển khoản ngân hàng</option>
-                                <option>ví điện tử</option>
                             </select>
                         </div>
-                        <div><b>Tên người nhận:</b> {bankInfo.accountName}</div>
+                        <div><b>Người nhận:</b> {bankInfo.accountName}</div>
                     </div>
                     <div>
                         <button onClick={handleBack}>Hủy</button>
@@ -118,13 +116,13 @@ export default function PaymentHistory() {
 
             {step === "qr" && (
                 <div>
-                    <h3>Thông tin chuyển khoản</h3>
+                    <h3>Thanh toán</h3>
                     <div>
                         <div style={{ width: 120, height: 120, background: "#ccc", margin: "10px auto" }}>[QR]</div>
-                        <div><b>Hình thức:</b> {method}</div>
-                        <div><b>Tên tài khoản:</b> {bankInfo.accountName}</div>
-                        <div><b>Ngân hàng:</b> {bankInfo.bankName}</div>
-                        <div><b>Số tài khoản:</b> {bankInfo.accountNumber}</div>
+                        <div>{method}</div>
+                        <div>{bankInfo.accountName}</div>
+                        <div>{bankInfo.bankName}</div>
+                        <div>{bankInfo.accountNumber}</div>
                         <div><b>Số tiền:</b> {selectedPayment?.total}</div>
                     </div>
                     <div>
@@ -143,8 +141,8 @@ export default function PaymentHistory() {
                         onChange={(e) => setFile(e.target.files[0])}
                     />
                     {file && <p style={{ color: "green" }}>Đã chọn: {file.name}</p>}
+                    <p>Upload bill chuyển khoản</p>
                     <div>
-                        <button onClick={handleBack}>Hủy</button>
                         <button onClick={() => setStep("success")}>Xác nhận</button>
                     </div>
                 </div>
@@ -152,7 +150,7 @@ export default function PaymentHistory() {
 
             {step === "success" && (
                 <div style={{ textAlign: "center", color: "green" }}>
-                    ✅ Xác minh chuyển khoản thành công
+                    Xác minh chuyển khoản thành công
                 </div>
             )}
         </div>
