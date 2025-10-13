@@ -31,22 +31,27 @@ namespace BusinessLogicLayer.Services
         {
             try
             {
-                using (var client = new SmtpClient(_smtpServer, _smtpPort))
+                using (var client = new SmtpClient("smtp.gmail.com", 587))
                 {
                     client.Credentials = new NetworkCredential(_smtpUser, _smtpPass);
-                    client.EnableSsl = true;
+                    client.EnableSsl = true;  
+                    client.DeliveryMethod = SmtpDeliveryMethod.Network;
+                    client.UseDefaultCredentials = false;
 
-                    var mailMessage = new MailMessage(_fromEmail, toEmail, subject, body);
-                    mailMessage.IsBodyHtml = true; // gửi HTML body
+                    var mail = new MailMessage();
+                    mail.From = new MailAddress(_fromEmail, "EVCO System");
+                    mail.To.Add(toEmail);
+                    mail.Subject = subject;
+                    mail.Body = body;
+                    mail.IsBodyHtml = true;
 
-                    await client.SendMailAsync(mailMessage);
+                    await client.SendMailAsync(mail);
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception("Lỗi khi gửi email: " + ex.Message);
+                throw new Exception($"Lỗi khi gửi email: {ex.Message}");
             }
         }
-
     }
 }
