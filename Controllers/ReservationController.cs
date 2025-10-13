@@ -1,0 +1,85 @@
+﻿using BusinessLogicLayer.Others;
+using BusinessLogicLayer.Services;
+using Microsoft.AspNetCore.Mvc;
+using System;
+
+namespace EVCoOwnershipAndCostSharingSystem.Controllers
+{
+    [ApiController]
+    [Route("api/reservation")]
+    public class ReservationController : ControllerBase
+    {
+        private readonly ReservationService _reservationService;
+
+        public ReservationController()
+        {
+            _reservationService = new ReservationService();
+        }
+
+        // POST api/reservation
+        [HttpPost]
+        public IActionResult CreateReservation([FromBody] ReservationRequest request)
+        {
+            if (request == null)
+                return BadRequest("Request không hợp lệ");
+
+            try
+            {
+                var reservation = _reservationService.CreateReservation(
+                    request.ContractId,
+                    request.UserId,
+                    request.StartTime,
+                    request.EndTime
+                );
+
+                return Ok(new
+                {
+                    Message = "Đặt lịch thành công!!",
+                    Data = reservation
+                });
+            }
+            catch (ArgumentException ex) // lỗi do input
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (InvalidOperationException ex) // lỗi nghiệp vụ (vd: trùng lịch)
+            {
+                return Conflict(new { Error = ex.Message });
+            }
+            catch (Exception ex) // lỗi hệ thống
+            {
+                return StatusCode(500, new { Error = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        // GET api/reservation/contract/{contractId}?date=yyyy-MM-dd
+        [HttpGet("contract/{contractId}")]
+        public IActionResult GetReservationsByContract(int contractId, [FromQuery] DateTime date)
+        {
+            try
+            {
+                var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date);
+                return Ok(reservations);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        // PUT api/reservation/{reservationId}/status?newStatus=Approved
+        [HttpPut("{reservationId}/status")]
+        public IActionResult UpdateReservationStatus(int reservationId, [FromQuery] string newStatus)
+        {
+            try
+            {
+                _reservationService.UpdateReservationStatus(reservationId, newStatus);
+                return Ok($"Cập nhật trạng thái đặt lịch {reservationId} thành {newStatus} thành công.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+    }
+}
