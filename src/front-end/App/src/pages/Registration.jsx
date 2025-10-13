@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function RegistrationForm() {
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
+    email: "",
     password: "",
     confirmPassword: "",
     cccd: "",
@@ -18,9 +19,21 @@ export default function RegistrationForm() {
   });
 
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate();
+  const [showOTP, setShowOTP] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [message, setMessage] = useState("");
+  const [countdown, setCountdown] = useState(0);
 
-  // Validation rules
+  const navigate = useNavigate();
+  const mockOTP = "123456";
+
+  useEffect(() => {
+    if (countdown > 0) {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [countdown]);
+
   const validateField = (name, value) => {
     let error = "";
     switch (name) {
@@ -29,6 +42,10 @@ export default function RegistrationForm() {
         break;
       case "phone":
         if (!/^[0-9]{10}$/.test(value)) error = "Số điện thoại phải đủ 10 số";
+        break;
+      case "email":
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+          error = "Email không hợp lệ";
         break;
       case "password":
         if (value.length < 6) error = "Mật khẩu phải từ 6 ký tự trở lên";
@@ -41,18 +58,6 @@ export default function RegistrationForm() {
         break;
       case "license":
         if (!value.trim()) error = "Số giấy phép lái xe là bắt buộc";
-        break;
-      case "cccdFront":
-        if (!value) error = "Vui lòng tải ảnh CCCD mặt trước";
-        break;
-      case "cccdBack":
-        if (!value) error = "Vui lòng tải ảnh CCCD mặt sau";
-        break;
-      case "licenseFront":
-        if (!value) error = "Vui lòng tải ảnh bằng lái mặt trước";
-        break;
-      case "licenseBack":
-        if (!value) error = "Vui lòng tải ảnh bằng lái mặt sau";
         break;
       case "bankName":
         if (!value.trim()) error = "Tên ngân hàng là bắt buộc";
@@ -69,34 +74,37 @@ export default function RegistrationForm() {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     const fieldValue = files ? files[0] : value;
-
     setFormData({ ...formData, [name]: fieldValue });
-
-    const errorMsg = validateField(name, fieldValue);
-    setErrors((prev) => ({
-      ...prev,
-      [name]: errorMsg || "",
-    }));
-
-    if (name === "password" && formData.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        confirmPassword: validateField("confirmPassword", formData.confirmPassword),
-      }));
-    }
+    setErrors((prev) => ({ ...prev, [name]: validateField(name, fieldValue) }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     const newErrors = {};
-    Object.keys(formData).forEach((key) => {
-      newErrors[key] = validateField(key, formData[key]);
-    });
+    Object.keys(formData).forEach(
+      (key) => (newErrors[key] = validateField(key, formData[key]))
+    );
     setErrors(newErrors);
 
     if (Object.values(newErrors).every((err) => !err)) {
-      console.log("Form data:", formData);
+      setShowOTP(true);
+      setCountdown(30);
+      alert(`Mock gửi OTP (${mockOTP}) tới email: ${formData.email}`);
+    }
+  };
+
+  const handleVerify = () => {
+    if (otp === mockOTP) {
+      navigate("/registrationpending");
+    } else {
+      setMessage("Mã OTP không đúng, vui lòng thử lại.");
+    }
+  };
+
+  const resendCode = () => {
+    if (countdown === 0) {
+      setCountdown(30);
+      alert(`🔄 Mã mới (mock): ${mockOTP}`);
     }
   };
 
@@ -104,6 +112,7 @@ export default function RegistrationForm() {
     setFormData({
       fullName: "",
       phone: "",
+      email: "",
       password: "",
       confirmPassword: "",
       cccd: "",
@@ -120,182 +129,111 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div
-      style={{
-        width: "400px",
-        border: "1px solid #ccc",
-        borderRadius: "10px",
-        padding: "20px",
-        boxSizing: "border-box",
-      }}
-    >
+    <div>
       <form onSubmit={handleSubmit} noValidate>
         <h2>Đăng ký</h2>
 
-        {/* Full Name */}
-        <label>Họ tên</label>
-        <input
-          type="text"
-          name="fullName"
-          value={formData.fullName}
-          onChange={handleChange}
-          style={{ borderColor: errors.fullName ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.fullName && <p style={{ color: "red" }}>{errors.fullName}</p>}
+        {[["Họ tên", "fullName", "text"],
+        ["Số điện thoại", "phone", "tel"],
+        ["Email", "email", "email"],
+        ["Mật khẩu", "password", "password"],
+        ["Nhập lại mật khẩu", "confirmPassword", "password"],
+        ["CCCD", "cccd", "text"],
+        ["Giấy phép lái xe", "license", "text"],
+        ["Tên ngân hàng", "bankName", "text"],
+        ["Số tài khoản", "bankNumber", "text"],
+        ].map(([label, name, type]) => (
+          <div key={name}>
+            <label>{label}</label>
+            <input
+              type={type}
+              name={name}
+              value={formData[name]}
+              onChange={handleChange}
+            />
+            {errors[name] && <p style={{ color: "red" }}>{errors[name]}</p>}
+          </div>
+        ))}
 
-        {/* Phone */}
-        <label>Số điện thoại</label>
-        <input
-          type="tel"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          style={{ borderColor: errors.phone ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.phone && <p style={{ color: "red" }}>{errors.phone}</p>}
+        {[["Ảnh CCCD (Mặt trước)", "cccdFront"],
+        ["Ảnh CCCD (Mặt sau)", "cccdBack"],
+        ["Ảnh bằng lái (Mặt trước)", "licenseFront"],
+        ["Ảnh bằng lái (Mặt sau)", "licenseBack"],
+        ].map(([label, name]) => (
+          <div key={name}>
+            <button
+              type="button"
+              onClick={() => document.getElementById(name).click()}
+            >
+              {label}
+            </button>
+            <input
+              id={name}
+              type="file"
+              name={name}
+              accept="image/*"
+              onChange={handleChange}
+              style={{ display: "none" }}
+            />
+            {formData[name] && <span> {formData[name].name}</span>}
+          </div>
+        ))}
 
-        {/* Password */}
-        <label>Mật khẩu</label>
-        <input
-          type="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          style={{ borderColor: errors.password ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.password && <p style={{ color: "red" }}>{errors.password}</p>}
-
-        {/* Confirm Password */}
-        <label>Nhập lại mật khẩu</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          style={{ borderColor: errors.confirmPassword ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.confirmPassword && <p style={{ color: "red" }}>{errors.confirmPassword}</p>}
-
-        {/* CCCD */}
-        <label>CCCD</label>
-        <input
-          type="text"
-          name="cccd"
-          value={formData.cccd}
-          onChange={handleChange}
-          style={{ borderColor: errors.cccd ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.cccd && <p style={{ color: "red" }}>{errors.cccd}</p>}
-
-        {/* License */}
-        <label>Giấy phép lái xe</label>
-        <input
-          type="text"
-          name="license"
-          value={formData.license}
-          onChange={handleChange}
-          style={{ borderColor: errors.license ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.license && <p style={{ color: "red" }}>{errors.license}</p>}
-
-        {/* CCCD Front */}
-        <div style={{ marginTop: "10px" }}>
-          <button type="button" onClick={() => document.getElementById("cccdFrontInput").click()}>
-            Ảnh CCCD (Mặt trước)
-          </button>
-          <input
-            id="cccdFrontInput"
-            type="file"
-            name="cccdFront"
-            accept="image/*"
-            onChange={handleChange}
-            style={{ display: "none" }}
-          />
-          {formData.cccdFront && <span> {formData.cccdFront.name}</span>}
-          {errors.cccdFront && <p style={{ color: "red" }}>{errors.cccdFront}</p>}
-        </div>
-
-        {/* CCCD Back */}
-        <div style={{ marginTop: "10px" }}>
-          <button type="button" onClick={() => document.getElementById("cccdBackInput").click()}>
-            Ảnh CCCD (Mặt sau)
-          </button>
-          <input
-            id="cccdBackInput"
-            type="file"
-            name="cccdBack"
-            accept="image/*"
-            onChange={handleChange}
-            style={{ display: "none" }}
-          />
-          {formData.cccdBack && <span> {formData.cccdBack.name}</span>}
-          {errors.cccdBack && <p style={{ color: "red" }}>{errors.cccdBack}</p>}
-        </div>
-
-        {/* License Front */}
-        <div style={{ marginTop: "10px" }}>
-          <button type="button" onClick={() => document.getElementById("licenseFrontInput").click()}>
-            Ảnh bằng lái (Mặt trước)
-          </button>
-          <input
-            id="licenseFrontInput"
-            type="file"
-            name="licenseFront"
-            accept="image/*"
-            onChange={handleChange}
-            style={{ display: "none" }}
-          />
-          {formData.licenseFront && <span> {formData.licenseFront.name}</span>}
-          {errors.licenseFront && <p style={{ color: "red" }}>{errors.licenseFront}</p>}
-        </div>
-
-        {/* License Back */}
-        <div style={{ marginTop: "10px" }}>
-          <button type="button" onClick={() => document.getElementById("licenseBackInput").click()}>
-            Ảnh bằng lái (Mặt sau)
-          </button>
-          <input
-            id="licenseBackInput"
-            type="file"
-            name="licenseBack"
-            accept="image/*"
-            onChange={handleChange}
-            style={{ display: "none" }}
-          />
-          {formData.licenseBack && <span> {formData.licenseBack.name}</span>}
-          {errors.licenseBack && <p style={{ color: "red" }}>{errors.licenseBack}</p>}
-        </div>
-
-        {/* Bank Name */}
-        <label style={{ marginTop: "10px", display: "block" }}>Tên ngân hàng</label>
-        <input
-          type="text"
-          name="bankName"
-          value={formData.bankName}
-          onChange={handleChange}
-          style={{ borderColor: errors.bankName ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.bankName && <p style={{ color: "red" }}>{errors.bankName}</p>}
-
-        {/* Bank Number */}
-        <label style={{ marginTop: "10px", display: "block" }}>Số tài khoản</label>
-        <input
-          type="text"
-          name="bankNumber"
-          value={formData.bankNumber}
-          onChange={handleChange}
-          style={{ borderColor: errors.bankNumber ? "red" : "#ccc", width: "100%" }}
-        />
-        {errors.bankNumber && <p style={{ color: "red" }}>{errors.bankNumber}</p>}
-
-        {/* Buttons */}
-        <div style={{ marginTop: "20px", display: "flex", gap: "10px" }}>
+        <div>
           <button type="submit">Đăng ký</button>
           <button type="button" onClick={handleCancel}>
             Hủy
           </button>
         </div>
       </form>
+
+      {/* Overlay OTP */}
+      {showOTP && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              padding: "20px",
+              borderRadius: "8px",
+              textAlign: "center",
+            }}
+          >
+            <h3>Xác minh email</h3>
+            <p>{formData.email}</p>
+            <input
+              type="number"
+              placeholder="Nhập mã OTP"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+            {message && <p style={{ color: "red" }}>{message}</p>}
+
+            <button onClick={handleVerify}>Xác minh</button>
+            <button
+              onClick={resendCode}
+              disabled={countdown > 0}
+              style={{
+                color: countdown > 0 ? "gray" : "blue",
+                background: "none",
+                border: "none",
+              }}
+            >
+              {countdown > 0
+                ? `Gửi lại mã sau ${countdown}s`
+                : "Gửi lại mã xác minh"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
