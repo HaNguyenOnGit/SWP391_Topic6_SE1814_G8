@@ -63,125 +63,147 @@ export default function NewContract() {
   return (
     <div className="main-container">
       <Navbar username="Username" />
-      <h1>Tạo hợp đồng</h1>
+      <div className="main-content">
+        <h1>Tạo hợp đồng</h1>
 
-      {step === 1 && (
-        <div>
-          <h2>Thông tin phương tiện</h2>
+        {step === 1 && (
           <div>
-            <label>Tên phương tiện:</label>
+            <h2>Thông tin phương tiện</h2>
+            <div>
+              <label>Tên phương tiện</label>
+              <input
+                className="txtInput"
+                type="text"
+                value={vehicle.name}
+                onChange={e => {
+                  setVehicle({ ...vehicle, name: e.target.value });
+                  validateField("name", e.target.value);
+                }}
+              />
+              {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+            </div>
+            <div>
+              <label>Biển kiểm soát</label>
+              <input
+                className="txtInput"
+                type="text"
+                value={vehicle.license}
+                placeholder="VD: 30A-12345"
+                onChange={e => {
+                  setVehicle({ ...vehicle, license: e.target.value });
+                  validateField("license", e.target.value);
+                }}
+              />
+              {errors.license && <p style={{ color: "red" }}>{errors.license}</p>}
+            </div>
+            <div>
+              <label>Model</label>
+              <input
+                className="txtInput"
+                type="text"
+                value={vehicle.model}
+                onChange={e => {
+                  setVehicle({ ...vehicle, model: e.target.value });
+                  validateField("model", e.target.value);
+                }}
+              />
+              {errors.model && <p style={{ color: "red" }}>{errors.model}</p>}
+            </div>
+            <button
+              className="btnInput"
+              disabled={
+                !vehicle.name.trim() ||
+                !vehicle.license.trim() ||
+                !vehicle.model.trim() ||
+                errors.name ||
+                errors.license ||
+                errors.model
+              }
+              onClick={() => setStep(2)}
+            >
+              Tiếp theo
+            </button>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div>
+            <h2>Thêm người đồng sở hữu</h2>
             <input
+              className="txtInput"
               type="text"
-              value={vehicle.name}
-              onChange={e => {
-                setVehicle({ ...vehicle, name: e.target.value });
-                validateField("name", e.target.value);
-              }}
+              placeholder="Nhập số điện thoại"
+              value={phone}
+              onChange={e => setPhone(e.target.value)}
             />
-            {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+            <button onClick={addOwner}>Thêm</button>
+
+            <div>
+              {owners.map((o, i) => (
+                <div key={i}>
+                  <span>{o.phone}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={o.ratio}
+                    onChange={e => updateRatio(i, Number(e.target.value))}
+                  />
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={o.ratio}
+                    onChange={e => updateRatio(i, Number(e.target.value))}
+                    style={{ width: "50px", marginLeft: "8px" }}
+                  />
+                  <span>%</span>
+                </div>
+              ))}
+            </div>
+
+            {ratioError && (
+              <p style={{ color: "red" }}>Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)</p>
+            )}
+
+            <button onClick={() => setStep(1)}>Quay lại</button>
+            <button
+              disabled={owners.length === 0 || ratioError}
+              onClick={() => setStep(3)}
+            >
+              Tiếp theo
+            </button>
           </div>
+        )}
+
+        {step === 3 && (
           <div>
-            <label>Biển kiểm soát:</label>
-            <input
-              type="text"
-              value={vehicle.license}
-              placeholder="VD: 30A-12345"
-              onChange={e => {
-                setVehicle({ ...vehicle, license: e.target.value });
-                validateField("license", e.target.value);
-              }}
-            />
-            {errors.license && <p style={{ color: "red" }}>{errors.license}</p>}
+            <h2>Điều khoản hợp đồng</h2>
+            <ul>
+              {terms.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
+            </ul>
+            <button onClick={() => setStep(2)}>Quay lại</button>
+            <button
+              disabled={terms.length === 0}
+              onClick={() => setStep(4)}
+            >
+              Xác nhận
+            </button>
           </div>
+        )}
+
+        {step === 4 && (
           <div>
-            <label>Model:</label>
-            <input
-              type="text"
-              value={vehicle.model}
-              onChange={e => {
-                setVehicle({ ...vehicle, model: e.target.value });
-                validateField("model", e.target.value);
-              }}
-            />
-            {errors.model && <p style={{ color: "red" }}>{errors.model}</p>}
+            <h2>Hợp đồng đã được khởi tạo</h2>
+            <p>
+              Hợp đồng sẽ được kích hoạt khi các thành viên trong hợp đồng xác nhận.
+            </p>
+            <button onClick={() => alert("Đã xác nhận!")}>Xác nhận</button>
           </div>
-          <button
-            disabled={errors.name || errors.license || errors.model}
-            onClick={() => setStep(2)}
-          >
-            Tiếp theo
-          </button>
-        </div>
-      )}
-
-      {step === 2 && (
-        <div>
-          <h2>Thêm người đồng sở hữu</h2>
-          <input
-            type="text"
-            placeholder="Nhập số điện thoại"
-            value={phone}
-            onChange={e => setPhone(e.target.value)}
-          />
-          <button onClick={addOwner}>Thêm</button>
-
-          <div>
-            {owners.map((o, i) => (
-              <div key={i}>
-                <span>{o.phone}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={o.ratio}
-                  onChange={e => updateRatio(i, Number(e.target.value))}
-                />
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={o.ratio}
-                  onChange={e => updateRatio(i, Number(e.target.value))}
-                  style={{ width: "50px", marginLeft: "8px" }}
-                />
-                <span>%</span>
-              </div>
-            ))}
-          </div>
-
-          {ratioError && (
-            <p style={{ color: "red" }}>Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)</p>
-          )}
-
-          <button onClick={() => setStep(1)}>Quay lại</button>
-          <button disabled={ratioError} onClick={() => setStep(3)}>
-            Tiếp theo
-          </button>
-        </div>
-      )}
-
-      {step === 3 && (
-        <div>
-          <h2>Điều khoản hợp đồng</h2>
-          <ul>
-            {terms.map((t, i) => (
-              <li key={i}>{t}</li>
-            ))}
-          </ul>
-          <button onClick={() => setStep(2)}>Quay lại</button>
-          <button onClick={() => setStep(4)}>Xác nhận</button>
-        </div>
-      )}
-
-      {step === 4 && (
-        <div>
-          <h2>Hợp đồng đã được khởi tạo</h2>
-          <p>
-            Hợp đồng sẽ được kích hoạt khi các thành viên trong hợp đồng xác nhận.
-          </p>
-          <button onClick={() => alert("Đã xác nhận!")}>Xác nhận</button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
