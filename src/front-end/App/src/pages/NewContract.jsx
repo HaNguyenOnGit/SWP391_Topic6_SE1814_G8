@@ -61,7 +61,7 @@ export default function NewContract() {
   const ratioError = totalRatio !== 100;
 
   return (
-    <div>
+    <div className="main-container">
       <Navbar username="Username" />
       <h1>Tạo hợp đồng</h1>
 
