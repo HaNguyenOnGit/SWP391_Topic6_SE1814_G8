@@ -52,6 +52,12 @@ a {
     margin: 15px;
     padding: 10px;
     border: 1px solid #000000;
+    display: flex;
+    align-items: center;
+}
+
+.username span {
+    padding-left: 10px;
 }
 
 .nvbr-main {
