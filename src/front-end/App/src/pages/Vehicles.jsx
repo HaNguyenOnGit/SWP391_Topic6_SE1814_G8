@@ -18,22 +18,23 @@ export default function Vehicles() {
     };
 
     return (
-        <div>
+        <div className="main-container">
             <Navbar username="Username" />
+            <div className="main-content">
+                <h1>Phương tiện của bạn</h1>
+                <Link to="/newContract">Tạo hợp đồng</Link>
 
-            <h1>Phương tiện của bạn</h1>
-            <Link to="/newContract">Tạo hợp đồng</Link>
-
-            {vehicles.map((vehicle) => (
-                <div key={vehicle.id}>
-                    <Link to={`/vehicle/${vehicle.id}`}>
-                        <span>{vehicle.name} - </span>
-                        <span style={{ color: getStatusColor(vehicle.status) }}>
-                            {vehicle.status}
-                        </span>
-                    </Link>
-                </div>
-            ))}
+                {vehicles.map((vehicle) => (
+                    <div key={vehicle.id}>
+                        <Link to={`/vehicle/${vehicle.id}`}>
+                            <span>{vehicle.name} - </span>
+                            <span style={{ color: getStatusColor(vehicle.status) }}>
+                                {vehicle.status}
+                            </span>
+                        </Link>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
