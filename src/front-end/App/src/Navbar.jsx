@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 
 export default function Navbar({ username }) {
@@ -14,26 +14,48 @@ export default function Navbar({ username }) {
             <div className="color-box"></div>
             <div className="nvbr-main">
                 <div className="navigate">
-                    <Link to="/vehicles" className="hover:text-gray-300">
+                    <NavLink
+                        to="/vehicles"
+                        className={({ isActive }) =>
+                            isActive ? "active" : ""
+                        }
+                    >
                         Xe của bạn
-                    </Link>
-                    <Link to="/schedule" className="hover:text-gray-300">
+                    </NavLink>
+                    <NavLink
+                        to="/schedule"
+                        className={({ isActive }) =>
+                            isActive ? "active" : ""
+                        }
+                    >
                         Đặt lịch
-                    </Link>
-                    <Link to="/usageHistory" className="hover:text-gray-300">
+                    </NavLink>
+                    <NavLink
+                        to="/usageHistory"
+                        className={({ isActive }) =>
+                            isActive ? "active" : ""
+                        }
+                    >
                         Lịch sử
-                    </Link>
-                    <Link to="/notifycaition" className="hover:text-gray-300">
+                    </NavLink>
+                    <NavLink
+                        to="/notifycaition"
+                        className={({ isActive }) =>
+                            isActive ? "active" : ""
+                        }
+                    >
                         Thông báo
-                    </Link>
-                    <Link to="/support" className="hover:text-gray-300">
+                    </NavLink>
+                    <NavLink
+                        to="/support"
+                        className={({ isActive }) =>
+                            isActive ? "active" : ""
+                        }
+                    >
                         Hỗ trợ
-                    </Link>
+                    </NavLink>
                 </div>
-                <div
-                    className="username"
-                    onClick={handleProfileClick}
-                >
+                <div className="username" onClick={handleProfileClick}>
                     <FaUserCircle size={28} />
                     <span>{username}</span>
                 </div>

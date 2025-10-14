@@ -3,18 +3,18 @@ import Navbar from "../NavBar";
 import { Link } from "react-router-dom";
 
 export default function Vehicles() {
-    // Mock data
     const vehicles = [
         { id: 1, name: "Xe Honda City", status: "Đang sử dụng" },
         { id: 2, name: "Xe Toyota Vios", status: "Đang trống" },
         { id: 3, name: "Xe Ford Ranger", status: "Chưa kích hoạt hợp đồng" },
     ];
 
-    const getStatusColor = (status) => {
-        if (status === "Đang sử dụng") return "green";
-        if (status === "Đang trống") return "orange";
-        if (status === "Chưa kích hoạt hợp đồng") return "red";
-        return "black";
+    // Hàm xác định class CSS cho trạng thái
+    const getStatusClass = (status) => {
+        if (status === "Đang sử dụng") return "using";
+        if (status === "Đang trống") return "free";
+        if (status === "Chưa kích hoạt hợp đồng") return "inactive";
+        return "";
     };
 
     return (
@@ -22,18 +22,23 @@ export default function Vehicles() {
             <Navbar username="Username" />
             <div className="main-content">
                 <h1>Phương tiện của bạn</h1>
-                <Link to="/newContract">Tạo hợp đồng</Link>
+                <Link to="/newContract">Tạo hợp đồng →</Link>
 
-                {vehicles.map((vehicle) => (
-                    <div key={vehicle.id}>
-                        <Link to={`/vehicle/${vehicle.id}`}>
-                            <span>{vehicle.name} - </span>
-                            <span style={{ color: getStatusColor(vehicle.status) }}>
+                {/* Danh sách phương tiện */}
+                <div className="vehicle-list">
+                    {vehicles.map((vehicle) => (
+                        <Link
+                            key={vehicle.id}
+                            to={`/vehicle/${vehicle.id}`}
+                            className="vehicle-card"
+                        >
+                            <h3>{vehicle.name}</h3>
+                            <div className={`status ${getStatusClass(vehicle.status)}`}>
                                 {vehicle.status}
-                            </span>
+                            </div>
                         </Link>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
         </div>
     );

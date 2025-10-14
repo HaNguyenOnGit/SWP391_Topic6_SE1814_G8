@@ -1,6 +1,7 @@
 import React from "react";
 import Navbar from "../NavBar";
 import { Link } from "react-router-dom";
+import "../index.css";
 
 export default function Schedule() {
     const vehicles = [
@@ -9,31 +10,36 @@ export default function Schedule() {
         { id: 3, name: "Xe Ford Ranger", status: "Chưa kích hoạt hợp đồng" },
     ];
 
-    const getStatusColor = (status) => {
-        if (status === "Đang sử dụng") return "green";
-        if (status === "Đang trống") return "orange";
-        if (status === "Chưa kích hoạt hợp đồng") return "red";
-        return "black";
+    const getStatusClass = (status) => {
+        if (status === "Đang sử dụng") return "using";
+        if (status === "Đang trống") return "free";
+        if (status === "Chưa kích hoạt hợp đồng") return "inactive";
+        return "";
     };
 
     return (
-        <div>
+        <div className="main-container">
             <Navbar username="Username" />
+            <div className="main-content">
+                <h1>Phương tiện của bạn</h1>
+                <Link to="/newContract">Tạo hợp đồng →</Link>
 
-            <h1>Phương tiện của bạn</h1>
-            <Link to="/newContract">Tạo hợp đồng</Link>
-
-            {vehicles.map((vehicle) => (
-                <div key={vehicle.id}>
-                    {/* Chuyển đến path /vehicle/:id/schedule */}
-                    <Link to={`/vehicle/${vehicle.id}/schedule`}>
-                        <span>{vehicle.name} - </span>
-                        <span style={{ color: getStatusColor(vehicle.status) }}>
-                            {vehicle.status}
-                        </span>
-                    </Link>
+                {/* Danh sách phương tiện */}
+                <div className="vehicle-list">
+                    {vehicles.map((vehicle) => (
+                        <Link
+                            key={vehicle.id}
+                            to={`/vehicle/${vehicle.id}/schedule`}
+                            className="vehicle-card"
+                        >
+                            <h3>{vehicle.name}</h3>
+                            <div className={`status ${getStatusClass(vehicle.status)}`}>
+                                {vehicle.status}
+                            </div>
+                        </Link>
+                    ))}
                 </div>
-            ))}
+            </div>
         </div>
     );
 }

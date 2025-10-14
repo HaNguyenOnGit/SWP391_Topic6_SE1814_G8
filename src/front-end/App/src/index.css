@@ -32,6 +32,21 @@ body {
     height: 100%;
 }
 
+.navigate a.active {
+    font-weight: 700;
+    border: 1px solid #000;
+    /* tuỳ chọn, giúp dễ nhìn hơn */
+}
+
+.navigate a:hover {
+    border-color: #000;
+}
+
+/* Giúp active luôn rõ ràng, không bị hover đè lên */
+.navigate a.active:hover {
+    border-color: #000;
+}
+
 .username {
     margin: 15px;
     padding: 10px;
@@ -62,6 +77,19 @@ body {
     border-color: #000000;
 }
 
+.navigate a.active {
+    font-weight: 700;
+    border: 1px solid #000;
+}
+
+.navigate a:hover {
+    border-color: #000;
+}
+
+.navigate a.active:hover {
+    border-color: #000;
+}
+
 .color-box {
     width: 100%;
     height: 100px;
@@ -74,10 +102,93 @@ body {
     width: 100%;
 }
 
+/* ========== PHƯƠNG TIỆN CỦA BẠN ========== */
+
 .main-content {
     margin-left: 15px;
     border: 1px solid #000000;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
     width: calc(80% - 30px);
+    padding: 40px 50px;
+}
 
+.main-content h1 {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.main-content>a {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 17px;
+    color: #2e7d32;
+    text-decoration: none;
+    margin-bottom: 25px;
+}
+
+.main-content a:hover {
+    text-decoration: underline;
+}
+
+.vehicle-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 25px;
+    justify-content: start;
+}
+
+.vehicle-card {
+    background-color: #d9d9d9;
+    border: 1px solid #000000;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    /* Giữ tỉ lệ vuông */
+    aspect-ratio: 1 / 1;
+    width: 200px;
+    height: auto;
+    /* xóa height cố định */
+    padding: 15px 20px;
+    /* giảm padding để không phá tỉ lệ */
+    box-sizing: border-box;
+}
+
+.vehicle-card:hover {
+    transform: scale(1.02);
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+}
+
+.vehicle-card h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #000;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    color: #000;
+    gap: 8px;
+}
+
+.status::before {
+    content: "●";
+    font-size: 18px;
+}
+
+.status.using::before {
+    color: #4caf50;
+}
+
+.status.free::before {
+    color: #ff9800;
+}
+
+.status.inactive::before {
+    color: #f44336;
 }
