@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function RegistrationForm() {
@@ -23,9 +24,7 @@ export default function RegistrationForm() {
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
   const [countdown, setCountdown] = useState(0);
-
   const navigate = useNavigate();
-  const mockOTP = "123456";
 
   useEffect(() => {
     if (countdown > 0) {
@@ -78,7 +77,7 @@ export default function RegistrationForm() {
     setErrors((prev) => ({ ...prev, [name]: validateField(name, fieldValue) }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newErrors = {};
     Object.keys(formData).forEach(
@@ -87,24 +86,74 @@ export default function RegistrationForm() {
     setErrors(newErrors);
 
     if (Object.values(newErrors).every((err) => !err)) {
-      setShowOTP(true);
-      setCountdown(30);
-      alert(`Mock gửi OTP (${mockOTP}) tới email: ${formData.email}`);
+      try {
+        const toBase64 = (file) =>
+          new Promise((resolve, reject) => {
+            if (!file) return resolve("");
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(",")[1]);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+
+        const frontIdImage = await toBase64(formData.cccdFront);
+        const backIdImage = await toBase64(formData.cccdBack);
+        const frontLicenseImage = await toBase64(formData.licenseFront);
+        const backLicenseImage = await toBase64(formData.licenseBack);
+
+        const payload = {
+          fullName: formData.fullName,
+          email: formData.email,
+          citizenId: formData.cccd,
+          driverLicenseId: formData.license,
+          bankName: formData.bankName,
+          bankAccount: formData.bankNumber,
+          role: "Co-owner",
+          phoneNumber: formData.phone,
+          password: formData.password,
+          frontIdImage,
+          backIdImage,
+          frontLicenseImage,
+          backLicenseImage,
+        };
+
+        const res = await axios.post("/api/user/add", payload);
+
+        console.log("Register response:", res.data);
+        setShowOTP(true);
+        setCountdown(30);
+        alert("Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.");
+      } catch (err) {
+        console.error("Registration error:", err);
+        alert(
+          err.response?.data || "Đăng ký thất bại! Kiểm tra lại thông tin."
+        );
+      }
     }
   };
 
-  const handleVerify = () => {
-    if (otp === mockOTP) {
+  const handleVerify = async () => {
+    try {
+      const res = await axios.post(
+        `/api/user/confirm-email?email=${formData.email}&code=${otp}`
+      );
+      alert(res.data || "Xác minh thành công!");
       navigate("/registrationpending");
-    } else {
-      setMessage("Mã OTP không đúng, vui lòng thử lại.");
+    } catch (err) {
+      console.error(err);
+      setMessage("Mã OTP không đúng hoặc đã hết hạn.");
     }
   };
 
-  const resendCode = () => {
+  const resendCode = async () => {
     if (countdown === 0) {
-      setCountdown(30);
-      alert(`🔄 Mã mới (mock): ${mockOTP}`);
+      try {
+        await axios.post(`/api/user/generate-code?email=${formData.email}`);
+        setCountdown(30);
+        alert("Mã xác nhận mới đã được gửi đến email của bạn!");
+      } catch (err) {
+        alert("Không thể gửi lại mã xác nhận.");
+      }
     }
   };
 
@@ -133,15 +182,16 @@ export default function RegistrationForm() {
       <form onSubmit={handleSubmit} noValidate>
         <h2>Đăng ký</h2>
 
-        {[["Họ tên", "fullName", "text"],
-        ["Số điện thoại", "phone", "tel"],
-        ["Email", "email", "email"],
-        ["Mật khẩu", "password", "password"],
-        ["Nhập lại mật khẩu", "confirmPassword", "password"],
-        ["CCCD", "cccd", "text"],
-        ["Giấy phép lái xe", "license", "text"],
-        ["Tên ngân hàng", "bankName", "text"],
-        ["Số tài khoản", "bankNumber", "text"],
+        {[
+          ["Họ tên", "fullName", "text"],
+          ["Số điện thoại", "phone", "tel"],
+          ["Email", "email", "email"],
+          ["Mật khẩu", "password", "password"],
+          ["Nhập lại mật khẩu", "confirmPassword", "password"],
+          ["CCCD", "cccd", "text"],
+          ["Giấy phép lái xe", "license", "text"],
+          ["Tên ngân hàng", "bankName", "text"],
+          ["Số tài khoản", "bankNumber", "text"],
         ].map(([label, name, type]) => (
           <div key={name}>
             <label>{label}</label>
@@ -155,10 +205,11 @@ export default function RegistrationForm() {
           </div>
         ))}
 
-        {[["Ảnh CCCD (Mặt trước)", "cccdFront"],
-        ["Ảnh CCCD (Mặt sau)", "cccdBack"],
-        ["Ảnh bằng lái (Mặt trước)", "licenseFront"],
-        ["Ảnh bằng lái (Mặt sau)", "licenseBack"],
+        {[
+          ["Ảnh CCCD (Mặt trước)", "cccdFront"],
+          ["Ảnh CCCD (Mặt sau)", "cccdBack"],
+          ["Ảnh bằng lái (Mặt trước)", "licenseFront"],
+          ["Ảnh bằng lái (Mặt sau)", "licenseBack"],
         ].map(([label, name]) => (
           <div key={name}>
             <button
@@ -187,7 +238,7 @@ export default function RegistrationForm() {
         </div>
       </form>
 
-      {/* Overlay OTP */}
+      {/* OTP Popup */}
       {showOTP && (
         <div
           style={{
@@ -237,3 +288,5 @@ export default function RegistrationForm() {
     </div>
   );
 }
+
+
