@@ -72,7 +72,7 @@ export default function VehicleInfo({ vehicle }) {
             <div>
                 <Link
                     to={`/vehicle/${vehicle.id}/contract`}
-                    style={{ color: "#ff980", textDecoration: "none" }}
+                    style={{ color: "#ff9800", textDecoration: "none" }}
                 >
                     Xem hợp đồng →
                 </Link>

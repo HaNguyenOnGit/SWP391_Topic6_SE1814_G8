@@ -63,11 +63,12 @@ export default function Proposal() {
           <div>
             {stage === "form" && (
               <div>
-                <h2>Đề xuất khoản chi cho phương tiện</h2>
+                <h1>Đề xuất khoản chi cho phương tiện</h1>
 
                 <label>Tên chi phí</label>
                 <br />
                 <input
+                  className="txtInput"
                   type="text"
                   value={expenseName}
                   onChange={(e) => setExpenseName(e.target.value)}
@@ -77,6 +78,7 @@ export default function Proposal() {
                 <label>Chi phí</label>
                 <br />
                 <input
+                  className="txtInput"
                   type="text"
                   value={amount}
                   onChange={handleAmountChange}
@@ -86,31 +88,35 @@ export default function Proposal() {
 
                 <label>Cách thức</label>
                 <br />
-                <select value={method} onChange={(e) => setMethod(e.target.value)}>
+                <select
+                  className="txtInput"
+                  value={method} onChange={(e) => setMethod(e.target.value)}>
                   <option>Theo tỉ lệ sở hữu</option>
                   <option>Góp quỹ</option>
                   <option>Tự chi trả</option>
                 </select>
                 <br /><br />
 
-                <button onClick={handleSubmit}>Đề xuất</button>
+                <button className="btnInput" onClick={handleSubmit}>Đề xuất</button>
               </div>
             )}
 
             {stage === "detail" && (
               <div>
-                <h3>{expenseName}</h3>
-                <h3>Tỉ lệ chi phí</h3>
-                <p>{total.toLocaleString("vi-VN")}đ</p>
-
+                <h1>{expenseName}</h1>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <h2>Tỉ lệ chi phí</h2>
+                  <p style={{ color: "#4caf50", fontWeight: "700", margin: "10px 0 20px 0" }}>{total.toLocaleString("vi-VN")}đ</p>
+                </div>
                 {contributions.map((c, i) => {
                   const pay = Math.round((c.percent / 100) * total);
                   const isFixed = method === "Theo tỉ lệ sở hữu";
                   return (
-                    <div key={i}>
-                      <p>{c.username}</p>
+                    <div key={i} className="pSlider">
+                      <p className=".pSlider-nam">{c.username}</p>
                       <p>{pay.toLocaleString("vi-VN")}đ</p>
                       <input
+                        className="slider"
                         type="range"
                         min="0"
                         max="100"
@@ -129,17 +135,18 @@ export default function Proposal() {
                   );
                 })}
 
-                <button onClick={() => setStage("form")}>Hủy</button>
-                <button onClick={handleFinalSubmit}>Đề xuất</button>
+                <button className="btnReturn" onClick={() => setStage("form")}>Hủy</button>
+                <button className="btnInput" onClick={handleFinalSubmit}>Đề xuất</button>
               </div>
             )}
 
             {stage === "success" && (
               <div>
-                <h3>Đã tạo đề xuất thành công!</h3>
-                <a href="#">Xem đề xuất</a>
+                <h3 style={{ color: "#4caf50" }}>Đã tạo đề xuất thành công!</h3>
               </div>
             )}
+
+            <a href="#">Xem đề xuất</a>
           </div>
         </div>
       </div>
