@@ -109,6 +109,12 @@ a {
     width: 100%;
 }
 
+.main-content-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+}
+
 /* ========== PHƯƠNG TIỆN CỦA BẠN ========== */
 
 .main-content {
@@ -304,4 +310,12 @@ a {
     background: #0F6CAE;
     border: none;
     cursor: pointer;
+}
+
+.vehicle-info {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 20%;
 }

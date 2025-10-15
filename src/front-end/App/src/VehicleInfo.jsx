@@ -36,44 +36,43 @@ export default function VehicleInfo({ vehicle }) {
     };
 
     return (
-        <div>
-            {/* Vehicle name + plate */}
-            <h2>{vehicle.name}</h2>
-            <p>{vehicle.plate}</p>
-
-            {/* Status */}
+        <div className="vehicle-info">
             <div>
-                <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
-                    ● {vehicle.status}
-                </span>
-            </div>
+                <h1>{vehicle.name}</h1>
+                <p>{vehicle.plate}</p>
+                <br></br>
+                <div>
+                    <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
+                        ● {vehicle.status}
+                    </span>
+                </div>
 
-            {/* Co-owners */}
-            <h4>Người đồng sở hữu</h4>
-            {coowners.length > 0 ? (
-                coowners.map((c, index) => (
-                    <div key={index}>
-                        <input type="radio" name="coowner" aria-label={c.username} />{" "}
-                        {c.username}{" "}
-                        <span style={{ color: "blue" }}>{c.share}%</span>
-                    </div>
-                ))
-            ) : (
-                <p>Đang tải...</p>
-            )}
-
-            {/* Navigation links */}
-            <div>
                 <Link
                     to={`/vehicle/${vehicle.id}`}
-                    style={{ color: "purple", textDecoration: "none" }}
+                    style={{ color: "purple", textDecoration: "none", fontSize: "24pt", margin: "20px 0 20px 0" }}
                 >
-                    ← Quay lại phương tiện
+                    ←
                 </Link>
-                <br></br>
+            </div>
+            <div>
+                <h4>Người đồng sở hữu</h4>
+                {coowners.length > 0 ? (
+                    coowners.map((c, index) => (
+                        <div key={index} style={{ margin: "10px 0 10px 0" }}>
+                            <span style={{ marginRight: "10px" }}>
+                                {c.username}
+                            </span>
+                            <span style={{ color: "blue" }}>{c.share}%</span>
+                        </div>
+                    ))
+                ) : (
+                    <p>Đang tải...</p>
+                )}
+            </div>
+            <div>
                 <Link
                     to={`/vehicle/${vehicle.id}/contract`}
-                    style={{ color: "orange", textDecoration: "none" }}
+                    style={{ color: "#ff980", textDecoration: "none" }}
                 >
                     Xem hợp đồng →
                 </Link>
