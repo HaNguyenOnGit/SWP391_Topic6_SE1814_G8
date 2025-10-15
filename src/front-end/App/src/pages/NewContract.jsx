@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Navbar from "../NavBar";
+import "./newContract.css"
 
 export default function NewContract() {
   const [step, setStep] = useState(1);
@@ -71,6 +72,7 @@ export default function NewContract() {
             <h2>Thông tin phương tiện</h2>
             <div>
               <label>Tên phương tiện</label>
+              <br></br>
               <input
                 className="txtInput"
                 type="text"
@@ -84,6 +86,7 @@ export default function NewContract() {
             </div>
             <div>
               <label>Biển kiểm soát</label>
+              <br></br>
               <input
                 className="txtInput"
                 type="text"
@@ -98,6 +101,7 @@ export default function NewContract() {
             </div>
             <div>
               <label>Model</label>
+              <br></br>
               <input
                 className="txtInput"
                 type="text"
@@ -136,13 +140,14 @@ export default function NewContract() {
               value={phone}
               onChange={e => setPhone(e.target.value)}
             />
-            <button onClick={addOwner}>Thêm</button>
-
+            <button className="addBtn" onClick={addOwner}>+</button>
             <div>
               {owners.map((o, i) => (
-                <div key={i}>
-                  <span>{o.phone}</span>
+                <div key={i} className="pSlider">
+                  <span className="pSlider-name">{o.phone}</span>
+                  <br></br>
                   <input
+                    className="slider"
                     type="range"
                     min="0"
                     max="100"
@@ -150,6 +155,7 @@ export default function NewContract() {
                     onChange={e => updateRatio(i, Number(e.target.value))}
                   />
                   <input
+                    className="pTxtInput"
                     type="number"
                     min="0"
                     max="100"
@@ -161,13 +167,13 @@ export default function NewContract() {
                 </div>
               ))}
             </div>
-
             {ratioError && (
               <p style={{ color: "red" }}>Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)</p>
             )}
 
-            <button onClick={() => setStep(1)}>Quay lại</button>
+            <button className="btnReturn" onClick={() => setStep(1)}>Quay lại</button>
             <button
+              className="btnInput"
               disabled={owners.length === 0 || ratioError}
               onClick={() => setStep(3)}
             >
@@ -179,13 +185,14 @@ export default function NewContract() {
         {step === 3 && (
           <div>
             <h2>Điều khoản hợp đồng</h2>
-            <ul>
+            <ul style={{ padding: "20px 0 30px 25px" }}>
               {terms.map((t, i) => (
                 <li key={i}>{t}</li>
               ))}
             </ul>
-            <button onClick={() => setStep(2)}>Quay lại</button>
+            <button className="btnReturn" onClick={() => setStep(2)}>Quay lại</button>
             <button
+              className="btnInput"
               disabled={terms.length === 0}
               onClick={() => setStep(4)}
             >
@@ -196,11 +203,11 @@ export default function NewContract() {
 
         {step === 4 && (
           <div>
-            <h2>Hợp đồng đã được khởi tạo</h2>
-            <p>
+            <h2 style={{ color: "#4caf50" }}>Hợp đồng đã được khởi tạo</h2>
+            <p style={{ padding: "10px 0 30px 0" }}>
               Hợp đồng sẽ được kích hoạt khi các thành viên trong hợp đồng xác nhận.
             </p>
-            <button onClick={() => alert("Đã xác nhận!")}>Xác nhận</button>
+            <button className="btnInput" onClick={() => alert("Đã xác nhận!")}>Xác nhận</button>
           </div>
         )}
       </div>
