@@ -1,0 +1,29 @@
+.registration-page .txtInputReg {
+    width: 250px !important;
+    height: 10px;
+    margin: 5px 0 !important;
+}
+
+.registration-page .image-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 50%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.registration-page .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.registration-page .form {
+    padding: 0 0 0 70px;
+    margin-left: 50%;
+    width: calc(50% - 70px);
+}

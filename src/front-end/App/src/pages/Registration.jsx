@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./Registration.css"
 
 export default function RegistrationForm() {
   const [formData, setFormData] = useState({
@@ -20,10 +21,10 @@ export default function RegistrationForm() {
   });
 
   const [errors, setErrors] = useState({});
-  const [formMessage, setFormMessage] = useState(""); // ⚡ Thông báo lỗi hoặc thành công của form
+  const [formMessage, setFormMessage] = useState("");
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState("");
-  const [otpMessage, setOtpMessage] = useState(""); // ⚡ Thông báo OTP
+  const [otpMessage, setOtpMessage] = useState("");
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
 
@@ -125,10 +126,10 @@ export default function RegistrationForm() {
         console.log("Register response:", res.data);
         setShowOTP(true);
         setCountdown(30);
-        setFormMessage("Đăng ký thành công! Vui lòng kiểm tra email để nhận mã OTP."); // ✅ hiện trong UI
+        setFormMessage("Đăng ký thành công! Vui lòng kiểm tra email để nhận mã OTP.");
       } catch (err) {
         console.error("Registration error:", err);
-        setFormMessage("Đăng ký có nội dung đã tồn tại hoặc chưa chính xác."); // ❌ hiện lỗi trong UI
+        setFormMessage("Đăng ký có nội dung đã tồn tại hoặc chưa chính xác.");
       }
     } else {
       setFormMessage("Vui lòng kiểm tra lại thông tin bên trên.");
@@ -140,11 +141,11 @@ export default function RegistrationForm() {
       const res = await axios.post(
         `/api/user/confirm-email?email=${formData.email}&code=${otp}`
       );
-      setOtpMessage("✅ Xác minh thành công!"); // hiện thành công
+      setOtpMessage("Xác minh thành công!");
       setTimeout(() => navigate("/registrationpending"), 1500);
     } catch (err) {
       console.error(err);
-      setOtpMessage("❌ Mã OTP không đúng hoặc đã hết hạn.");
+      setOtpMessage("Mã OTP không đúng hoặc đã hết hạn.");
     }
   };
 
@@ -153,7 +154,7 @@ export default function RegistrationForm() {
       try {
         await axios.post(`/api/user/generate-code?email=${formData.email}`);
         setCountdown(30);
-        setOtpMessage("📧 Mã xác nhận mới đã được gửi đến email của bạn!");
+        setOtpMessage("Mã xác nhận mới đã được gửi đến email của bạn!");
       } catch (err) {
         setOtpMessage("Không thể gửi lại mã xác nhận.");
       }
@@ -182,8 +183,11 @@ export default function RegistrationForm() {
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} noValidate>
+    <div className="registration-page">
+      <div className="image-container">
+        <img src="/theme.png" alt="img" />
+      </div>
+      <form className="form" onSubmit={handleSubmit} noValidate>
         <h2>Đăng ký</h2>
 
         {[
@@ -199,7 +203,9 @@ export default function RegistrationForm() {
         ].map(([label, name, type]) => (
           <div key={name}>
             <label>{label}</label>
+            <br></br>
             <input
+              className="txtInput txtInputReg"
               type={type}
               name={name}
               value={formData[name]}
@@ -234,14 +240,13 @@ export default function RegistrationForm() {
           </div>
         ))}
 
-        <div>
-          <button type="submit">Đăng ký</button>
-          <button type="button" onClick={handleCancel}>
+        <div style={{ padding: "20px 0" }}>
+          <button className="btnInput" style={{ marginRight: "10px" }} type="submit">Đăng ký</button>
+          <button className="btnReturn" type="button" onClick={handleCancel}>
             Hủy
           </button>
         </div>
 
-        {/* ⚡ Hiển thị lỗi hoặc thành công */}
         {formMessage && (
           <p
             style={{
@@ -285,7 +290,7 @@ export default function RegistrationForm() {
             {otpMessage && (
               <p
                 style={{
-                  color: otpMessage.startsWith("✅") ? "green" : "red",
+                  color: otpMessage.startsWith("X") ? "green" : "red",
                   marginTop: "8px",
                 }}
               >
