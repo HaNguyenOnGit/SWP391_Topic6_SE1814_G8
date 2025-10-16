@@ -54,105 +54,109 @@ export default function PaymentHistory() {
         return <div style={{ textAlign: "center", color: "#555" }}>Đang tải dữ liệu...</div>;
 
     return (
-        <div>
+        <div className="main-container">
             <Navbar username="Username" />
-            <VehicleInfo vehicle={vehicle} />
+            <div className="main-content">
+                <div className="main-content-layout">
+                    <VehicleInfo vehicle={vehicle} />
 
-            {step === "list" && (
-                <div>
-                    <h3>Chọn khoản thanh toán</h3>
-                    <div>
-                        {payments.map((p) => (
-                            <div
-                                key={p.id}
-                                onClick={() => {
-                                    if (p.status === "Not Paid") {
-                                        setSelectedPayment(p);
-                                        setStep("form");
-                                    }
-                                }}
-                            >
-                                <div>
-                                    <span>{p.name}</span>
-                                    <span>{p.total}</span>
-                                </div>
-                                <div style={{ fontSize: 14 }}>
-                                    <div>{p.date}</div>
-                                    <div style={{ fontWeight: "bold", color: p.status === "Paid" ? "green" : "red" }}>
-                                        {p.paid}
-                                    </div>
-                                    <div>{p.proposer}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            {step === "form" && selectedPayment && (
-                <div>
-                    <div>
-                        <div>{selectedPayment.name}</div>
-                        <div><b>Tổng:</b> {selectedPayment.total}</div>
-                        <div><b>Số tiền cần trả:</b> {selectedPayment.total}</div>
+                    {step === "list" && (
                         <div>
-                            <b>Hình thức thanh toán:</b>
-                            <select
-                                value={method}
-                                onChange={(e) => setMethod(e.target.value)}
-                                style={{ marginLeft: 5 }}
-                            >
-                                <option>chuyển khoản ngân hàng</option>
-                            </select>
+                            <h3>Chọn khoản thanh toán</h3>
+                            <div>
+                                {payments.map((p) => (
+                                    <div
+                                        key={p.id}
+                                        onClick={() => {
+                                            if (p.status === "Not Paid") {
+                                                setSelectedPayment(p);
+                                                setStep("form");
+                                            }
+                                        }}
+                                    >
+                                        <div>
+                                            <span>{p.name}</span>
+                                            <span>{p.total}</span>
+                                        </div>
+                                        <div style={{ fontSize: 14 }}>
+                                            <div>{p.date}</div>
+                                            <div style={{ fontWeight: "bold", color: p.status === "Paid" ? "green" : "red" }}>
+                                                {p.paid}
+                                            </div>
+                                            <div>{p.proposer}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div><b>Người nhận:</b> {bankInfo.accountName}</div>
-                    </div>
-                    <div>
-                        <button onClick={handleBack}>Hủy</button>
-                        <button onClick={() => setStep("qr")}>Thanh toán</button>
-                    </div>
-                </div>
-            )}
+                    )}
 
-            {step === "qr" && (
-                <div>
-                    <h3>Thanh toán</h3>
-                    <div>
-                        <div style={{ width: 120, height: 120, background: "#ccc", margin: "10px auto" }}>[QR]</div>
-                        <div>{method}</div>
-                        <div>{bankInfo.accountName}</div>
-                        <div>{bankInfo.bankName}</div>
-                        <div>{bankInfo.accountNumber}</div>
-                        <div><b>Số tiền:</b> {selectedPayment?.total}</div>
-                    </div>
-                    <div>
-                        <button onClick={handleBack}>Hủy</button>
-                        <button onClick={() => setStep("confirm")}>Xác nhận</button>
-                    </div>
-                </div>
-            )}
+                    {step === "form" && selectedPayment && (
+                        <div>
+                            <div>
+                                <div>{selectedPayment.name}</div>
+                                <div><b>Tổng:</b> {selectedPayment.total}</div>
+                                <div><b>Số tiền cần trả:</b> {selectedPayment.total}</div>
+                                <div>
+                                    <b>Hình thức thanh toán:</b>
+                                    <select
+                                        value={method}
+                                        onChange={(e) => setMethod(e.target.value)}
+                                        style={{ marginLeft: 5 }}
+                                    >
+                                        <option>chuyển khoản ngân hàng</option>
+                                    </select>
+                                </div>
+                                <div><b>Người nhận:</b> {bankInfo.accountName}</div>
+                            </div>
+                            <div>
+                                <button onClick={handleBack}>Hủy</button>
+                                <button onClick={() => setStep("qr")}>Thanh toán</button>
+                            </div>
+                        </div>
+                    )}
 
-            {step === "confirm" && (
-                <div>
-                    <h3>Xác minh thanh toán</h3>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setFile(e.target.files[0])}
-                    />
-                    {file && <p style={{ color: "green" }}>Đã chọn: {file.name}</p>}
-                    <p>Upload bill chuyển khoản</p>
-                    <div>
-                        <button onClick={() => setStep("success")}>Xác nhận</button>
-                    </div>
-                </div>
-            )}
+                    {step === "qr" && (
+                        <div>
+                            <h3>Thanh toán</h3>
+                            <div>
+                                <div style={{ width: 120, height: 120, background: "#ccc", margin: "10px auto" }}>[QR]</div>
+                                <div>{method}</div>
+                                <div>{bankInfo.accountName}</div>
+                                <div>{bankInfo.bankName}</div>
+                                <div>{bankInfo.accountNumber}</div>
+                                <div><b>Số tiền:</b> {selectedPayment?.total}</div>
+                            </div>
+                            <div>
+                                <button onClick={handleBack}>Hủy</button>
+                                <button onClick={() => setStep("confirm")}>Xác nhận</button>
+                            </div>
+                        </div>
+                    )}
 
-            {step === "success" && (
-                <div style={{ textAlign: "center", color: "green" }}>
-                    Xác minh chuyển khoản thành công
+                    {step === "confirm" && (
+                        <div>
+                            <h3>Xác minh thanh toán</h3>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => setFile(e.target.files[0])}
+                            />
+                            {file && <p style={{ color: "green" }}>Đã chọn: {file.name}</p>}
+                            <p>Upload bill chuyển khoản</p>
+                            <div>
+                                <button onClick={() => setStep("success")}>Xác nhận</button>
+                            </div>
+                        </div>
+                    )}
+
+                    {step === "success" && (
+                        <div style={{ textAlign: "center", color: "green" }}>
+                            Xác minh chuyển khoản thành công
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }

@@ -16,9 +16,8 @@ function OdoUpload({ value, onChange, disabled }) {
 
   return (
     <div
-      className={`relative w-40 h-40 border rounded overflow-hidden flex items-center justify-center bg-gray-50 ${
-        disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-      }`}
+      className={`relative w-40 h-40 border rounded overflow-hidden flex items-center justify-center bg-gray-50 ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
+        }`}
       onClick={() => !disabled && document.getElementById("odoInput").click()}
     >
       {preview ? (
@@ -84,9 +83,8 @@ function CheckForm({ type, data, setData, onConfirm, checkinKm, lastTripKm, disa
       {!disabled ? (
         <button
           disabled={!isReady || !!error}
-          className={`px-4 py-2 rounded text-white font-semibold ${
-            isReady && !error ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
-          }`}
+          className={`px-4 py-2 rounded text-white font-semibold ${isReady && !error ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
+            }`}
           onClick={onConfirm}
         >
           Xác nhận
@@ -150,49 +148,51 @@ export default function Checkin() {
   if (!vehicle) return <h2>Không tìm thấy phương tiện</h2>;
 
   return (
-    <div>
+    <div className="main-container">
       <Navbar username="Username" />
-      <div className="p-6">
-        <VehicleInfo vehicle={vehicle} />
+      <div className="main-content">
+        <div className="main-content-layout">
+          <VehicleInfo vehicle={vehicle} />
+          <div>
+            {tripInfo && (
+              <>
+                <h3 className="mt-4 font-semibold text-lg">Hành trình của bạn</h3>
+                <p className="mb-2">
+                  <b>{tripInfo.distance} km</b>
+                </p>
+              </>
+            )}
 
-        {/* Thêm phần hành trình tổng hợp */}
-        {tripInfo && (
-          <>
-            <h3 className="mt-4 font-semibold text-lg">Hành trình của bạn</h3>
-            <p className="mb-2">
-              <b>{tripInfo.distance} km</b>
-            </p>
-          </>
-        )}
+            {phase === "checkin" && (
+              <CheckForm
+                type="checkin"
+                data={checkinData}
+                setData={setCheckinData}
+                lastTripKm={lastTripKm}
+                onConfirm={() => {
+                  localStorage.setItem("checkinData", JSON.stringify(checkinData));
+                  setPhase("checked");
+                }}
+              />
+            )}
 
-        {phase === "checkin" && (
-          <CheckForm
-            type="checkin"
-            data={checkinData}
-            setData={setCheckinData}
-            lastTripKm={lastTripKm}
-            onConfirm={() => {
-              localStorage.setItem("checkinData", JSON.stringify(checkinData));
-              setPhase("checked");
-            }}
-          />
-        )}
-
-        {phase === "checked" && (
-          <>
-            <CheckForm type="checkin" data={checkinData} setData={setCheckinData} lastTripKm={lastTripKm} disabled />
-            <CheckForm
-              type="checkout"
-              data={checkoutData}
-              setData={setCheckoutData}
-              checkinKm={Number(checkinData.km.replace(/,/g, ""))}
-              onConfirm={() => {
-                alert("Đã hoàn tất check-out!");
-                reset();
-              }}
-            />
-          </>
-        )}
+            {phase === "checked" && (
+              <>
+                <CheckForm type="checkin" data={checkinData} setData={setCheckinData} lastTripKm={lastTripKm} disabled />
+                <CheckForm
+                  type="checkout"
+                  data={checkoutData}
+                  setData={setCheckoutData}
+                  checkinKm={Number(checkinData.km.replace(/,/g, ""))}
+                  onConfirm={() => {
+                    alert("Đã hoàn tất check-out!");
+                    reset();
+                  }}
+                />
+              </>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

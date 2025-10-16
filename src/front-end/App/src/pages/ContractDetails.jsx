@@ -60,9 +60,9 @@ export default function ContractDetails() {
     };
 
     return (
-        <div>
+        <div className="main-container">
             <Navbar username="Username" />
-            <div style={{ padding: "20px" }}>
+            <div className="main-content">
                 <h1>Chi tiết hợp đồng</h1>
 
                 {/* Vehicle info */}

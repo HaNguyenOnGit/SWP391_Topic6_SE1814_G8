@@ -128,234 +128,236 @@ export default function Booking() {
 
 
     return (
-        <div className="p-4">
+        <div className="main-container">
             <Navbar username="Username" />
 
-            <h2 className="text-xl font-semibold mb-4">
-                {vehicle?.name}
-            </h2>
-            {/* --- Chọn tháng & năm --- */}
-            <div style={{ marginBottom: "10px" }}>
-                <select
-                    value={selectedMonth}
-                    onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                >
-                    {[...Array(12)].map((_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                            Tháng {i + 1}
-                        </option>
-                    ))}
-                </select>
-
-                <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                >
-                    {[2024, 2025, 2026].map((year) => (
-                        <option key={year} value={year}>
-                            {year}
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            {/* --- Lịch hiển thị --- */}
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(7, 1fr)",
-                    maxWidth: "280px",
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    marginBottom: "4px",
-                }}
-            >
-                {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
-                    <div key={i}>{d}</div>
-                ))}
-            </div>
-
-            <div
-                style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(7, 1fr)",
-                    gap: "6px",
-                    maxWidth: "280px",
-                }}
-            >
-                {Array.from({ length: getStartOffset() }).map((_, i) => (
-                    <div key={`empty-${i}`}></div>
-                ))}
-
-                {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => (
-                    <div
-                        key={i + 1}
-                        onClick={() => setSelectedDay(i + 1)}
-                        style={{
-                            padding: "8px",
-                            textAlign: "center",
-                            borderRadius: "50%",
-                            cursor: "pointer",
-                            background:
-                                selectedDay === i + 1
-                                    ? "linear-gradient(45deg, #d47dff, #79c7ff)"
-                                    : "transparent",
-                            color: selectedDay === i + 1 ? "white" : "black",
-                            fontWeight: selectedDay === i + 1 ? "bold" : "normal",
-                        }}
+            <div className="main-content">
+                <h2 className="text-xl font-semibold mb-4">
+                    {vehicle?.name}
+                </h2>
+                {/* --- Chọn tháng & năm --- */}
+                <div style={{ marginBottom: "10px" }}>
+                    <select
+                        value={selectedMonth}
+                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
                     >
-                        {String(i + 1).padStart(2, "0")}
-                    </div>
-                ))}
-            </div>
+                        {[...Array(12)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                                Tháng {i + 1}
+                            </option>
+                        ))}
+                    </select>
 
-            {/* --- Khung đặt lịch --- */}
-            <div
-                style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    background: "#fff",
-                    borderRadius: "10px",
-                    padding: "10px 14px",
-                    boxShadow: "2px 2px 6px rgba(0,0,0,0.1)",
-                    width: "260px",
-                    marginTop: "20px",
-                }}
-            >
-                <div style={{ display: "flex", flexDirection: "column", fontSize: "13px" }}>
-                    <strong>
-                        Đặt lịch cho ngày {selectedDay}/{selectedMonth}
-                    </strong>
-                    <div style={{ color: "#888", marginTop: "3px" }}>
-                        Từ&nbsp;–&nbsp;Đến
-                    </div>
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                    >
+                        {[2024, 2025, 2026].map((year) => (
+                            <option key={year} value={year}>
+                                {year}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
-                <button
-                    onClick={() => setShowBooking(!showBooking)}
-                    style={{
-                        width: "36px",
-                        height: "36px",
-                        borderRadius: "10px",
-                        border: "none",
-                        background: "linear-gradient(45deg, #d47dff, #79c7ff)",
-                        color: "white",
-                        fontSize: "22px",
-                        cursor: "pointer",
-                    }}
-                    title="Thêm lịch"
-                >
-                    {showBooking ? "−" : "+"}
-                </button>
-            </div>
-
-            {/* --- Form đặt giờ --- */}
-            {showBooking && (
+                {/* --- Lịch hiển thị --- */}
                 <div
                     style={{
-                        marginTop: "10px",
-                        padding: "10px",
-                        border: "1px solid #ddd",
-                        borderRadius: "10px",
-                        width: "260px",
-                        background: "#fafafa",
+                        display: "grid",
+                        gridTemplateColumns: "repeat(7, 1fr)",
+                        maxWidth: "280px",
+                        textAlign: "center",
+                        fontWeight: "bold",
+                        marginBottom: "4px",
                     }}
                 >
-                    <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                        <label>
-                            Từ:
-                            <select
-                                value={fromTime}
-                                onChange={(e) => setFromTime(e.target.value)}
-                                style={{ width: "100%", padding: "4px" }}
-                            >
-                                <option value="">-- Chọn giờ bắt đầu --</option>
-                                {hours.map((h) => (
-                                    <option key={h} value={h}>
-                                        {h}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-
-                        <label>
-                            Đến:
-                            <select
-                                value={toTime}
-                                onChange={(e) => setToTime(e.target.value)}
-                                style={{ width: "100%", padding: "4px" }}
-                            >
-                                <option value="">-- Chọn giờ kết thúc --</option>
-                                {hours.map((h) => (
-                                    <option key={h} value={h}>
-                                        {h}
-                                    </option>
-                                ))}
-                            </select>
-                        </label>
-
-                        <button
-                            onClick={handleAddBooking}
-                            style={{
-                                marginTop: "5px",
-                                background: "linear-gradient(45deg, #79c7ff, #d47dff)",
-                                color: "white",
-                                border: "none",
-                                borderRadius: "8px",
-                                padding: "6px",
-                                cursor: "pointer",
-                            }}
-                        >
-                            Lưu lịch
-                        </button>
-                    </div>
+                    {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
+                        <div key={i}>{d}</div>
+                    ))}
                 </div>
-            )}
 
-            {/* --- Danh sách lịch --- */}
-            {currentBookings.length > 0 && (
-                <div style={{ marginTop: "15px", width: "260px" }}>
-                    <h5 style={{ fontSize: "14px", marginBottom: "6px" }}>
-                        Lịch đã đặt ({selectedDay}/{selectedMonth}):
-                    </h5>
-                    {currentBookings.map((b) => (
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(7, 1fr)",
+                        gap: "6px",
+                        maxWidth: "280px",
+                    }}
+                >
+                    {Array.from({ length: getStartOffset() }).map((_, i) => (
+                        <div key={`empty-${i}`}></div>
+                    ))}
+
+                    {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => (
                         <div
-                            key={b.id}
+                            key={i + 1}
+                            onClick={() => setSelectedDay(i + 1)}
                             style={{
-                                background: "#fff",
-                                border: "1px solid #eee",
-                                borderRadius: "8px",
-                                padding: "6px 10px",
-                                marginBottom: "5px",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                fontSize: "13px",
+                                padding: "8px",
+                                textAlign: "center",
+                                borderRadius: "50%",
+                                cursor: "pointer",
+                                background:
+                                    selectedDay === i + 1
+                                        ? "linear-gradient(45deg, #d47dff, #79c7ff)"
+                                        : "transparent",
+                                color: selectedDay === i + 1 ? "white" : "black",
+                                fontWeight: selectedDay === i + 1 ? "bold" : "normal",
                             }}
                         >
-                            <span>
-                                <strong>{b.user}</strong> &nbsp;
-                                {b.from} → {b.to}
-                            </span>
-
-                            {b.user === "Bạn" && (
-                                <button
-                                    onClick={() => handleDeleteBooking(b.id)}
-                                    style={{
-                                        background: "none",
-                                        border: "none",
-                                        color: "red",
-                                        cursor: "pointer",
-                                    }}
-                                >
-                                    ✕
-                                </button>
-                            )}
+                            {String(i + 1).padStart(2, "0")}
                         </div>
                     ))}
                 </div>
-            )}
+
+                {/* --- Khung đặt lịch --- */}
+                <div
+                    style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        background: "#fff",
+                        borderRadius: "10px",
+                        padding: "10px 14px",
+                        boxShadow: "2px 2px 6px rgba(0,0,0,0.1)",
+                        width: "260px",
+                        marginTop: "20px",
+                    }}
+                >
+                    <div style={{ display: "flex", flexDirection: "column", fontSize: "13px" }}>
+                        <strong>
+                            Đặt lịch cho ngày {selectedDay}/{selectedMonth}
+                        </strong>
+                        <div style={{ color: "#888", marginTop: "3px" }}>
+                            Từ&nbsp;–&nbsp;Đến
+                        </div>
+                    </div>
+
+                    <button
+                        onClick={() => setShowBooking(!showBooking)}
+                        style={{
+                            width: "36px",
+                            height: "36px",
+                            borderRadius: "10px",
+                            border: "none",
+                            background: "linear-gradient(45deg, #d47dff, #79c7ff)",
+                            color: "white",
+                            fontSize: "22px",
+                            cursor: "pointer",
+                        }}
+                        title="Thêm lịch"
+                    >
+                        {showBooking ? "−" : "+"}
+                    </button>
+                </div>
+
+                {/* --- Form đặt giờ --- */}
+                {showBooking && (
+                    <div
+                        style={{
+                            marginTop: "10px",
+                            padding: "10px",
+                            border: "1px solid #ddd",
+                            borderRadius: "10px",
+                            width: "260px",
+                            background: "#fafafa",
+                        }}
+                    >
+                        <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                            <label>
+                                Từ:
+                                <select
+                                    value={fromTime}
+                                    onChange={(e) => setFromTime(e.target.value)}
+                                    style={{ width: "100%", padding: "4px" }}
+                                >
+                                    <option value="">-- Chọn giờ bắt đầu --</option>
+                                    {hours.map((h) => (
+                                        <option key={h} value={h}>
+                                            {h}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+
+                            <label>
+                                Đến:
+                                <select
+                                    value={toTime}
+                                    onChange={(e) => setToTime(e.target.value)}
+                                    style={{ width: "100%", padding: "4px" }}
+                                >
+                                    <option value="">-- Chọn giờ kết thúc --</option>
+                                    {hours.map((h) => (
+                                        <option key={h} value={h}>
+                                            {h}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+
+                            <button
+                                onClick={handleAddBooking}
+                                style={{
+                                    marginTop: "5px",
+                                    background: "linear-gradient(45deg, #79c7ff, #d47dff)",
+                                    color: "white",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    padding: "6px",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                Lưu lịch
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* --- Danh sách lịch --- */}
+                {currentBookings.length > 0 && (
+                    <div style={{ marginTop: "15px", width: "260px" }}>
+                        <h5 style={{ fontSize: "14px", marginBottom: "6px" }}>
+                            Lịch đã đặt ({selectedDay}/{selectedMonth}):
+                        </h5>
+                        {currentBookings.map((b) => (
+                            <div
+                                key={b.id}
+                                style={{
+                                    background: "#fff",
+                                    border: "1px solid #eee",
+                                    borderRadius: "8px",
+                                    padding: "6px 10px",
+                                    marginBottom: "5px",
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    fontSize: "13px",
+                                }}
+                            >
+                                <span>
+                                    <strong>{b.user}</strong> &nbsp;
+                                    {b.from} → {b.to}
+                                </span>
+
+                                {b.user === "Bạn" && (
+                                    <button
+                                        onClick={() => handleDeleteBooking(b.id)}
+                                        style={{
+                                            background: "none",
+                                            border: "none",
+                                            color: "red",
+                                            cursor: "pointer",
+                                        }}
+                                    >
+                                        ✕
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

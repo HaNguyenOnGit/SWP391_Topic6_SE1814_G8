@@ -34,19 +34,21 @@ export default function Vehicle() {
     };
 
     return (
-        <div>
+        <div className="main-container">
             <Navbar username="Username" />
+            <div className="main-content">
+                <div className="main-content-layout">
+                    <VehicleInfo vehicle={vehicle} />
 
-            <VehicleInfo vehicle={vehicle} />
-
-            <div style={{ marginTop: "30px", border: "1px solid black", padding: "15px" }}>
-                {actions.map((action, idx) => (
-                    <div key={idx} style={{ marginBottom: "10px" }}>
-                        <Link to={action.path}>{action.name}</Link>
+                    <div style={{ marginTop: "30px", border: "1px solid black", padding: "15px" }}>
+                        {actions.map((action, idx) => (
+                            <div key={idx} style={{ marginBottom: "10px" }}>
+                                <Link to={action.path}>{action.name}</Link>
+                            </div>
+                        ))}
                     </div>
-                ))}
+                </div>
             </div>
-
         </div>
     );
 }
