@@ -1,142 +1,107 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../NavBar";
-import VehicleInfo from "../VehicleInfo";
+import "./Booking.css";
 
 export default function Booking() {
     const { id } = useParams();
 
-    // --- Danh sách xe (dữ liệu demo) ---
     const vehicles = [
         { id: 1, name: "Xe Honda City", plate: "51H-12345", status: "Đang sử dụng" },
         { id: 2, name: "Xe Toyota Vios", plate: "60A-67890", status: "Đang trống" },
         { id: 3, name: "Xe Ford Ranger", plate: "43C-24680", status: "Chưa kích hoạt hợp đồng" },
     ];
 
-    // --- Lấy xe theo id từ URL ---
     const vehicle = vehicles.find((v) => v.id === parseInt(id));
-
     const today = new Date();
+
     const [selectedDay, setSelectedDay] = useState(today.getDate());
     const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(today.getFullYear());
-
-    // --- Data ảo của các user khác ---
-    const fakeBookings = {
-        "2025-10-07": [
-            { id: 1, user: "user 1", from: "06:00", to: "10:00" },
-            { id: 2, user: "user 2", from: "12:00", to: "14:00" },
-        ],
-        "2025-10-08": [
-            { id: 3, user: "user 3", from: "09:00", to: "11:00" },
-        ],
-        "2025-10-09": [
-            { id: 4, user: "user 4", from: "13:00", to: "16:00" },
-        ],
-    };
-
-    // --- Booking người dùng thật ---
-    const [bookings, setBookings] = useState({});
     const [showBooking, setShowBooking] = useState(false);
     const [fromTime, setFromTime] = useState("");
     const [toTime, setToTime] = useState("");
+    const [bookings, setBookings] = useState({});
 
-    // --- Helper ---
+    const fakeBookings = {
+        "2025-10-01": [
+            { id: 1, user: "user 1", from: "06h", to: "10h" },
+            { id: 2, user: "user 2", from: "12h", to: "14h" },
+            { id: 3, user: "user 3", from: "17h", to: "20h" },
+        ],
+    };
+
     const getDateKey = () =>
         `${selectedYear}-${String(selectedMonth).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`;
 
     const daysInMonth = (month, year) => new Date(year, month, 0).getDate();
-
     const getStartOffset = () => {
         const firstDay = new Date(selectedYear, selectedMonth - 1, 1).getDay();
         return firstDay === 0 ? 6 : firstDay - 1;
     };
 
-    // --- Kiểm tra trùng lịch ---
-    const isOverlapping = (existing, from, to) => {
-        // Nếu thời gian mới có phần giao nhau với lịch cũ thì báo lỗi
-        return !(to <= existing.from || from >= existing.to);
-    };
-
-    // --- Thêm lịch mới ---
     const handleAddBooking = () => {
-        if (!fromTime || !toTime) {
-            alert("⚠️ Vui lòng chọn đầy đủ giờ bắt đầu và kết thúc!");
-            return;
-        }
-
-        if (fromTime >= toTime) {
-            alert("⚠️ Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
-            return;
-        }
+        if (!fromTime || !toTime) return alert("Vui lòng chọn giờ bắt đầu và kết thúc!");
+        if (fromTime >= toTime) return alert("Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
 
         const key = getDateKey();
-        const allBookings = [
-            ...(fakeBookings[key] || []),
-            ...(bookings[key] || []),
-        ];
-
-        // Kiểm tra trùng lịch
-        const hasConflict = allBookings.some((b) =>
-            isOverlapping(b, fromTime, toTime)
-        );
-
-        if (hasConflict) {
-            alert("❌ Khung giờ này đã có người đặt! Vui lòng chọn giờ khác.");
-            return;
-        }
-
-        const newBooking = {
-            id: Date.now(),
-            user: "Bạn",
-            from: fromTime,
-            to: toTime,
-        };
+        const newBooking = { id: Date.now(), user: "Bạn", from: fromTime, to: toTime };
 
         setBookings((prev) => ({
             ...prev,
             [key]: [...(prev[key] || []), newBooking],
         }));
 
+        setShowBooking(false);
         setFromTime("");
         setToTime("");
-        setShowBooking(false);
-        alert("✅ Đặt lịch thành công!");
     };
 
-    // --- Xóa lịch của chính mình ---
     const handleDeleteBooking = (id) => {
-        if (window.confirm("🗑️ Bạn có chắc muốn xóa lịch này không?")) {
-            const key = getDateKey();
-            setBookings((prev) => ({
-                ...prev,
-                [key]: prev[key].filter((b) => b.id !== id),
-            }));
-            setTimeout(() => alert("✅ Đã xóa lịch thành công!"), 200);
-        }
+        const key = getDateKey();
+        setBookings((prev) => ({
+            ...prev,
+            [key]: prev[key].filter((b) => b.id !== id),
+        }));
     };
 
-    // --- Gộp data ảo + data thật ---
     const key = getDateKey();
     const currentBookings = [
         ...(fakeBookings[key] || []),
         ...(bookings[key] || []),
     ];
 
-    // --- Danh sách giờ ---
-    const hours = Array.from({ length: 24 }, (_, i) => `${String(i).padStart(2, "0")}:00`);
-
+    const getStatusColor = (status) => {
+        if (status === "Đang sử dụng") return "green";
+        if (status === "Đang trống") return "orange";
+        if (status === "Chưa kích hoạt hợp đồng") return "red";
+        return "black";
+    };
 
     return (
         <div className="main-container">
             <Navbar username="Username" />
 
             <div className="main-content">
+<<<<<<< Updated upstream
                 <h2 className="text-xl font-semibold mb-4">
                     {vehicle?.name}
                 </h2>
                 {/* --- Chọn tháng & năm --- */}
                 <div style={{ marginBottom: "10px" }}>
+=======
+                <h1>{vehicle.name}</h1>
+                <p>{vehicle.plate}</p>
+                <br />
+                <div>
+                    <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
+                        ● {vehicle.status}
+                    </span>
+                </div>
+
+                {/* --- Bộ lọc tháng năm --- */}
+                <div className="select-row">
+>>>>>>> Stashed changes
                     <select
                         value={selectedMonth}
                         onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
@@ -152,14 +117,21 @@ export default function Booking() {
                         value={selectedYear}
                         onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                     >
+<<<<<<< Updated upstream
                         {[2024, 2025, 2026].map((year) => (
                             <option key={year} value={year}>
                                 {year}
+=======
+                        {[2024, 2025, 2026].map((y) => (
+                            <option key={y} value={y}>
+                                {y}
+>>>>>>> Stashed changes
                             </option>
                         ))}
                     </select>
                 </div>
 
+<<<<<<< Updated upstream
                 {/* --- Lịch hiển thị --- */}
                 <div
                     style={{
@@ -206,9 +178,109 @@ export default function Booking() {
                             }}
                         >
                             {String(i + 1).padStart(2, "0")}
+=======
+                {/* --- Bọc lịch và khung đặt lịch thành 2 cột --- */}
+                <div className="calendar-wrapper">
+
+                    {/* --- Khu vực Lịch (Cột trái) --- */}
+                    <div className="calendar-section">
+                        <div className="calendar-header">
+                            {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
+                                <div key={i}>{d}</div>
+                            ))}
                         </div>
-                    ))}
+
+                        <div className="calendar-grid">
+                            {Array.from({ length: getStartOffset() }).map((_, i) => (
+                                <div key={`empty-${i}`} />
+                            ))}
+                            {Array.from(
+                                { length: daysInMonth(selectedMonth, selectedYear) },
+                                (_, i) => (
+                                    <div
+                                        key={i + 1}
+                                        className={`day ${selectedDay === i + 1 ? "active" : ""}`}
+                                        onClick={() => setSelectedDay(i + 1)}
+                                    >
+                                        {String(i + 1).padStart(2, "0")}
+                                    </div>
+                                )
+                            )}
+>>>>>>> Stashed changes
+                        </div>
+                    </div>
+
+                    {/* --- Cột phải: danh sách + đặt lịch --- */}
+                    <div className="booking-right">
+
+                        {/* --- Danh sách lịch (fake data + bạn đặt) --- */}
+                        <div className="booking-list">
+                            {currentBookings.map((b) => (
+                                <div key={b.id} className="booking-item">
+                                    <span>
+                                        <b>{b.user}</b> {b.from} - {b.to}
+                                    </span>
+                                    {b.user === "Bạn" && (
+                                        <button onClick={() => handleDeleteBooking(b.id)}>✕</button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* --- Thanh “Đặt lịch cho bạn” --- */}
+                        <div className="booking-bar">
+                            <div className="info">
+                                <b>Đặt lịch cho bạn</b>
+                                <div>Từ - Đến</div>
+                            </div>
+
+                            <button
+                                className="addBtn"
+                                onClick={() => setShowBooking(!showBooking)}
+                            >
+                                {showBooking ? "−" : "+"}
+                            </button>
+                        </div>
+
+                        {/* --- Form đặt lịch --- */}
+                        {showBooking && (
+                            <div className="booking-form">
+                                <label>
+                                    Từ:
+                                    <select
+                                        value={fromTime}
+                                        onChange={(e) => setFromTime(e.target.value)}
+                                    >
+                                        <option value="">-- Chọn giờ --</option>
+                                        {[...Array(24)].map((_, i) => (
+                                            <option key={i} value={`${String(i).padStart(2, "0")}h`}>
+                                                {String(i).padStart(2, "0")}h
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+
+                                <label>
+                                    Đến:
+                                    <select
+                                        value={toTime}
+                                        onChange={(e) => setToTime(e.target.value)}
+                                    >
+                                        <option value="">-- Chọn giờ --</option>
+                                        {[...Array(24)].map((_, i) => (
+                                            <option key={i} value={`${String(i).padStart(2, "0")}h`}>
+                                                {String(i).padStart(2, "0")}h
+                                            </option>
+                                        ))}
+                                    </select>
+                                </label>
+
+                                <button onClick={handleAddBooking}>Lưu lịch</button>
+                            </div>
+                        )}
+                    </div>
                 </div>
+<<<<<<< Updated upstream
 
                 {/* --- Khung đặt lịch --- */}
                 <div
@@ -357,6 +429,8 @@ export default function Booking() {
                         ))}
                     </div>
                 )}
+=======
+>>>>>>> Stashed changes
             </div>
         </div>
     );

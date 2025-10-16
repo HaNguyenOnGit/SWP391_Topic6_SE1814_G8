@@ -1,0 +1,242 @@
+.calendar-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    margin-top: 20px;
+}
+
+.calendar-section {
+    flex: 2;
+}
+
+.booking-right {
+    flex: 1;
+    max-width: 100%;
+}
+
+/* --- Thông tin xe --- */
+.vehicle-header {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.vehicle-header h1 {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.vehicle-header p {
+    font-size: 15px;
+    margin: 0;
+}
+
+/* --- Trạng thái xe --- */
+.vehicle-status {
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 8px;
+    padding: 3px 8px;
+    font-size: 13px;
+    color: #2ecc71;
+    background: none;
+}
+
+/* --- Bộ lọc tháng - năm --- */
+.select-row {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0;
+
+}
+
+.select-row select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #777;
+    background: none;
+}
+
+/* --- Lịch --- */
+.calendar-header,
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 40px);
+    text-align: center;
+    gap: 30px;
+    margin: 0 auto;
+}
+
+.calendar-header {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.calendar-grid {
+    padding: 10px 0;
+}
+
+.day {
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.day:hover {
+    background: #eee;
+}
+
+.day.active {
+    background: linear-gradient(45deg, #d47dff, #79c7ff);
+    font-weight: bold;
+    color: white;
+}
+
+/* --- Khung đặt lịch bên phải --- */
+.booking-right {
+    width: 280px;
+    border: 1px solid #000;
+    padding: 12px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
+}
+
+/* --- Thanh tiêu đề đặt lịch --- */
+.booking-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.booking-bar .info {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* --- Nút thêm lịch (Add) --- */
+.addBtn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 27pt;
+    font-weight: 700;
+    color: #D9D9D9;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    border: none;
+    margin-left: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.2s ease;
+}
+
+.addBtn:hover {
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+    transform: scale(1.05);
+}
+
+/* --- Nút nhỏ bên trong booking bar --- */
+.booking-right .addBtn {
+    width: 35px;
+    height: 35px;
+    font-size: 20pt;
+    margin-left: 0;
+}
+
+/* --- Form đặt lịch --- */
+.booking-form {
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.booking-form label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.booking-form input,
+.booking-form select {
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #bbb;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.booking-form input:focus,
+.booking-form select:focus {
+    border-color: #79c7ff;
+    box-shadow: 0 0 4px rgba(121, 199, 255, 0.6);
+}
+
+/* --- Nút xác nhận đặt lịch --- */
+.booking-form button {
+    padding: 10px;
+    border-radius: 6px;
+    border: none;
+    background: linear-gradient(135deg, #79c7ff, #d47dff);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.booking-form button:hover {
+    background: linear-gradient(135deg, #68b5e8, #c36ae8);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Danh sách lịch đã đặt --- */
+.booking-list {
+    margin-top: 10px;
+    font-size: 14px;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.booking-list .booking-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+}
+
+.booking-list .booking-item span {
+    flex: 1;
+}
+
+/* ✅ Cố định vị trí giờ sang phải */
+.booking-list .booking-item span b {
+    font-weight: 500;
+    margin-right: 8px;
+}
+
+.booking-list .booking-item button {
+    background: none;
+    border: none;
+    color: red;
+    font-size: 14px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 8px;
+}
