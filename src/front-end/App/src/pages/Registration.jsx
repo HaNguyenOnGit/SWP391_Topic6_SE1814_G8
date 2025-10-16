@@ -20,9 +20,10 @@ export default function RegistrationForm() {
   });
 
   const [errors, setErrors] = useState({});
+  const [formMessage, setFormMessage] = useState(""); // ⚡ Thông báo lỗi hoặc thành công của form
   const [showOTP, setShowOTP] = useState(false);
   const [otp, setOtp] = useState("");
-  const [message, setMessage] = useState("");
+  const [otpMessage, setOtpMessage] = useState(""); // ⚡ Thông báo OTP
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
 
@@ -79,6 +80,8 @@ export default function RegistrationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormMessage(""); // reset thông báo
+
     const newErrors = {};
     Object.keys(formData).forEach(
       (key) => (newErrors[key] = validateField(key, formData[key]))
@@ -122,13 +125,13 @@ export default function RegistrationForm() {
         console.log("Register response:", res.data);
         setShowOTP(true);
         setCountdown(30);
-        alert("Đăng ký thành công! Mã OTP đã được gửi đến email của bạn.");
+        setFormMessage("Đăng ký thành công! Vui lòng kiểm tra email để nhận mã OTP."); // ✅ hiện trong UI
       } catch (err) {
         console.error("Registration error:", err);
-        alert(
-          err.response?.data || "Đăng ký thất bại! Kiểm tra lại thông tin."
-        );
+        setFormMessage("Đăng ký có nội dung đã tồn tại hoặc chưa chính xác."); // ❌ hiện lỗi trong UI
       }
+    } else {
+      setFormMessage("Vui lòng kiểm tra lại thông tin bên trên.");
     }
   };
 
@@ -137,11 +140,11 @@ export default function RegistrationForm() {
       const res = await axios.post(
         `/api/user/confirm-email?email=${formData.email}&code=${otp}`
       );
-      alert(res.data || "Xác minh thành công!");
-      navigate("/registrationpending");
+      setOtpMessage("✅ Xác minh thành công!"); // hiện thành công
+      setTimeout(() => navigate("/registrationpending"), 1500);
     } catch (err) {
       console.error(err);
-      setMessage("Mã OTP không đúng hoặc đã hết hạn.");
+      setOtpMessage("❌ Mã OTP không đúng hoặc đã hết hạn.");
     }
   };
 
@@ -150,9 +153,9 @@ export default function RegistrationForm() {
       try {
         await axios.post(`/api/user/generate-code?email=${formData.email}`);
         setCountdown(30);
-        alert("Mã xác nhận mới đã được gửi đến email của bạn!");
+        setOtpMessage("📧 Mã xác nhận mới đã được gửi đến email của bạn!");
       } catch (err) {
-        alert("Không thể gửi lại mã xác nhận.");
+        setOtpMessage("Không thể gửi lại mã xác nhận.");
       }
     }
   };
@@ -174,6 +177,7 @@ export default function RegistrationForm() {
       bankNumber: "",
     });
     setErrors({});
+    setFormMessage("");
     navigate("/login");
   };
 
@@ -236,6 +240,18 @@ export default function RegistrationForm() {
             Hủy
           </button>
         </div>
+
+        {/* ⚡ Hiển thị lỗi hoặc thành công */}
+        {formMessage && (
+          <p
+            style={{
+              color: formMessage.startsWith("Đăng ký thành công") ? "green" : "red",
+              marginTop: "10px",
+            }}
+          >
+            {formMessage}
+          </p>
+        )}
       </form>
 
       {/* OTP Popup */}
@@ -266,7 +282,16 @@ export default function RegistrationForm() {
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
             />
-            {message && <p style={{ color: "red" }}>{message}</p>}
+            {otpMessage && (
+              <p
+                style={{
+                  color: otpMessage.startsWith("✅") ? "green" : "red",
+                  marginTop: "8px",
+                }}
+              >
+                {otpMessage}
+              </p>
+            )}
 
             <button onClick={handleVerify}>Xác minh</button>
             <button
@@ -288,5 +313,7 @@ export default function RegistrationForm() {
     </div>
   );
 }
+
+
 
 

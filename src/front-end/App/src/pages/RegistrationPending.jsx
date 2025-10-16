@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function RegistrationPending() {
     return (
@@ -8,9 +9,9 @@ export default function RegistrationPending() {
                     Đăng ký thành công!
                 </h2>
                 <p>
-                    Tài khoản của bạn đang được xác minh. Vui lòng kiểm tra email để xác
-                    nhận kích hoạt.
+                    Tài khoản của bạn đang được xác minh.
                 </p>
+                <Link to="/login">Đăng nhập</Link>
             </div>
         </div>
     );
