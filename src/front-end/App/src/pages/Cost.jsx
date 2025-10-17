@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import "./Cost.css";
 
 export default function CostDetail() {
     const { id } = useParams();
@@ -29,6 +30,7 @@ export default function CostDetail() {
     ];
 
     const [selectedCost, setSelectedCost] = useState(null);
+    const [isAnimating, setIsAnimating] = useState(false);
 
     if (!vehicle) return <h2>Không tìm thấy phương tiện</h2>;
 
@@ -45,29 +47,40 @@ export default function CostDetail() {
         console.log("Thanh toán được kích hoạt (chưa thực hiện xử lý).");
     };
 
+    const handleShowDetail = (cost) => {
+        setIsAnimating(true);
+        setTimeout(() => {
+            setSelectedCost(cost);
+            setIsAnimating(false);
+        }, 300);
+    };
+
+    const handleBack = () => {
+        setIsAnimating(true);
+        setTimeout(() => {
+            setSelectedCost(null);
+            setIsAnimating(false);
+        }, 300);
+    };
+
     return (
         <div className="main-container">
             <Navbar username="Username" />
             <div className="main-content">
                 <div className="main-content-layout">
                     <VehicleInfo vehicle={vehicle} />
-                    <div>
-                        <h3>Thông tin chi phí</h3>
+                    <div className="cost-section">
+                        <h3 className="cost-section-title">Thông tin chi phí</h3>
+
                         {!selectedCost ? (
-                            <ul className="mt-2">
+                            <ul className={`cost-list ${!selectedCost ? "fade-slide-in" : "fade-slide-out"}`}>
                                 {costs.map((c, i) => (
-                                    <li
-                                        key={i}
-                                        className="flex justify-between items-center border-b py-2"
-                                    >
-                                        <div>
-                                            <span>{c.type}: </span>
+                                    <li key={i} className="cost-item">
+                                        <div className="cost-left">
+                                            <span className="cost-type">{c.type}</span>
                                             <span
-                                                className={
-                                                    c.amount > 300000
-                                                        ? "text-red-500"
-                                                        : "text-green-500"
-                                                }
+                                                className={`cost-amount ${c.amount > 300000 ? "red" : "green"
+                                                    }`}
                                             >
                                                 {c.amount.toLocaleString()}đ
                                             </span>
@@ -76,9 +89,9 @@ export default function CostDetail() {
                                             href="#"
                                             onClick={(e) => {
                                                 e.preventDefault();
-                                                setSelectedCost(c);
+                                                handleShowDetail(c);
                                             }}
-                                            className="text-blue-500 hover:underline text-sm cursor-pointer"
+                                            className="cost-detail-link"
                                         >
                                             Xem thông tin chi tiết
                                         </a>
@@ -86,44 +99,40 @@ export default function CostDetail() {
                                 ))}
                             </ul>
                         ) : (
-                            <div className="mt-4 p-4 border rounded bg-gray-50 max-w-sm">
-                                <h4 className="font-bold mb-2">{selectedCost.type}</h4>
-                                <p className="text-gray-700 mb-3">{selectedCost.detail}</p>
+                            <div className={`cost-detail-card ${selectedCost ? "fade-slide-in" : "fade-slide-out"}`}>
+
+                                <h4 className="cost-detail-title">{selectedCost.type}</h4>
+                                <p className="cost-detail-desc">{selectedCost.detail}</p>
 
                                 {(() => {
                                     const total = calcTotalFromUser(selectedCost.amount, 40);
                                     const shares = calcShares(total);
                                     return (
                                         <>
-                                            <div className="flex justify-between font-semibold">
+                                            <div className="cost-total">
                                                 <span>Tổng:</span>
-                                                <span className="text-green-600">
+                                                <span className="total-value">
                                                     {total.toLocaleString()}đ
                                                 </span>
                                             </div>
 
-                                            <div className="flex justify-between text-sm text-gray-700 mb-2">
+                                            <div className="your-amount">
                                                 <span>Số tiền của bạn:</span>
-                                                <span className="text-green-500">
+                                                <span className="your-value">
                                                     {selectedCost.amount.toLocaleString()}đ
                                                 </span>
                                             </div>
 
-                                            <h5 className="mt-3 font-semibold text-sm">Hình thức</h5>
-                                            <p className="text-xs text-gray-500 mb-2">
-                                                Theo tỉ lệ sở hữu
-                                            </p>
+                                            <h5 className="cost-method">Hình thức</h5>
+                                            <p className="cost-note">Theo tỉ lệ sở hữu</p>
 
-                                            <div className="space-y-2">
+                                            <div className="share-list">
                                                 {shares.map((o, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className="flex justify-between items-center border rounded px-2 py-1 bg-white"
-                                                    >
+                                                    <div key={i} className="share-item">
                                                         <span>{o.name}</span>
-                                                        <div className="text-right text-sm">
-                                                            <div className="text-blue-500">{o.ratio}%</div>
-                                                            <div className="text-gray-700">
+                                                        <div className="share-right">
+                                                            <div className="ratio">{o.ratio}%</div>
+                                                            <div className="share-value">
                                                                 {o.share.toLocaleString()}đ
                                                             </div>
                                                         </div>
@@ -134,21 +143,18 @@ export default function CostDetail() {
                                     );
                                 })()}
 
-                                <button
-                                    onClick={handlePayment}
-                                    className="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 transition"
-                                >
+                                <button className="btn-pay" onClick={handlePayment}>
                                     Thanh toán
                                 </button>
 
-                                <div className="mt-6 text-center">
+                                <div className="back-section">
                                     <Link
                                         to="#"
                                         onClick={(e) => {
                                             e.preventDefault();
-                                            setSelectedCost(null);
+                                            handleBack();
                                         }}
-                                        className="text-blue-500 hover:underline text-sm"
+                                        className="back-link"
                                     >
                                         ← Quay lại danh sách chi phí
                                     </Link>

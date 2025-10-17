@@ -41,29 +41,24 @@ export default function Booking() {
     };
 
     const handleAddBooking = () => {
-        // 1️⃣ Kiểm tra đã chọn giờ chưa
         if (!fromTime || !toTime) {
-            alert("⚠️ Vui lòng chọn cả giờ bắt đầu và kết thúc!");
+            alert("Vui lòng chọn cả giờ bắt đầu và kết thúc!");
             return;
         }
 
-        // 2️⃣ Chuyển '06h' → 6, '20h' → 20 để dễ so sánh
         const from = parseInt(fromTime.replace("h", ""), 10);
         const to = parseInt(toTime.replace("h", ""), 10);
 
-        // 3️⃣ Kiểm tra định dạng hợp lệ
         if (isNaN(from) || isNaN(to)) {
-            alert("⚠️ Giờ không hợp lệ!");
+            alert("Giờ không hợp lệ!");
             return;
         }
 
-        // 4️⃣ Giờ bắt đầu phải nhỏ hơn giờ kết thúc
         if (from >= to) {
-            alert("⚠️ Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
+            alert("Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
             return;
         }
 
-        // 5️⃣ Kiểm tra trùng lịch (so với lịch có sẵn)
         const key = getDateKey();
         const allBookings = [
             ...(fakeBookings[key] || []),
@@ -78,26 +73,27 @@ export default function Booking() {
         });
 
         if (overlap) {
-            alert("⚠️ Khoảng thời gian này đã có người đặt rồi!");
+            alert("Khoảng thời gian này đã có người đặt rồi!");
             return;
         }
 
-        // 6️⃣ Nếu ổn, thêm booking
         const newBooking = { id: Date.now(), user: "Bạn", from: fromTime, to: toTime };
         setBookings((prev) => ({
             ...prev,
             [key]: [...(prev[key] || []), newBooking],
         }));
 
-        // 7️⃣ Reset form
         setShowBooking(false);
         setFromTime("");
         setToTime("");
-        alert("✅ Đặt lịch thành công!");
+        alert("Đặt lịch thành công!");
     };
 
 
     const handleDeleteBooking = (id) => {
+        const confirmDelete = window.confirm("Bạn có chắc muốn xóa lịch này không?");
+        if (!confirmDelete) return; // nếu người dùng bấm Hủy thì thoát hàm
+
         const key = getDateKey();
         setBookings((prev) => ({
             ...prev,
@@ -117,6 +113,8 @@ export default function Booking() {
         if (status === "Chưa kích hoạt hợp đồng") return "red";
         return "black";
     };
+
+
 
     return (
         <div className="main-container">

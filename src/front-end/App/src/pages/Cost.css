@@ -1,0 +1,218 @@
+/* --- Khối chính --- */
+.cost-section {
+    flex: 1;
+    padding: 20px 25px;
+    border-radius: 8px;
+}
+
+.cost-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+/* --- Danh sách chi phí --- */
+.cost-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cost-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.cost-left {
+    display: flex;
+    flex-direction: column;
+}
+
+.cost-type {
+    font-weight: 600;
+    color: #000;
+}
+
+.cost-amount {
+    font-weight: 600;
+}
+
+.cost-amount.red {
+    color: #e74c3c;
+    /* đỏ */
+}
+
+.cost-amount.green {
+    color: #16a34a;
+    /* xanh lá */
+}
+
+.cost-detail-link {
+    color: #ff5c00;
+    /* cam như ảnh */
+    font-size: 14px;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.cost-detail-link:hover {
+    text-decoration: underline;
+}
+
+/* --- Thẻ chi tiết chi phí --- */
+.cost-detail-card {
+    opacity: 0;
+    transform: translateY(10px);
+    animation-fill-mode: forwards;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.cost-detail-title {
+    font-weight: 700;
+    font-size: 18px;
+    margin-bottom: 6px;
+}
+
+.cost-detail-desc {
+    color: #555;
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* --- Tổng và phần chia tỉ lệ --- */
+.cost-total,
+.your-amount {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.total-value {
+    color: #16a34a;
+}
+
+.your-value {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.cost-method {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 15px;
+}
+
+.cost-note {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+/* --- Danh sách chia sẻ --- */
+.share-list {
+    margin-top: 10px;
+}
+
+.share-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+}
+
+.share-right {
+    text-align: right;
+}
+
+.ratio {
+    color: #007bff;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.share-value {
+    color: #333;
+    font-size: 13px;
+}
+
+/* --- Nút & Link --- */
+.btn-pay {
+    width: 100%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-pay:hover {
+    background-color: #0056b3;
+}
+
+.back-section {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.back-link {
+    color: #007bff;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Hiệu ứng fade + slide */
+.fade-slide-in {
+    animation: fadeSlideIn 0.6s ease forwards;
+}
+
+.fade-slide-out {
+    animation: fadeSlideOut 0.6s ease forwards;
+}
+
+@keyframes fadeSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+/* Nhẹ nhàng hơn cho card chi tiết */
+.cost-detail-card.show {
+    animation: fadeSlideIn 0.6s ease forwards;
+}
