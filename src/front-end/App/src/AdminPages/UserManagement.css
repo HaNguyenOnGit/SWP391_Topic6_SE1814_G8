@@ -1,0 +1,159 @@
+.user-management {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #f7f7f7;
+}
+
+/* Tiêu đề và thanh điều khiển */
+.user-management h2 {
+    margin: 20px;
+    color: #333;
+}
+
+.user-controls {
+    display: flex;
+    gap: 10px;
+    margin: 0 20px 10px;
+}
+
+.user-controls input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.user-controls button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.user-controls button:hover {
+    background-color: #2563eb;
+}
+
+/* Vùng chứa danh sách và chi tiết */
+.user-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    padding: 0 20px 20px;
+    gap: 20px;
+}
+
+/* Danh sách user (scroll độc lập) */
+.user-list {
+    flex: 1;
+    overflow-y: auto;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.user-table tr:hover {
+    background-color: #f1f5f9;
+    cursor: pointer;
+}
+
+.user-detail {
+    position: relative;
+    flex: 0 0 20%;
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 10px;
+    height: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    /* 👈 để sticky hoạt động đúng */
+}
+
+.user-info {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.image-gallery img {
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.user-actions {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.15);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    z-index: 5;
+}
+
+.user-actions button {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.user-actions button:hover {
+    background-color: #4338ca;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    min-width: 300px;
+}
+
+.action-btn-group {
+    position: fixed;
+    width: 100%;
+    padding: 10px;
+}

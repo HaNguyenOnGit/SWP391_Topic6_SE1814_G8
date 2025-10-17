@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaUserShield } from "react-icons/fa";
+import "./ANavbar.css";
 
 export default function AdminNavbar({ adminName }) {
     const navigate = useNavigate();
@@ -10,28 +11,18 @@ export default function AdminNavbar({ adminName }) {
     };
 
     return (
-        <nav className="flex items-center justify-between bg-gray-900 px-6 py-3 text-white">
-            {/* Left Side Menu */}
-            <div className="flex space-x-6">
-                <Link to="/admin/users" className="hover:text-gray-300">
-                    Quản lý user
-                </Link>
-                <Link to="/admin/contracts" className="hover:text-gray-300">
-                    Quản lý hợp đồng
-                </Link>
-                <Link to="/admin/overview" className="hover:text-gray-300">
-                    Tổng quan
-                </Link>
+        <nav className="admin-navbar">
+            <div className="menu">
+                <Link to="/admin/users">Quản lý user</Link>
+                <Link to="/admin/contracts">Quản lý hợp đồng</Link>
+                <Link to="/admin/overview">Tổng quan</Link>
             </div>
 
-            {/* Admin Box */}
-            <div
-                className="flex items-center space-x-2 cursor-pointer hover:text-gray-300"
-                onClick={handleProfileClick}
-            >
-                <FaUserShield size={28} />
+            <div className="admin-box" onClick={handleProfileClick}>
+                <FaUserShield size={24} />
                 <span>{adminName}</span>
             </div>
         </nav>
     );
 }
+
