@@ -41,21 +41,61 @@ export default function Booking() {
     };
 
     const handleAddBooking = () => {
-        if (!fromTime || !toTime) return alert("Vui lòng chọn giờ bắt đầu và kết thúc!");
-        if (fromTime >= toTime) return alert("Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
+        // 1️⃣ Kiểm tra đã chọn giờ chưa
+        if (!fromTime || !toTime) {
+            alert("⚠️ Vui lòng chọn cả giờ bắt đầu và kết thúc!");
+            return;
+        }
 
+        // 2️⃣ Chuyển '06h' → 6, '20h' → 20 để dễ so sánh
+        const from = parseInt(fromTime.replace("h", ""), 10);
+        const to = parseInt(toTime.replace("h", ""), 10);
+
+        // 3️⃣ Kiểm tra định dạng hợp lệ
+        if (isNaN(from) || isNaN(to)) {
+            alert("⚠️ Giờ không hợp lệ!");
+            return;
+        }
+
+        // 4️⃣ Giờ bắt đầu phải nhỏ hơn giờ kết thúc
+        if (from >= to) {
+            alert("⚠️ Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
+            return;
+        }
+
+        // 5️⃣ Kiểm tra trùng lịch (so với lịch có sẵn)
         const key = getDateKey();
-        const newBooking = { id: Date.now(), user: "Bạn", from: fromTime, to: toTime };
+        const allBookings = [
+            ...(fakeBookings[key] || []),
+            ...(bookings[key] || []),
+        ];
 
+        const overlap = allBookings.some((b) => {
+            const bFrom = parseInt(b.from.replace("h", ""), 10);
+            const bTo = parseInt(b.to.replace("h", ""), 10);
+            // kiểm tra khoảng thời gian giao nhau
+            return !(to <= bFrom || from >= bTo);
+        });
+
+        if (overlap) {
+            alert("⚠️ Khoảng thời gian này đã có người đặt rồi!");
+            return;
+        }
+
+        // 6️⃣ Nếu ổn, thêm booking
+        const newBooking = { id: Date.now(), user: "Bạn", from: fromTime, to: toTime };
         setBookings((prev) => ({
             ...prev,
             [key]: [...(prev[key] || []), newBooking],
         }));
 
+        // 7️⃣ Reset form
         setShowBooking(false);
         setFromTime("");
         setToTime("");
+        alert("✅ Đặt lịch thành công!");
     };
+
 
     const handleDeleteBooking = (id) => {
         const key = getDateKey();

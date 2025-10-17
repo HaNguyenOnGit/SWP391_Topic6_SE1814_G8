@@ -7,7 +7,6 @@
 
 .calendar-section {
     flex: 2;
-    margin-left: 30px;
 }
 
 .booking-right {
@@ -52,7 +51,7 @@
     display: flex;
     gap: 8px;
     margin: 10px 0;
-    margin-left: 30px;
+
 }
 
 .select-row select {
@@ -60,6 +59,7 @@
     border-radius: 6px;
     border: 1px solid #777;
     background: none;
+    margin-left: 30px;
 }
 
 /* --- Lịch --- */
@@ -70,6 +70,7 @@
     text-align: center;
     gap: 30px;
     margin: 0 auto;
+    margin-left: 30px;
 }
 
 .calendar-header {
@@ -100,14 +101,18 @@
 
 /* --- Khung đặt lịch bên phải --- */
 .booking-right {
+    width: 280px;
     flex: 1;
     max-width: 3800px;
     min-height: 500px;
     border: 1px solid #000;
+    padding: 12px 15px;
     border-radius: 18px;
     padding: 25px 22px;
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    justify-content: flex-start;
     justify-content: space-between;
     gap: 18px;
     box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.15);
@@ -161,6 +166,11 @@
 }
 
 /* --- Form đặt lịch --- */
+.booking-right {
+    position: relative;
+    /* để form định vị tuyệt đối trong khung này */
+}
+
 .booking-form {
     border: 1px solid #ccc;
     padding: 15px;
@@ -169,6 +179,30 @@
     flex-direction: column;
     gap: 12px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+    /* 💡 thêm phần dưới đây để form hiện phía trên */
+    position: absolute;
+    bottom: 80px;
+    /* đẩy form lên phía trên nút “+” */
+    left: 0;
+    right: 0;
+    width: 90%;
+    margin: 0 auto;
+    z-index: 10;
+    animation: slideUp 0.25s ease;
+}
+
+/* Hiệu ứng trượt nhẹ khi form bật lên */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .booking-form label {
@@ -186,6 +220,7 @@
     font-size: 14px;
     outline: none;
     transition: all 0.2s ease;
+    background: none;
 }
 
 .booking-form input:focus,
