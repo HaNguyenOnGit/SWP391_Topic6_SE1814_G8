@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import "./Payment.css";
 
 export default function PaymentHistory() {
     const { id } = useParams();
@@ -61,12 +62,13 @@ export default function PaymentHistory() {
                     <VehicleInfo vehicle={vehicle} />
 
                     {step === "list" && (
-                        <div>
+                        <div className="payment-section fade-slide-in">
                             <h3>Chọn khoản thanh toán</h3>
-                            <div>
+                            <div className="payment-list">
                                 {payments.map((p) => (
                                     <div
                                         key={p.id}
+                                        className="payment-item"
                                         onClick={() => {
                                             if (p.status === "Not Paid") {
                                                 setSelectedPayment(p);
@@ -74,16 +76,14 @@ export default function PaymentHistory() {
                                             }
                                         }}
                                     >
-                                        <div>
-                                            <span>{p.name}</span>
-                                            <span>{p.total}</span>
+                                        <div className="left">
+                                            <span className="name">{p.name}</span>
+                                            <span className="date">{p.date}</span>
+                                            <span>{p.proposer}</span>
                                         </div>
-                                        <div style={{ fontSize: 14 }}>
-                                            <div>{p.date}</div>
-                                            <div style={{ fontWeight: "bold", color: p.status === "Paid" ? "green" : "red" }}>
-                                                {p.paid}
-                                            </div>
-                                            <div>{p.proposer}</div>
+                                        <div className="right">
+                                            <div className={`amount ${p.status === "Paid" ? "green" : "red"}`}>{p.paid}</div>
+                                            <div className="total">{p.total}</div>
                                         </div>
                                     </div>
                                 ))}
@@ -92,50 +92,76 @@ export default function PaymentHistory() {
                     )}
 
                     {step === "form" && selectedPayment && (
-                        <div>
-                            <div>
-                                <div>{selectedPayment.name}</div>
-                                <div><b>Tổng:</b> {selectedPayment.total}</div>
-                                <div><b>Số tiền cần trả:</b> {selectedPayment.total}</div>
-                                <div>
-                                    <b>Hình thức thanh toán:</b>
+                        <div className="payment-form fade-slide-in">
+                            <h3>Thông tin thanh toán</h3>
+
+                            <div className="payment-details">
+                                <div className="row-amount">
+                                    <b>Tổng:</b>
+                                    <span className="total">{selectedPayment.total.toLocaleString("vi-VN")} ₫</span>
+                                </div>
+
+                                <div className="row-amount">
+                                    <b>Số tiền của bạn:</b>
+                                    <span className="user-amount">850.000 ₫</span>
+                                </div>
+
+                                <div className="row-amount column">
+                                    <b>Số tiền cần trả</b>
+                                    <input
+                                        className="txtInput"
+                                        type="text"
+                                        value={selectedPayment.total.toLocaleString("vi-VN")}
+                                        readOnly
+                                    />
+                                </div>
+
+                                <div className="row-payment column">
+                                    <b>Hình thức thanh toán</b>
                                     <select
+                                        className="txtInput"
                                         value={method}
                                         onChange={(e) => setMethod(e.target.value)}
-                                        style={{ marginLeft: 5 }}
                                     >
-                                        <option>chuyển khoản ngân hàng</option>
+                                        <option>Chuyển khoản ngân hàng</option>
                                     </select>
                                 </div>
-                                <div><b>Người nhận:</b> {bankInfo.accountName}</div>
+
+                                <div className="row-recipient">
+                                    <b>Người nhận:</b>&nbsp; <span>{bankInfo.accountName}</span>
+                                </div>
                             </div>
-                            <div>
-                                <button onClick={handleBack}>Hủy</button>
-                                <button onClick={() => setStep("qr")}>Thanh toán</button>
+
+                            <div className="payment-actions">
+                                <button className="payment-btn btn-cancel" onClick={handleBack}>
+                                    Hủy
+                                </button>
+                                <button className="payment-btn btn-confirm" onClick={() => setStep("qr")}>
+                                    Thanh toán
+                                </button>
                             </div>
                         </div>
                     )}
 
                     {step === "qr" && (
-                        <div>
+                        <div className="payment-qr fade-slide-in">
                             <h3>Thanh toán</h3>
-                            <div>
-                                <div style={{ width: 120, height: 120, background: "#ccc", margin: "10px auto" }}>[QR]</div>
-                                <div>{method}</div>
-                                <div>{bankInfo.accountName}</div>
-                                <div>{bankInfo.bankName}</div>
-                                <div>{bankInfo.accountNumber}</div>
-                                <div><b>Số tiền:</b> {selectedPayment?.total}</div>
-                            </div>
-                            <div>
-                                <button onClick={handleBack}>Hủy</button>
-                                <button onClick={() => setStep("confirm")}>Xác nhận</button>
+                            <div className="qr-box"></div>
+                            <div>{method}</div>
+                            <div>{bankInfo.accountName}</div>
+                            <div>{bankInfo.bankName}</div>
+                            <div>{bankInfo.accountNumber}</div>
+                            <div><b>Số tiền:</b> {selectedPayment?.total}</div>
+
+                            <div className="payment-actions">
+                                <button className="payment-btn btn-cancel" onClick={handleBack}>Hủy</button>
+                                <button className="payment-btn btn-confirm" onClick={() => setStep("confirm")}>Xác nhận</button>
                             </div>
                         </div>
                     )}
 
                     {step === "confirm" && (
-                        <div>
+                        <div className="payment-confirm fade-slide-in">
                             <h3>Xác minh thanh toán</h3>
                             <input
                                 type="file"
@@ -144,14 +170,14 @@ export default function PaymentHistory() {
                             />
                             {file && <p style={{ color: "green" }}>Đã chọn: {file.name}</p>}
                             <p>Upload bill chuyển khoản</p>
-                            <div>
-                                <button onClick={() => setStep("success")}>Xác nhận</button>
+                            <div className="payment-actions">
+                                <button className="payment-btn btn-confirm" onClick={() => setStep("success")}>Xác nhận</button>
                             </div>
                         </div>
                     )}
 
                     {step === "success" && (
-                        <div style={{ textAlign: "center", color: "green" }}>
+                        <div className="payment-success fade-slide-in">
                             Xác minh chuyển khoản thành công
                         </div>
                     )}
