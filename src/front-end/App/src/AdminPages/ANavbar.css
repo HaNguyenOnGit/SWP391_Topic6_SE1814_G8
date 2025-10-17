@@ -1,0 +1,51 @@
+.admin-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #111827, #1f2937);
+    color: white;
+    padding: 12px 24px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.admin-navbar .menu {
+    display: flex;
+    gap: 24px;
+}
+
+.admin-navbar .menu a {
+    color: #d1d5db;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.admin-navbar .menu a:hover {
+    color: white;
+    transform: translateY(-1px);
+}
+
+.admin-navbar .admin-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.admin-navbar .admin-box:hover {
+    color: #9ca3af;
+}
+
+@media (max-width: 640px) {
+    .admin-navbar {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .admin-navbar .menu {
+        flex-direction: column;
+        gap: 8px;
+    }
+}
