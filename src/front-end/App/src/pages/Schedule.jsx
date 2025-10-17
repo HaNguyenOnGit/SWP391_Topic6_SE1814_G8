@@ -21,7 +21,7 @@ export default function Schedule() {
         <div className="main-container">
             <Navbar username="Username" />
             <div className="main-content">
-                <h1>Phương tiện của bạn</h1>
+                <h1 className="vehicle-title">Phương tiện của bạn</h1>
                 <Link to="/newContract">Tạo hợp đồng →</Link>
 
                 {/* Danh sách phương tiện */}

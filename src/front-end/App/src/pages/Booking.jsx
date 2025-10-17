@@ -83,14 +83,17 @@ export default function Booking() {
             <Navbar username="Username" />
 
             <div className="main-content">
-                <h1>{vehicle.name}</h1>
-                <p>{vehicle.plate}</p>
-                <br />
-                <div>
-                    <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
-                        ● {vehicle.status}
-                    </span>
+                <div style={{ marginLeft: "30px" }}>
+                    <h1>{vehicle.name}</h1>
+                    <p>{vehicle.plate}</p>
+                    <br />
+                    <div>
+                        <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
+                            ● {vehicle.status}
+                        </span>
+                    </div>
                 </div>
+
 
                 {/* --- Bộ lọc tháng năm --- */}
                 <div className="select-row">

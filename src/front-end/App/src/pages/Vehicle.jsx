@@ -2,6 +2,7 @@ import React from "react";
 import Navbar from "../NavBar";
 import { useParams, Link } from "react-router-dom";
 import VehicleInfo from "../VehicleInfo";
+import "./Vehicle.css";
 
 export default function Vehicle() {
     const { id } = useParams();
@@ -40,9 +41,9 @@ export default function Vehicle() {
                 <div className="main-content-layout">
                     <VehicleInfo vehicle={vehicle} />
 
-                    <div style={{ marginTop: "30px", border: "1px solid black", padding: "15px" }}>
+                    <div className="action-menu">
                         {actions.map((action, idx) => (
-                            <div key={idx} style={{ marginBottom: "10px" }}>
+                            <div key={idx} className="action-item">
                                 <Link to={action.path}>{action.name}</Link>
                             </div>
                         ))}
