@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Navbar from "../NavBar";
 import "./newContract.css"
+import axios from "axios";
 
 export default function NewContract() {
   const [step, setStep] = useState(1);
@@ -15,6 +16,7 @@ export default function NewContract() {
 
   // form 2 state
   const [owners, setOwners] = useState([]);
+  const [ownerError, setOwnerError] = useState("");
   const [phone, setPhone] = useState("");
 
   // form 3 state
@@ -23,6 +25,7 @@ export default function NewContract() {
     "Không được tự ý bán hoặc chuyển nhượng khi chưa có sự đồng ý của đồng sở hữu.",
     "Mọi chi phí bảo dưỡng, sửa chữa sẽ được chia theo tỷ lệ sở hữu."
   ];
+  const [submitMessage, setSubmitMessage] = useState("");
 
   // validate license plate VN
   const licenseRegex = /^([0-9]{2}[A-Z]{1,2}-[0-9]{3}\.?[0-9]{2,3})$/;
@@ -44,11 +47,35 @@ export default function NewContract() {
   };
 
   // add owner
-  const addOwner = () => {
-    if (!phone) return;
-    setOwners([...owners, { phone, ratio: 0 }]);
-    setPhone("");
-  };
+  const addOwner = async () => {
+    const trimmedPhone = phone.trim();
+    if (!trimmedPhone) {
+      setOwnerError("Vui lòng nhập số điện thoại");
+      return;
+    }
+
+    if (owners.some(o => o.phone === trimmedPhone)) {
+      setOwnerError("Số điện thoại này đã được thêm");
+      return;
+    }
+
+    try {
+      const res = await axios.get(`/api/user/phone/${trimmedPhone}`);
+      if (res.status === 200) {
+        const fullName = res.data; // API trả về FullName (string)
+        setOwners([...owners, { phone: trimmedPhone, fullName, ratio: 0 }]);
+        setPhone("");
+        setOwnerError("");
+      }
+    } catch (err) {
+      if (err.response && err.response.status === 404) {
+        setOwnerError("Số điện thoại này không tồn tại trong hệ thống");
+      } else {
+        setOwnerError("Có lỗi khi kiểm tra số điện thoại");
+        console.error(err);
+      }
+    }
+  }
 
   // update ratio
   const updateRatio = (i, val) => {
@@ -141,11 +168,14 @@ export default function NewContract() {
               onChange={e => setPhone(e.target.value)}
             />
             <button className="addBtn" onClick={addOwner}>+</button>
+            {ownerError && <p style={{ color: "red" }}>{ownerError}</p>}
             <div>
               {owners.map((o, i) => (
                 <div key={i} className="pSlider">
-                  <span className="pSlider-name">{o.phone}</span>
-                  <br></br>
+                  <span className="pSlider-name">
+                    {o.fullName}
+                  </span>
+                  <br />
                   <input
                     className="slider"
                     type="range"
@@ -193,11 +223,51 @@ export default function NewContract() {
             <button className="btnReturn" onClick={() => setStep(2)}>Quay lại</button>
             <button
               className="btnInput"
-              disabled={terms.length === 0}
-              onClick={() => setStep(4)}
+              disabled={terms.length === 0 || owners.length === 0 || totalRatio !== 100}
+              onClick={async () => {
+                setSubmitMessage(""); // reset message
+                try {
+                  // Build members exactly like teammate's JSON
+                  const members = owners.map(o => ({
+                    PhoneNumber: o.phone,
+                    SharePercent: o.ratio.toFixed(2) // string like "60.00"
+                  }));
+
+                  // Build contract JSON
+                  const contractData = {
+                    VehicleName: vehicle.name,
+                    LicensePlate: vehicle.license,
+                    Model: vehicle.model,
+                    StartDate: new Date().toISOString().split("T")[0], // "YYYY-MM-DD"
+                    Status: "Pending",
+                    Members: members
+                  };
+
+                  // Call backend API
+                  const res = await axios.post("/api/contract/contractRequest", contractData);
+
+                  console.log("Tạo hợp đồng thành công:", res.data);
+                  setSubmitMessage("Tạo hợp đồng thành công!");
+                  setStep(4); // move to confirmation step
+                } catch (err) {
+                  console.error("Lỗi khi tạo hợp đồng:", err.response?.data || err.message);
+                  setSubmitMessage("Có lỗi khi tạo hợp đồng. Vui lòng thử lại!");
+                }
+              }}
             >
               Xác nhận
             </button>
+            {submitMessage && (
+              <p
+                style={{
+                  marginTop: "10px",
+                  color: submitMessage.includes("thành công") ? "green" : "red"
+                }}
+              >
+                {submitMessage}
+              </p>
+            )}
+
           </div>
         )}
 

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.Others
 {
-    public class LoginRequest
+    public class UpdateUserRequest
     {
-        public string FullName { get; set; }
-        public string Password { get; set; }
+        public string? NewPassword { get; set; }
+        public int UserId { get; set; }
     }
 }

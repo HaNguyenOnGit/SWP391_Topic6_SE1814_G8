@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../NavBar";
+import { useNavigate } from "react-router-dom";
 
 export default function UserProfile() {
+    const navigate = useNavigate();
     const [user, setUser] = useState({
         fullName: "Nguyễn Văn A",
         phone: "0901234567",
@@ -145,6 +147,9 @@ export default function UserProfile() {
                 </div>
 
                 {message && <p className="text-center text-sm mt-4">{message}</p>}
+                <div className="text-center mt-4">
+                    <button onClick={() => { localStorage.removeItem('auth_token'); localStorage.removeItem('auth_user'); navigate('/login'); }} className="bg-red-600 text-white px-4 py-2 rounded">Đăng xuất</button>
+                </div>
             </div>
         </div>
     );

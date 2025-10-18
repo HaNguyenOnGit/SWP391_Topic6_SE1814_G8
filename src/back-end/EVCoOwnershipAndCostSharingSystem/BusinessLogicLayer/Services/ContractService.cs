@@ -16,11 +16,12 @@ namespace BusinessLogicLayer.Services
         {
             _cr = new ContractRepository();
         }
-        public void CreateContract(string licensePlate, string model, DateOnly startDate,
+        public void CreateContract(string vehicleName, string licensePlate, string model, DateOnly startDate,
                                    string status)
         {
             Contract contract = new Contract
             {
+                VehicleName = vehicleName,
                 LicensePlate = licensePlate,
                 Model = model,
                 StartDate = startDate,
@@ -31,6 +32,19 @@ namespace BusinessLogicLayer.Services
         public Contract? GetContractByPlate(string licensePlate)
         {
             return _cr.GetContractByPlate(licensePlate);
+        }
+        public void DeleteContract(string vehicleName, string licensePlate, string model, DateOnly startDate,
+                                   string status)
+        {
+            Contract contract = new Contract
+            {
+                VehicleName = vehicleName,
+                LicensePlate = licensePlate,
+                Model = model,
+                StartDate = startDate,
+                Status = status
+            };
+            _cr.DeleteContract(contract);
         }
     }
 }

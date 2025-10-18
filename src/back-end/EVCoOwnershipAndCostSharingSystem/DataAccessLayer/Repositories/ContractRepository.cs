@@ -24,5 +24,10 @@ namespace DataAccessLayer.Repositories
         {
             return _context.Contracts.FirstOrDefault(c => c.LicensePlate == licensePlate);
         }
+        public void DeleteContract(Contract contract)
+        {
+            _context.Contracts.Remove(contract);
+            _context.SaveChanges();
+        }
     }
 }
