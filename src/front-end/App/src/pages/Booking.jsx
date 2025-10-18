@@ -252,7 +252,7 @@ export default function Booking() {
                             <div className="time-inputs">
                                 <input
                                     type="text"
-                                    placeholder="Từ (VD: 930 → 09h30p)"
+                                    placeholder="Từ"
                                     value={fromTime}
                                     onChange={(e) => {
                                         let val = e.target.value.replace(
@@ -274,10 +274,10 @@ export default function Booking() {
                                         setFromTime(formatted);
                                     }}
                                 />
-
+                                <b>→</b>
                                 <input
                                     type="text"
-                                    placeholder="Đến (VD: 1415 → 14h15p)"
+                                    placeholder="Đến"
                                     value={toTime}
                                     onChange={(e) => {
                                         let val = e.target.value.replace(
@@ -299,12 +299,11 @@ export default function Booking() {
                                         setToTime(formatted);
                                     }}
                                 />
+                                    <button className="addBtn" onClick={handleAddBooking}>
+                                        +
+                                    </button>
                             </div>
                         </div>
-
-                        <button className="addBtn" onClick={handleAddBooking}>
-                            +
-                        </button>
                     </div>
                 </div>
             </div>
