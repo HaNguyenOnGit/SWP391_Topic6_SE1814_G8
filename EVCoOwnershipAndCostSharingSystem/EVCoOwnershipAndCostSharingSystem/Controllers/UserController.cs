@@ -9,28 +9,58 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _us;
-        private readonly EmailService _emailService;
+    private readonly UserService _us;
+    private readonly EmailService _emailService;
+    private readonly AuthService _authService;
 
         // Inject cả UserService và EmailService
-        public UserController(UserService us, EmailService emailService)
+        public UserController(UserService us, EmailService emailService, AuthService authService)
         {
             _us = us;
             _emailService = emailService;
+            _authService = authService;
         }
-        [HttpPost("login")]
-        public ActionResult<User> GetUser([FromBody] LoginRequest request)
+
+        // Lấy tất cả người dùng
+        // Dung trong dang ky nguoi dung moi
+        // De phong truong hop trung so dien thoai
+        [HttpGet("all")]
+        public ActionResult<List<User>> GetAllUsers()
         {
-            string fullName = request.FullName;
+            var userList = _us.GetAllUsers();
+            return Ok(userList);
+        }
+
+        //Dang nhap
+        [HttpPost("login")]
+        public ActionResult GetUser([FromBody] LoginRequest request)
+        {
+            string phoneNumber = request.PhoneNumber;
             string password = request.Password;
-            var user = _us.GetUser(fullName, password);
+            var user = _us.GetUser(phoneNumber, password);
             if (user == null)
             {
                 return NotFound("User not found");
             }
-            return Ok(user);
+
+            // Generate JWT token
+            var token = _authService.GenerateJwtToken(user);
+
+            // Return token and minimal user info (no password)
+            return Ok(new {
+                Token = token,
+                User = new {
+                    user.UserId,
+                    user.FullName,
+                    user.Email,
+                    user.PhoneNumber,
+                    user.Role
+                }
+            });
         }
+
         //API nay chi dung de kiem tra so dien thoai da duoc dang ky chua
+        //Dung trong viec them thanh vien vao hop dong
         [HttpGet("phone/{phoneNumber}")]
         public ActionResult<User> GetUserByPhone(string phoneNumber)
         {
@@ -39,7 +69,21 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             {
                 return NotFound($"User with phone number {phoneNumber} not found");
             }
-            return Ok();
+            return Ok(user.FullName);
+        }
+
+        //Cap nhat mat khau
+        [HttpPut("updateUserRequest")]
+        public IActionResult UpdateUser([FromBody] UpdateUserRequest uur)
+        {
+            int userId = uur.UserId;
+            string newPassword = uur.NewPassword;
+            if (string.IsNullOrEmpty(newPassword))
+            {
+                return BadRequest("Password must not empty.");
+            }
+            _us.UpdateUser(newPassword, userId);
+            return Ok("User updated successfully");
         }
 
         [HttpPost("confirm-email")]

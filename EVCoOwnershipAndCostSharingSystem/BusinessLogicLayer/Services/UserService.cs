@@ -20,9 +20,14 @@ namespace BusinessLogicLayer.Services
             _ur = new UserRepository();
         }
 
-        public User GetUser(string fullName, string email)
+        public List<User> GetAllUsers()
         {
-            return _ur.GetUser(fullName, email);
+            return _ur.GetAllUsers();
+        }
+
+        public User GetUser(string phoneNumber, string email)
+        {
+            return _ur.GetUser(phoneNumber, email);
         }
 
         public User? GetUserByEmail(string email)
@@ -65,6 +70,16 @@ namespace BusinessLogicLayer.Services
             };
 
             _ur.AddUser(user);
+        }
+
+        public void UpdateUser(User user)
+        {
+            _ur.UpdateUser(user);
+        }
+
+        public void UpdateUser(string newPassword, int userId)
+        {
+            _ur.UpdateUser(newPassword,userId);
         }
 
         // Gửi mã xác nhận

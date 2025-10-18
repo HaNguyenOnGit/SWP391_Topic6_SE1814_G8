@@ -18,9 +18,9 @@ namespace DataAccessLayer.Repositories
             _context = new EvcoOwnershipAndCostSharingSystemContext();
         }
 
-        public User GetUser(string fullName, string password)
+        public User GetUser(string phoneNumber, string password)
         {
-            var user = _context.Users.FirstOrDefault(x => x.FullName == fullName && x.Password == password);
+            var user = _context.Users.FirstOrDefault(x => x.PhoneNumber == phoneNumber && x.Password == password);
             return user;
         }
 
@@ -28,6 +28,11 @@ namespace DataAccessLayer.Repositories
         {
             _context.Users.Add(user);
             _context.SaveChanges();
+        }
+
+        public List<User> GetAllUsers()
+        {
+            return _context.Users.ToList();
         }
 
         public User? GetUserByPhone(string phoneNumber)
@@ -50,6 +55,15 @@ namespace DataAccessLayer.Repositories
             _context.Users.Update(user);
             _context.SaveChanges();
         }
+
+        public void UpdateUser(string newPassword, int userId)
+        {
+            var user = GetUserById(userId);
+            user.Password = newPassword;
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
+
         public void ConfirmEmail(string email, string code)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
