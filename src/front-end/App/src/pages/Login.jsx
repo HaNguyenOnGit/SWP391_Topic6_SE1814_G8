@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function LoginPage({ apiUrl }) {
     const [phone, setPhone] = useState("");
@@ -7,6 +7,7 @@ export default function LoginPage({ apiUrl }) {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
 
     // Validate 1 field
     const validateField = (name, value) => {
@@ -51,22 +52,41 @@ export default function LoginPage({ apiUrl }) {
 
         setLoading(true);
         try {
-            const res = await fetch(apiUrl, {
+            // Use provided apiUrl if available, otherwise use relative path
+            const url = apiUrl ? `${apiUrl.replace(/\/+$/, '')}/api/user/login` : `/api/user/login`;
+
+            const res = await fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ phone, password }),
+                body: JSON.stringify({ PhoneNumber: phone, Password: password }),
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data?.message || "Đăng nhập thất bại");
+            // Try parse JSON but fallback to text for better error messages
+            let data = null;
+            const text = await res.text();
+            try { data = text ? JSON.parse(text) : null; } catch { data = text; }
 
-            if (data.token) {
-                localStorage.setItem("auth_token", data.token);
+            if (!res.ok) {
+                const errMsg = (data && data.message) || (typeof data === 'string' ? data : 'Đăng nhập thất bại');
+                throw new Error(errMsg);
+            }
+
+            // Backend returns { Token, User }
+            const token = data?.Token || data?.token;
+            const user = data?.User || data?.user || null;
+
+            if (token) {
+                localStorage.setItem("auth_token", token);
+            }
+            if (user) {
+                localStorage.setItem("auth_user", JSON.stringify(user));
             }
 
             setMessage("Đăng nhập thành công!");
             setPhone("");
             setPassword("");
+            // redirect to home or dashboard
+            navigate('/vehicles');
         } catch (err) {
             setMessage(err.message);
         } finally {
