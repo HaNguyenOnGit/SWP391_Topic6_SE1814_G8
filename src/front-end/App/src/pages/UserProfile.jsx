@@ -1,22 +1,81 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Navbar from "../NavBar";
 import { useNavigate } from "react-router-dom";
 
 export default function UserProfile() {
     const navigate = useNavigate();
     const [user, setUser] = useState({
-        fullName: "Nguyễn Văn A",
-        phone: "0901234567",
-        email: "nguyenvana@example.com",
-        cccd: "123456789012",
-        license: "B2",
-        bankName: "Vietcombank",
-        bankAccount: "0123456789",
+        fullName: "",
+        phone: "",
+        email: "",
+        cccd: "",
+        license: "",
+        bankName: "",
+        bankAccount: "",
     });
 
     const [section, setSection] = useState("");
     const [form, setForm] = useState({});
     const [message, setMessage] = useState("");
+
+    useEffect(() => {
+        const token = localStorage.getItem("auth_token");
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+
+        const fetchMe = async () => {
+            try {
+                const res = await axios.get("/api/user/me", {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const u = res?.data?.User ?? res?.data?.user;
+                if (u) {
+                    localStorage.setItem("auth_user", JSON.stringify(u));
+                    setUser({
+                        fullName: u?.FullName ?? u?.fullName ?? "",
+                        phone: u?.PhoneNumber ?? u?.phoneNumber ?? u?.phone ?? "",
+                        email: u?.Email ?? u?.email ?? "",
+                        cccd: u?.CitizenId ?? u?.citizenId ?? "",
+                        license: u?.DriverLicenseId ?? u?.driverLicenseId ?? "",
+                        bankName: u?.BankName ?? u?.bankName ?? "",
+                        bankAccount: u?.BankAccount ?? u?.bankAccount ?? ""
+                    });
+                }
+            } catch (err) {
+                if (err?.response && (err.response.status === 401 || err.response.status === 403)) {
+                    localStorage.removeItem("auth_token");
+                    localStorage.removeItem("auth_user");
+                    navigate("/login");
+                    return;
+                }
+                const userJson = localStorage.getItem("auth_user");
+                if (userJson) {
+                    try {
+                        const u = JSON.parse(userJson);
+                        setUser({
+                            fullName: u?.FullName ?? u?.fullName ?? "",
+                            phone: u?.PhoneNumber ?? u?.phoneNumber ?? u?.phone ?? "",
+                            email: u?.Email ?? u?.email ?? "",
+                            cccd: u?.CitizenId ?? u?.citizenId ?? "",
+                            license: u?.DriverLicenseId ?? u?.driverLicenseId ?? "",
+                            bankName: u?.BankName ?? u?.bankName ?? "",
+                            bankAccount: u?.BankAccount ?? u?.bankAccount ?? ""
+                        });
+                    } catch {
+                        setUser((prev) => ({ ...prev, fullName: userJson }));
+                    }
+                }
+            }
+        };
+
+        fetchMe();
+    }, [navigate]);
 
     const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -43,7 +102,7 @@ export default function UserProfile() {
 
     return (
         <div>
-            <Navbar username="Người dùng" />
+            <Navbar />
             <div className="max-w-xl mx-auto p-6 border rounded-2xl shadow-sm space-y-6">
                 <h2 className="text-2xl font-bold">Hồ sơ người dùng</h2>
 
