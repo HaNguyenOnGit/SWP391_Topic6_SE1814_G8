@@ -20,6 +20,7 @@ import ContractDetails from "./pages/ContractDetails";
 import UserManagement from "./AdminPages/UserManagement";
 import AdminContracts from "./AdminPages/AdminContract";
 import ProposalList from "./pages/ProposalList";
+import ContractVerification from "./pages/ContractVerification";
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="/admin/contracts" element={<AdminContracts />} />
 
         <Route path="/proposals" element={<ProposalList />} />
+        <Route path="/contractVerify/:contractId" element={<ContractVerification />} />
 
       </Routes>
     </BrowserRouter>

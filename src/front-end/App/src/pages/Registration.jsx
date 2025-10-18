@@ -91,6 +91,20 @@ export default function RegistrationForm() {
 
     if (Object.values(newErrors).every((err) => !err)) {
       try {
+        // Check if phone number exists
+        const phoneCheckRes = await axios.get(`/api/user/phone/${formData.phone}`);
+        if (phoneCheckRes.status === 200) {
+          setFormMessage("Số điện thoại đã tồn tại trong hệ thống. Vui lòng sử dụng số khác.");
+          return;
+        }
+      } catch (err) {
+        if (err.response && err.response.status !== 404) {
+          setFormMessage("Có lỗi khi kiểm tra số điện thoại. Vui lòng thử lại.");
+          return;
+        }
+      }
+
+      try {
         const toBase64 = (file) =>
           new Promise((resolve, reject) => {
             if (!file) return resolve("");
