@@ -1,0 +1,6 @@
+@EVCoOwnershipAndCostSharingSystem_HostAddress = http://localhost:5173
+
+GET {{EVCoOwnershipAndCostSharingSystem_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
