@@ -1,6 +1,9 @@
 
 using BusinessLogicLayer.Services;
 using DataAccessLayer.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace EVCoOwnershipAndCostSharingSystem
 {
@@ -26,7 +29,32 @@ namespace EVCoOwnershipAndCostSharingSystem
             builder.Services.AddOpenApi();
 
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddSingleton<AuthService>();
             builder.Services.AddScoped<UserRepository>();
+
+            // Configure JWT authentication
+            var jwtSection = builder.Configuration.GetSection("JwtSettings");
+            var jwtKey = jwtSection["Key"] ?? throw new Exception("JwtSettings:Key not configured");
+            var issuer = jwtSection["Issuer"] ?? "EVCo";
+            var audience = jwtSection["Audience"] ?? "EVCoClients";
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
+                };
+            });
 
             var app = builder.Build();
 
@@ -38,6 +66,7 @@ namespace EVCoOwnershipAndCostSharingSystem
 
             app.UseHttpsRedirection();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

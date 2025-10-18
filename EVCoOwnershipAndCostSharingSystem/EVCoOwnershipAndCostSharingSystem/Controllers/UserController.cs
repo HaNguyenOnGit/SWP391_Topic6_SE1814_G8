@@ -9,14 +9,16 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private readonly UserService _us;
-        private readonly EmailService _emailService;
+    private readonly UserService _us;
+    private readonly EmailService _emailService;
+    private readonly AuthService _authService;
 
         // Inject cả UserService và EmailService
-        public UserController(UserService us, EmailService emailService)
+        public UserController(UserService us, EmailService emailService, AuthService authService)
         {
             _us = us;
             _emailService = emailService;
+            _authService = authService;
         }
 
         // Lấy tất cả người dùng
@@ -31,7 +33,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
 
         //Dang nhap
         [HttpPost("login")]
-        public ActionResult<User> GetUser([FromBody] LoginRequest request)
+        public ActionResult GetUser([FromBody] LoginRequest request)
         {
             string phoneNumber = request.PhoneNumber;
             string password = request.Password;
@@ -40,7 +42,21 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             {
                 return NotFound("User not found");
             }
-            return Ok(user);
+
+            // Generate JWT token
+            var token = _authService.GenerateJwtToken(user);
+
+            // Return token and minimal user info (no password)
+            return Ok(new {
+                Token = token,
+                User = new {
+                    user.UserId,
+                    user.FullName,
+                    user.Email,
+                    user.PhoneNumber,
+                    user.Role
+                }
+            });
         }
 
         //API nay chi dung de kiem tra so dien thoai da duoc dang ky chua
