@@ -27,7 +27,7 @@ export default function App() {
     <BrowserRouter>
 
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/vehicles" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/newContract" element={<NewContract />} />
         <Route path="/register" element={<RegistrationForm />} />
