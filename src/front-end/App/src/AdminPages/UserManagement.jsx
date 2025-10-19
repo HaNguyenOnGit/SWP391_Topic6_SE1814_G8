@@ -1,8 +1,63 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import AdminNavbar from "./ANavbar";
 import "./UserManagement.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || ""; // e.g., http://localhost:5000
+
+const mapStatusLabel = (status) => {
+    switch ((status || "").toLowerCase()) {
+        case "enabled":
+            return "Đang hoạt động";
+        case "disabled":
+        default:
+            return "Chờ phê duyệt";
+    }
+};
+
+const getStatusStyle = (label) => {
+    const l = (label || "").toLowerCase();
+    if (l === "đang hoạt động") {
+        return {
+            color: "#065f46",
+            backgroundColor: "#d1fae5",
+            borderRadius: "12px",
+            padding: "2px 8px",
+            fontWeight: 600,
+            display: "inline-block",
+        };
+    }
+    return {
+        color: "#92400e",
+        backgroundColor: "#fef3c7",
+        borderRadius: "12px",
+        padding: "2px 8px",
+        fontWeight: 600,
+        display: "inline-block",
+    };
+};
+
+const mapUserFromApi = (u) => ({
+    id: u.userId,
+    fullName: u.fullName,
+    phone: u.phoneNumber ?? "",
+    email: u.email ?? "",
+    cccd: u.citizenId ?? "",
+    license: u.driverLicenseId ?? "",
+    cccdFront: u.frontIdImage ?? "",
+    cccdBack: u.backIdImage ?? "",
+    licenseFront: u.frontLicenseImage ?? "",
+    licenseBack: u.backLicenseImage ?? "",
+    bankName: u.bankName ?? "",
+    bankNumber: u.bankAccount ?? "",
+    role: u.role ?? "",
+    status: mapStatusLabel(u.status ?? ""),
+});
+
 export default function UserManagement() {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
     const [searchTerm, setSearchTerm] = useState("");
     const [filterPending, setFilterPending] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -11,164 +66,111 @@ export default function UserManagement() {
     const [newPassword, setNewPassword] = useState("");
     const [newStatus, setNewStatus] = useState("");
 
-    const users = [
-        {
-            id: 1,
-            fullName: "Nguyen Van A",
-            phone: "0901234567",
-            email: "nguyenvana@example.com",
-            cccd: "123456789012",
-            license: "B2",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "Vietcombank",
-            bankNumber: "0123456789",
-            registerDate: "2025-09-20",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 2,
-            fullName: "Tran Thi B",
-            phone: "0987654321",
-            email: "tranthib@example.com",
-            cccd: "987654321098",
-            license: "C",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "Techcombank",
-            bankNumber: "5678901234",
-            registerDate: "2025-09-25",
-            status: "Chờ phê duyệt",
-        },
-        {
-            id: 3,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 4,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 5,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 6,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 7,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 8,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-    ];
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoading(true);
+            setError("");
+            try {
+                const res = await fetch(`${API_BASE}/api/user/all`);
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(text || `Failed to fetch users (${res.status})`);
+                }
+                const data = await res.json();
+                // data is expected to be an array of users from backend
+                const mapped = Array.isArray(data) ? data.map(mapUserFromApi) : [];
+                setUsers(mapped);
+            } catch (e) {
+                setError(e.message || "Đã có lỗi xảy ra");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     const filteredUsers = useMemo(() => {
         return users.filter((user) => {
             const matchesSearch =
-                user.phone.includes(searchTerm) ||
-                user.email.toLowerCase().includes(searchTerm.toLowerCase());
-            const matchesFilter = filterPending
-                ? user.status === "Chờ phê duyệt"
-                : true;
+                (user.phone || "").includes(searchTerm) ||
+                (user.email || "").toLowerCase().includes(searchTerm.toLowerCase());
+            const matchesFilter = filterPending ? user.status === "Chờ phê duyệt" : true;
             return matchesSearch && matchesFilter;
         });
-    }, [searchTerm, filterPending]);
+    }, [users, searchTerm, filterPending]);
 
-    const handleApprove = () => {
-        alert(`Đã phê duyệt người dùng: ${selectedUser.fullName}`);
-        setSelectedUser({ ...selectedUser, status: "Đang hoạt động" });
+    const enableUser = async (userId) => {
+        const res = await fetch(`${API_BASE}/api/user/${userId}/enable`, {
+            method: "PUT",
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || `Enable failed (${res.status})`);
+        }
+        return res.json();
     };
 
-    const handlePasswordChange = () => {
-        alert(`Đổi mật khẩu cho ${selectedUser.fullName} thành "${newPassword}"`);
-        setShowPasswordModal(false);
-        setNewPassword("");
+    const updatePassword = async (userId, password) => {
+        const res = await fetch(`${API_BASE}/api/user/updateUserRequest`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, newPassword: password }),
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(text || `Update password failed (${res.status})`);
+        }
     };
 
-    const handleStatusChange = () => {
-        alert(`Trạng thái mới: ${newStatus}`);
-        setShowStatusModal(false);
-        setNewStatus("");
+    const handleApprove = async () => {
+        if (!selectedUser) return;
+        try {
+            await enableUser(selectedUser.id);
+            setUsers((prev) =>
+                prev.map((u) => (u.id === selectedUser.id ? { ...u, status: "Đang hoạt động" } : u))
+            );
+            setSelectedUser((prev) => (prev ? { ...prev, status: "Đang hoạt động" } : prev));
+            alert(`Đã phê duyệt người dùng: ${selectedUser.fullName}`);
+        } catch (e) {
+            alert(e.message || "Phê duyệt thất bại");
+        }
+    };
+
+    const handlePasswordChange = async () => {
+        if (!selectedUser) return;
+        if (!newPassword) {
+            alert("Vui lòng nhập mật khẩu mới");
+            return;
+        }
+        try {
+            await updatePassword(selectedUser.id, newPassword);
+            alert(`Đổi mật khẩu cho ${selectedUser.fullName} thành công`);
+            setShowPasswordModal(false);
+            setNewPassword("");
+        } catch (e) {
+            alert(e.message || "Đổi mật khẩu thất bại");
+        }
+    };
+
+    const handleStatusChange = async () => {
+        if (!selectedUser) return;
+        try {
+            if (newStatus === "Đang hoạt động" && selectedUser.status !== "Đang hoạt động") {
+                await enableUser(selectedUser.id);
+                setUsers((prev) =>
+                    prev.map((u) => (u.id === selectedUser.id ? { ...u, status: "Đang hoạt động" } : u))
+                );
+                setSelectedUser((prev) => (prev ? { ...prev, status: "Đang hoạt động" } : prev));
+                alert("Đã cập nhật trạng thái thành công");
+            } else {
+                alert("Chỉ hỗ trợ chuyển sang 'Đang hoạt động' (Enable) tại thời điểm này");
+            }
+        } catch (e) {
+            alert(e.message || "Cập nhật trạng thái thất bại");
+        } finally {
+            setShowStatusModal(false);
+            setNewStatus("");
+        }
     };
 
     return (
@@ -176,6 +178,10 @@ export default function UserManagement() {
             <AdminNavbar adminName="Admin" />
 
             <h2>Danh sách người dùng</h2>
+
+            {loading && <p>Đang tải...</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+
             <div className="user-controls">
                 <input
                     type="text"
@@ -197,7 +203,7 @@ export default function UserManagement() {
                                 <th>Tên</th>
                                 <th>SĐT</th>
                                 <th>Email</th>
-                                <th>Ngày đăng ký</th>
+                                <th>Vai trò</th>
                                 <th>Trạng thái</th>
                             </tr>
                         </thead>
@@ -216,8 +222,8 @@ export default function UserManagement() {
                                     <td>{u.fullName}</td>
                                     <td>{u.phone}</td>
                                     <td>{u.email}</td>
-                                    <td>{u.registerDate}</td>
-                                    <td>{u.status}</td>
+                                    <td>{u.role}</td>
+                                    <td><span style={getStatusStyle(u.status)}>{u.status}</span></td>
                                 </tr>
                             ))}
                         </tbody>
@@ -233,8 +239,8 @@ export default function UserManagement() {
                                 <p><strong>Họ tên:</strong> {selectedUser.fullName}</p>
                                 <p><strong>Số điện thoại:</strong> {selectedUser.phone}</p>
                                 <p><strong>Email:</strong> {selectedUser.email}</p>
-                                <p><strong>Ngày đăng ký:</strong> {selectedUser.registerDate}</p>
-                                <p><strong>Trạng thái:</strong> {selectedUser.status}</p>
+                                <p><strong>Vai trò:</strong> {selectedUser.role}</p>
+                                <p><strong>Trạng thái:</strong> <span style={getStatusStyle(selectedUser.status)}>{selectedUser.status}</span></p>
                                 <p><strong>CCCD:</strong> {selectedUser.cccd}</p>
                                 <p><strong>Bằng lái:</strong> {selectedUser.license}</p>
                                 <p><strong>Ngân hàng:</strong> {selectedUser.bankName}</p>
@@ -242,10 +248,18 @@ export default function UserManagement() {
                             </div>
 
                             <div className="image-gallery">
-                                <img src={selectedUser.cccdFront} alt="CCCD Front" />
-                                <img src={selectedUser.cccdBack} alt="CCCD Back" />
-                                <img src={selectedUser.licenseFront} alt="License Front" />
-                                <img src={selectedUser.licenseBack} alt="License Back" />
+                                {selectedUser.cccdFront && (
+                                    <img src={selectedUser.cccdFront} alt="CCCD Front" />
+                                )}
+                                {selectedUser.cccdBack && (
+                                    <img src={selectedUser.cccdBack} alt="CCCD Back" />
+                                )}
+                                {selectedUser.licenseFront && (
+                                    <img src={selectedUser.licenseFront} alt="License Front" />
+                                )}
+                                {selectedUser.licenseBack && (
+                                    <img src={selectedUser.licenseBack} alt="License Back" />
+                                )}
                             </div>
                         </div>
                         <div className="user-actions">
@@ -292,7 +306,6 @@ export default function UserManagement() {
                         >
                             <option value="">-- Chọn trạng thái --</option>
                             <option value="Đang hoạt động">Đang hoạt động</option>
-                            <option value="Bị khóa">Bị khóa</option>
                             <option value="Chờ phê duyệt">Chờ phê duyệt</option>
                         </select>
                         <div>
