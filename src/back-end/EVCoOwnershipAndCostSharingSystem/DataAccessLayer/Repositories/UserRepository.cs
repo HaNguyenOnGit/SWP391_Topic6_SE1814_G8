@@ -56,6 +56,15 @@ namespace DataAccessLayer.Repositories
             _context.SaveChanges();
         }
 
+        public void EnableUserById(int userId)
+        {
+            var user = GetUserById(userId);
+            if (user == null) throw new Exception("User not found");
+            user.Status = "Enabled";
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
+
         public void UpdateUser(string newPassword, int userId)
         {
             var user = GetUserById(userId);

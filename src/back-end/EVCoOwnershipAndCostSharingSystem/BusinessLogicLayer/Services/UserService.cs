@@ -58,6 +58,7 @@ namespace BusinessLogicLayer.Services
                 BankName = bankName,
                 BankAccount = bankAccount,
                 Role = role,
+                Status = "Disabled",
                 IsEmailConfirmed = false,
                 EmailConfirmationCode = null,
                 EmailConfirmationExpiry = null,
@@ -141,6 +142,15 @@ namespace BusinessLogicLayer.Services
             user.EmailConfirmationCode = null;
             user.EmailConfirmationExpiry = null;
 
+            _ur.UpdateUser(user);
+        }
+
+        public void EnableUserById(int userId)
+        {
+            var user = _ur.GetUserById(userId);
+            if (user == null)
+                throw new Exception("User not found");
+            user.Status = "Enabled";
             _ur.UpdateUser(user);
         }
         

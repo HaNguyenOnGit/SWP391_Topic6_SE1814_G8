@@ -320,6 +320,10 @@ public partial class EvcoOwnershipAndCostSharingSystemContext : DbContext
                 .HasMaxLength(12)
                 .IsUnicode(false);
             entity.Property(e => e.Role).HasMaxLength(20);
+            entity.Property(e => e.Status)
+                .HasMaxLength(12)
+                .IsUnicode(false)
+                .HasDefaultValue("Disabled");
         });
 
         OnModelCreatingPartial(modelBuilder);

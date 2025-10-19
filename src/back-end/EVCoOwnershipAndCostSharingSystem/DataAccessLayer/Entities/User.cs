@@ -21,6 +21,8 @@ public partial class User
 
     public string Role { get; set; } = null!;
 
+    public string Status { get; set; } = null!;
+
     public bool IsEmailConfirmed { get; set; }
 
     public string? EmailConfirmationCode { get; set; }
