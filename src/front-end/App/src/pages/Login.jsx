@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 export default function LoginPage({ apiUrl }) {
     const [phone, setPhone] = useState("");
@@ -8,6 +9,7 @@ export default function LoginPage({ apiUrl }) {
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const { setAuth } = useAuth();
 
     // Validate 1 field
     const validateField = (name, value) => {
@@ -75,12 +77,8 @@ export default function LoginPage({ apiUrl }) {
             const token = data?.Token || data?.token;
             const user = data?.User || data?.user || null;
 
-            if (token) {
-                localStorage.setItem("auth_token", token);
-            }
-            if (user) {
-                localStorage.setItem("auth_user", JSON.stringify(user));
-            }
+            // Store via AuthContext to update session-wide state
+            setAuth({ token, user });
 
             setMessage("Đăng nhập thành công!");
             setPhone("");

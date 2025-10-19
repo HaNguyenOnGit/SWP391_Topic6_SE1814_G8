@@ -1,36 +1,31 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
+import { useAuth } from "./auth/AuthContext";
 
 export default function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { isAuthenticated, user } = useAuth();
     const [username, setUsername] = useState("");
 
     useEffect(() => {
-        // Read auth token and user from localStorage
-        const token = localStorage.getItem("auth_token");
-        const userJson = localStorage.getItem("auth_user");
-
         // If missing token, redirect to login unless already on login or admin routes
         const path = location.pathname || "";
         const isAdminRoute = path.startsWith("/admin");
         const isLoginRoute = path === "/login";
 
-        if (!token && !isLoginRoute && !isAdminRoute) {
+        if (!isAuthenticated && !isLoginRoute && !isAdminRoute) {
             navigate("/login");
             return;
         }
 
-        if (userJson) {
-            try {
-                const user = JSON.parse(userJson);
-                setUsername(user?.FullName || user?.fullName || user?.username || "");
-            } catch {
-                setUsername(userJson);
-            }
+        if (user) {
+            setUsername(user?.FullName || user?.fullName || user?.username || "");
+        } else {
+            setUsername("");
         }
-    }, [location.pathname, navigate]);
+    }, [location.pathname, navigate, isAuthenticated, user]);
 
     const handleProfileClick = () => {
         navigate("/profile");
