@@ -1,22 +1,48 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar";
 import { useParams, Link } from "react-router-dom";
 import VehicleInfo from "../VehicleInfo";
 import "./Vehicle.css";
+import axios from "axios";
 
 export default function Vehicle() {
     const { id } = useParams();
+    const [vehicle, setVehicle] = useState(null);
 
-    // Mock data (sau này thay bằng API)
-    const vehicles = [
-        { id: 1, name: "Xe Honda City", plate: "59D3 - 23456", status: "Đang sử dụng" },
-        { id: 2, name: "Xe Toyota Vios", plate: "60A - 56789", status: "Đang trống" },
-        { id: 3, name: "Xe Ford Ranger", plate: "61C - 11122", status: "Chưa kích hoạt hợp đồng" },
-    ];
+    useEffect(() => {
+        const fetchVehicle = async () => {
+            try {
+                const res = await axios.get(`/api/contract/contract-detail/${id}`);
+                const data = res.data;
+                setVehicle({
+                    id: data.contractId,
+                    name: data.vehicleName,
+                    plate: data.licensePlate,
+                    model: data.model,
+                    status: translateStatus(data.status),
+                    coowners: data.members.map(m => ({
+                        username: m.fullName,
+                        phone: m.phoneNumber,
+                        share: m.sharePercent,
+                    })),
+                });
+            } catch (err) {
+                console.error("Lỗi khi tải thông tin phương tiện:", err);
+            }
+        };
+        fetchVehicle();
+    }, [id]);
 
-    const vehicle = vehicles.find((v) => v.id.toString() === id);
+    const translateStatus = (status) => {
+        switch (status) {
+            case "Active": return "Đang sử dụng";
+            case "Available": return "Đang trống";
+            case "Inactive": return "Chưa kích hoạt hợp đồng";
+            default: return status;
+        }
+    };
 
-    if (!vehicle) return <h2>Không tìm thấy phương tiện</h2>;
+    if (!vehicle) return <h2>Đang tải dữ liệu...</h2>;
 
     const actions = [
         { name: "Đặt lịch", path: `/vehicle/${id}/schedule` },
@@ -27,20 +53,12 @@ export default function Vehicle() {
         { name: "Lịch sử", path: `/vehicle/${id}/history` },
     ];
 
-    const getStatusColor = (status) => {
-        if (status === "Đang sử dụng") return "green";
-        if (status === "Đang trống") return "orange";
-        if (status === "Chưa kích hoạt hợp đồng") return "red";
-        return "black";
-    };
-
     return (
         <div className="main-container">
             <Navbar username="Username" />
             <div className="main-content">
                 <div className="main-content-layout">
                     <VehicleInfo vehicle={vehicle} />
-
                     <div className="action-menu">
                         {actions.map((action, idx) => (
                             <div key={idx} className="action-item">
@@ -53,3 +71,4 @@ export default function Vehicle() {
         </div>
     );
 }
+

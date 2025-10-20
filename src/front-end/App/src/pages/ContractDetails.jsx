@@ -1,26 +1,59 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../NavBar";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 export default function ContractDetails() {
-    // mock contract
-    const [contract, setContract] = useState({
-        vehicle: {
-            name: "Honda City",
-            license: "59A-12345",
-            model: "2021",
-        },
-        owners: [
-            { phone: "0901234567", ratio: 60 },
-            { phone: "0907654321", ratio: 40 },
-        ],
-        createDate: "2024-10-01",
-        status: "Đang hoạt động",
-    });
-
+    const { id } = useParams(); // lấy id từ URL
+    const [contract, setContract] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [owners, setOwners] = useState([]);
+    const [createDate, setCreateDate] = useState("");
     const [editing, setEditing] = useState(false);
-    const [owners, setOwners] = useState(contract.owners);
-    const [createDate, setCreateDate] = useState(contract.createDate);
     const [newPhone, setNewPhone] = useState("");
+
+    // gọi API khi id thay đổi
+    useEffect(() => {
+        if (!id) return;
+        axios
+            .get(`/api/contract/contract-detail/${id}`)
+            .then((res) => {
+                const data = res.data;
+
+                setContract({
+                    vehicle: {
+                        name: data.vehicleName,
+                        license: data.licensePlate,
+                        model: data.model,
+                    },
+                    createDate: data.startDate,
+                    status: translateStatus(data.status),
+                });
+
+                setOwners(
+                    data.members?.map((m) => ({
+                        name: m.fullName || "Chưa có tên",
+                        phone: m.phoneNumber || "Không có SĐT",
+                        ratio: m.sharePercent || 0,
+                    })) || []
+                );
+                setCreateDate(data.startDate);
+            })
+            .catch((err) => console.error("Lỗi khi tải chi tiết hợp đồng:", err))
+            .finally(() => setLoading(false));
+    }, [id]);
+
+    const translateStatus = (status) => {
+        switch (status?.toLowerCase()) {
+            case "active": return "Đang sử dụng";
+            case "available": return "Đang trống";
+            case "pending": return "Chờ kích hoạt";
+            default: return status || "";
+        }
+    };
+
+    if (loading) return <p>Đang tải dữ liệu...</p>;
+    if (!contract) return <p>Không tìm thấy hợp đồng.</p>;
 
     // tổng tỉ lệ
     const totalRatio = owners.reduce((a, b) => a + Number(b.ratio), 0);
@@ -34,9 +67,9 @@ export default function ContractDetails() {
 
     const addOwner = () => {
         if (!newPhone.trim()) return alert("Vui lòng nhập số điện thoại");
-        if (owners.some(o => o.phone === newPhone))
+        if (owners.some((o) => o.phone === newPhone))
             return alert("Thành viên này đã tồn tại");
-        setOwners([...owners, { phone: newPhone, ratio: 0 }]);
+        setOwners([...owners, { name: "Thành viên mới", phone: newPhone, ratio: 0 }]);
         setNewPhone("");
     };
 
@@ -78,8 +111,18 @@ export default function ContractDetails() {
                     <h2>Danh sách đồng sở hữu</h2>
 
                     {owners.map((o, i) => (
-                        <div key={i} style={{ marginBottom: "10px" }}>
-                            <span>{o.phone}</span>
+                        <div
+                            key={i}
+                            style={{
+                                marginBottom: "10px",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                width: "300px",
+                            }}
+                        >
+                            <span>
+                                <strong>{o.name}</strong> ({o.phone})
+                            </span>
                             {editing ? (
                                 <>
                                     <input
@@ -88,7 +131,7 @@ export default function ContractDetails() {
                                         max="100"
                                         value={o.ratio}
                                         onChange={(e) => updateRatio(i, e.target.value)}
-                                        style={{ marginLeft: "10px" }}
+                                        style={{ margin: "0 10px", flex: 1 }}
                                     />
                                     <input
                                         type="number"
@@ -107,7 +150,7 @@ export default function ContractDetails() {
                                     </button>
                                 </>
                             ) : (
-                                <span> — {o.ratio}%</span>
+                                <span style={{ color: "blue" }}>{o.ratio}%</span>
                             )}
                         </div>
                     ))}
@@ -163,9 +206,9 @@ export default function ContractDetails() {
                             <button
                                 style={{ marginLeft: "10px" }}
                                 onClick={() => {
+                                    setEditing(false);
                                     setOwners(contract.owners);
                                     setCreateDate(contract.createDate);
-                                    setEditing(false);
                                 }}
                             >
                                 Hủy
@@ -173,12 +216,12 @@ export default function ContractDetails() {
                         </>
                     ) : (
                         <>
-                            {contract.status === "Đang hoạt động" && (
+                            {contract.status === "Đang sử dụng" && (
                                 <>
                                     <button onClick={() => setEditing(true)}>Chỉnh sửa</button>
                                     <button
-                                        onClick={endContract}
                                         style={{ marginLeft: "10px", color: "red" }}
+                                        onClick={endContract}
                                     >
                                         Chấm dứt hợp đồng
                                     </button>
@@ -191,4 +234,3 @@ export default function ContractDetails() {
         </div>
     );
 }
-
