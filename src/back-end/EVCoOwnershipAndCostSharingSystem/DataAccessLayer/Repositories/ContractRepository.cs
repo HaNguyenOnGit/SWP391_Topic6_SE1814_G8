@@ -29,5 +29,10 @@ namespace DataAccessLayer.Repositories
             _context.Contracts.Remove(contract);
             _context.SaveChanges();
         }
+
+        public Contract? GetContractById(int contractId)
+        {
+            return _context.Contracts.FirstOrDefault(c => c.ContractId == contractId);
+        }
     }
 }

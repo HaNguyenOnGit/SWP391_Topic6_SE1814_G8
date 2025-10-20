@@ -19,5 +19,14 @@ namespace DataAccessLayer.Repositories
             _context.ContractMembers.Add(contractMember);
             _context.SaveChanges();
         }
+
+        public List<int> GetContractIdsByUserId(int userId)
+        {
+            return _context.ContractMembers
+                .Where(cm => cm.UserId == userId)
+                .Select(cm => cm.ContractId)
+                .Distinct()
+                .ToList();
+        }
     }
 }

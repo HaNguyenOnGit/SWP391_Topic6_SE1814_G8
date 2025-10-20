@@ -30,5 +30,10 @@ namespace BusinessLogicLayer.Services
             };
             _cmr.AddContractMember(contractMember);
         }
+
+        public List<int> GetContractIdsByUserId(int userId)
+        {
+            return _cmr.GetContractIdsByUserId(userId);
+        }
     }
 }
