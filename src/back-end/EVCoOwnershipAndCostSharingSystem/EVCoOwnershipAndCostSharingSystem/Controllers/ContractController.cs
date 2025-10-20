@@ -19,6 +19,35 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _cms = new ContractMemberService();
         }
 
+        [HttpGet("contract-detail/{contractId}")]
+        public IActionResult GetContractDetail(int contractId)
+        {
+            var contract = _cs.GetContractById(contractId);
+            if (contract == null)
+                return NotFound("Contract not found");
+
+            // Lấy danh sách member
+            var members = contract.ContractMembers.Select(cm => new {
+                cm.UserId,
+                cm.User.FullName,
+                cm.User.PhoneNumber,
+                cm.SharePercent,
+                cm.Status,
+                cm.JoinedAt
+            }).ToList();
+
+            var result = new {
+                contract.ContractId,
+                contract.VehicleName,
+                contract.LicensePlate,
+                contract.Model,
+                contract.StartDate,
+                contract.Status,
+                Members = members
+            };
+            return Ok(result);
+        }
+
         [HttpGet("user-contracts/{userId}")]
         public IActionResult GetContractsByUserId(int userId)
         {
