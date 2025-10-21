@@ -7,6 +7,15 @@ namespace DataAccessLayer.Repositories
 {
     public class ReservationRepository
     {
+
+        public bool DeleteReservation(int reservationId)
+        {
+            var reservation = _context.Reservations.FirstOrDefault(r => r.ReservationId == reservationId);
+            if (reservation == null) return false;
+            _context.Reservations.Remove(reservation);
+            _context.SaveChanges();
+            return true;
+        }
         private readonly EvcoOwnershipAndCostSharingSystemContext _context;
 
         public ReservationRepository()
