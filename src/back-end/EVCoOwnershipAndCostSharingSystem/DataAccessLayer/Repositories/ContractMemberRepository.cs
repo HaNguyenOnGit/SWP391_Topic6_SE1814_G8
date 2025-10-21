@@ -9,6 +9,16 @@ namespace DataAccessLayer.Repositories
 {
     public class ContractMemberRepository
     {
+
+
+        public bool UpdateMemberStatus(int contractId, int userId, string status)
+        {
+            var member = _context.ContractMembers.FirstOrDefault(cm => cm.ContractId == contractId && cm.UserId == userId);
+            if (member == null) return false;
+            member.Status = status;
+            _context.SaveChanges();
+            return true;
+        }
         private readonly EvcoOwnershipAndCostSharingSystemContext _context;
         public ContractMemberRepository()
         {

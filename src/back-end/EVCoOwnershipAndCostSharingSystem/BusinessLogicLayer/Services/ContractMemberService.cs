@@ -12,13 +12,17 @@ namespace BusinessLogicLayer.Services
     public class ContractMemberService
     {
         private readonly ContractMemberRepository _cmr;
-
         public ContractMemberService()
         {
             _cmr = new ContractMemberRepository();
         }
 
-        public void AddContractMember(int contractId, int userId, decimal sharePercent, DateTime joinedAt, string status) 
+        public bool UpdateMemberStatus(int contractId, int userId, string status)
+        {
+            return _cmr.UpdateMemberStatus(contractId, userId, status);
+        }
+
+        public void AddContractMember(int contractId, int userId, decimal sharePercent, DateTime joinedAt, string status)
         {
             ContractMember contractMember = new ContractMember
             {

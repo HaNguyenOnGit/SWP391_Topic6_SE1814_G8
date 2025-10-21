@@ -9,6 +9,25 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/contract")]
     public class ContractController : ControllerBase
     {
+
+        [HttpPost("update-member-status")]
+        public IActionResult UpdateMemberStatus([FromBody] UpdateMemberStatusRequest req)
+        {
+            // req gồm: contractId, userId, status
+            var allowedStatus = new[] { "Rejected", "Confirmed" };
+            if (!allowedStatus.Contains(req.Status))
+                return BadRequest("Invalid status value");
+            var result = _cms.UpdateMemberStatus(req.ContractId, req.UserId, req.Status);
+            if (!result) return NotFound("Member not found in contract");
+            return Ok("Status updated successfully");
+        }
+
+        public class UpdateMemberStatusRequest
+        {
+            public int ContractId { get; set; }
+            public int UserId { get; set; }
+            public string Status { get; set; }
+        }
         private readonly ContractService _cs;
         private readonly UserService _us;
         private readonly ContractMemberService _cms;
@@ -27,7 +46,8 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return NotFound("Contract not found");
 
             // Lấy danh sách member
-            var members = contract.ContractMembers.Select(cm => new {
+            var members = contract.ContractMembers.Select(cm => new
+            {
                 cm.UserId,
                 cm.User.FullName,
                 cm.User.PhoneNumber,
@@ -36,7 +56,8 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 cm.JoinedAt
             }).ToList();
 
-            var result = new {
+            var result = new
+            {
                 contract.ContractId,
                 contract.VehicleName,
                 contract.LicensePlate,
