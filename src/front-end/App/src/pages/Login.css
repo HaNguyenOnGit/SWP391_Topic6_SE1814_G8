@@ -1,0 +1,140 @@
+/* === RESET CƠ BẢN === */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+/* === NỀN VÀ BỐ CỤC === */
+body,
+html {
+    height: 100%;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+}
+
+/* Trung tâm form */
+form {
+    background: #ffffff;
+    max-width: 380px;
+    margin: 100px auto;
+    padding: 40px 35px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+form:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+/* === TIÊU ĐỀ === */
+form h2 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 600;
+    color: #1a237e;
+    margin-bottom: 25px;
+}
+
+/* === THÔNG BÁO === */
+form p {
+    text-align: center;
+    color: #1565c0;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+/* === INPUT GROUP === */
+label {
+    display: block;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #ccc;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    background: #fafafa;
+}
+
+input:focus {
+    border-color: #1565c0;
+    background: #fff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.15);
+}
+
+input.error {
+    border-color: #e53935 !important;
+}
+
+/* === THÔNG BÁO LỖI === */
+p[style*="color: red"] {
+    color: #e53935 !important;
+    margin-top: 5px;
+    font-size: 13px;
+}
+
+/* === BUTTON === */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #1e88e5, #1565c0);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+    background: linear-gradient(90deg, #1976d2, #0d47a1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(21, 101, 192, 0.25);
+}
+
+button:disabled {
+    background: #90caf9;
+    cursor: not-allowed;
+}
+
+/* === LINK ĐĂNG KÝ === */
+form p:last-child {
+    color: #555;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+form a {
+    color: #1565c0;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+form a:hover {
+    color: #0d47a1;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 480px) {
+    form {
+        margin: 60px 20px;
+        padding: 30px 25px;
+    }
+
+    form h2 {
+        font-size: 24px;
+    }
+}
