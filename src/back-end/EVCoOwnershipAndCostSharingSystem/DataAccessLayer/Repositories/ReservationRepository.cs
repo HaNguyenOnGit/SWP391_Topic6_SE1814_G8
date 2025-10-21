@@ -52,8 +52,17 @@ namespace DataAccessLayer.Repositories
         public List<Reservation> GetReservationsByContractAndDate(int contractId, DateTime date)
         {
             return _context.Reservations
-                .Where(r => r.ContractId == contractId &&
-                            r.StartTime.Date == date.Date)
+                .Where(r => r.ContractId == contractId && r.StartTime.Date == date.Date)
+                .Select(r => new Reservation {
+                    ReservationId = r.ReservationId,
+                    ContractId = r.ContractId,
+                    UserId = r.UserId,
+                    StartTime = r.StartTime,
+                    EndTime = r.EndTime,
+                    Status = r.Status,
+                    CreatedAt = r.CreatedAt,
+                    User = r.User
+                })
                 .ToList();
         }
     }

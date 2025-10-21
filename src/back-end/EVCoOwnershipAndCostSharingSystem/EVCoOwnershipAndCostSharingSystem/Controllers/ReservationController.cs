@@ -67,7 +67,17 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             try
             {
                 var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date);
-                return Ok(reservations);
+                var result = reservations.Select(r => new {
+                    r.ReservationId,
+                    r.ContractId,
+                    r.UserId,
+                    UserName = r.User?.FullName,
+                    r.StartTime,
+                    r.EndTime,
+                    r.Status,
+                    r.CreatedAt
+                });
+                return Ok(result);
             }
             catch (Exception ex)
             {
