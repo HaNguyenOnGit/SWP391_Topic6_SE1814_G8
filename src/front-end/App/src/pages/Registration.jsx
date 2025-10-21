@@ -198,9 +198,7 @@ export default function RegistrationForm() {
 
   return (
     <div className="registration-page">
-      <div className="image-container">
-        <img src="/theme.png" alt="img" />
-      </div>
+
       <form className="form" onSubmit={handleSubmit} noValidate>
         <h2>Đăng ký</h2>
 

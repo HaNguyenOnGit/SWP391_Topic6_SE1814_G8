@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Navbar from "../NavBar";
 import { useNavigate } from "react-router-dom";
+import "./UserProfile.css";
 
 export default function UserProfile() {
     const navigate = useNavigate();
@@ -100,78 +101,82 @@ export default function UserProfile() {
         setSection("");
     };
 
+    const handleSectionChange = (newSection) => {
+        setSection((prevSection) => (prevSection === newSection ? "" : newSection));
+    };
+
     return (
-        <div>
-            <Navbar />
-            <div className="max-w-xl mx-auto p-6 border rounded-2xl shadow-sm space-y-6">
-                <h2 className="text-2xl font-bold">Hồ sơ người dùng</h2>
-
-                {/* Thông tin cá nhân */}
-                <div>
-                    <h3 className="font-semibold text-lg mb-2">Thông tin cá nhân</h3>
-                    <p><b>Họ tên:</b> {user.fullName}</p>
-                    <p><b>Số điện thoại:</b> {user.phone}</p>
-                    <p><b>Email:</b> {user.email}</p>
-                    <p><b>CCCD:</b> {user.cccd}</p>
-                    <p><b>Giấy phép lái xe:</b> {user.license}</p>
+        <div className="user-profile-page">
+            {section === "bank" ? (
+                <div className="user-profile-card">
+                    <h2>Chỉnh sửa thông tin ngân hàng</h2>
+                    <div className="space-y-2">
+                        <input name="bankName" placeholder="Tên ngân hàng" onChange={handleChange} />
+                        <input name="bankAccount" placeholder="Số tài khoản" onChange={handleChange} />
+                        <input type="password" name="currentPwd" placeholder="Nhập mật khẩu hiện tại để xác nhận" onChange={handleChange} />
+                        <button className="user-save-btn" onClick={() => handleSubmit("bank")}>Lưu thay đổi</button>
+                        <a href="#" onClick={() => handleSectionChange("")}>Quay lại</a>
+                    </div>
                 </div>
-
-                {/* Thông tin ngân hàng */}
-                <div>
-                    <h3 className="font-semibold text-lg mb-2">Thông tin ngân hàng</h3>
-                    {section !== "bank" ? (
-                        <>
-                            <p><b>Ngân hàng:</b> {user.bankName}</p>
-                            <p><b>Số tài khoản:</b> {user.bankAccount}</p>
-                            <button className="text-blue-600 underline" onClick={() => setSection("bank")}>
-                                Chỉnh sửa thông tin ngân hàng
-                            </button>
-                        </>
-                    ) : (
-                        <div className="space-y-2">
-                            <input name="bankName" placeholder="Tên ngân hàng" onChange={handleChange} className="border p-2 w-full" />
-                            <input name="bankAccount" placeholder="Số tài khoản" onChange={handleChange} className="border p-2 w-full" />
-                            <input type="password" name="currentPwd" placeholder="Nhập mật khẩu hiện tại để xác nhận" onChange={handleChange} className="border p-2 w-full" />
-                            <button onClick={() => handleSubmit("bank")} className="bg-green-600 text-white px-4 py-2 rounded">
-                                Lưu thay đổi
-                            </button>
-                        </div>
-                    )}
+            ) : section === "password" ? (
+                <div className="user-profile-card">
+                    <h2>Đổi mật khẩu</h2>
+                    <div className="space-y-2">
+                        <input type="password" name="currentPwd" placeholder="Mật khẩu hiện tại" onChange={handleChange} />
+                        <input type="password" name="newPwd" placeholder="Mật khẩu mới" onChange={handleChange} />
+                        <input type="password" name="confirmPwd" placeholder="Xác nhận mật khẩu mới" onChange={handleChange} />
+                        <button className="user-save-btn" onClick={() => handleSubmit("password")}>Cập nhật mật khẩu</button>
+                        <a href="#" onClick={() => handleSectionChange("")}>Quay lại</a>
+                    </div>
                 </div>
+            ) : (
+                <div className="user-profile-card">
+                    <h2>Hồ sơ người dùng</h2>
 
-                {/* Đổi mật khẩu */}
-                <div>
-                    <h3 className="font-semibold text-lg mb-2">Đổi mật khẩu</h3>
-                    {section !== "password" ? (
-                        <button className="text-blue-600 underline" onClick={() => setSection("password")}>
-                            Đổi mật khẩu
-                        </button>
-                    ) : (
-                        <div className="space-y-2">
-                            <input type="password" name="currentPwd" placeholder="Mật khẩu hiện tại" onChange={handleChange} className="border p-2 w-full" />
-                            <input type="password" name="newPwd" placeholder="Mật khẩu mới" onChange={handleChange} className="border p-2 w-full" />
-                            <input type="password" name="confirmPwd" placeholder="Xác nhận mật khẩu mới" onChange={handleChange} className="border p-2 w-full" />
-                            <button onClick={() => handleSubmit("password")} className="bg-green-600 text-white px-4 py-2 rounded">
-                                Cập nhật mật khẩu
-                            </button>
-                        </div>
-                    )}
-                </div>
+                    <div className="user-section">
+                        <h3>Thông tin cá nhân</h3>
+                        <p><b>Họ tên:</b> {user.fullName}</p>
+                        <p><b>Số điện thoại:</b> {user.phone}</p>
+                        <p><b>Email:</b> {user.email}</p>
+                        <p><b>CCCD:</b> {user.cccd}</p>
+                        <p><b>Giấy phép lái xe:</b> {user.license}</p>
+                    </div>
 
-                {message && <p className="text-center text-sm mt-4">{message}</p>}
-                <div className="text-center mt-4">
+                    <div className="user-section">
+                        <h3>Thông tin ngân hàng</h3>
+                        <p><b>Ngân hàng:</b> {user.bankName}</p>
+                        <p><b>Số tài khoản:</b> {user.bankAccount}</p>
+                        <button onClick={() => handleSectionChange("bank")}>Chỉnh sửa thông tin ngân hàng</button>
+                    </div>
+
+                    <div className="user-section">
+                        <h3>Đổi mật khẩu</h3>
+                        {section !== "password" ? (
+                            <button onClick={() => handleSectionChange("password")}>Đổi mật khẩu</button>
+                        ) : (
+                            <div className="space-y-2">
+                                <input type="password" name="currentPwd" placeholder="Mật khẩu hiện tại" onChange={handleChange} />
+                                <input type="password" name="newPwd" placeholder="Mật khẩu mới" onChange={handleChange} />
+                                <input type="password" name="confirmPwd" placeholder="Xác nhận mật khẩu mới" onChange={handleChange} />
+                                <button className="user-save-btn" onClick={() => handleSubmit("password")}>Cập nhật mật khẩu</button>
+                                <a href="#" onClick={() => handleSectionChange("")}>Quay lại</a>
+                            </div>
+                        )}
+                    </div>
+
+                    {message && <p className="user-message">{message}</p>}
                     <button
+                        className="user-logout-btn"
                         onClick={() => {
                             localStorage.removeItem("auth_token");
                             localStorage.removeItem("auth_user");
                             navigate("/login");
                         }}
-                        className="bg-red-600 text-white px-4 py-2 rounded"
                     >
                         Đăng xuất
                     </button>
                 </div>
-            </div>
+            )}
         </div>
     );
 }
