@@ -94,7 +94,7 @@ export default function ProposalList() {
                                         </button>
                                     </span>
                                 ) : (
-                                    <span>⏳ Chờ phê duyệt</span>
+                                    <span>Chờ phê duyệt</span>
                                 )}
                             </div>
                         ))}

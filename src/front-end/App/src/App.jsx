@@ -47,7 +47,7 @@ export default function App() {
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/contracts" element={<AdminContracts />} />
 
-        <Route path="/proposals" element={<ProposalList />} />
+        <Route path="/vehicle/:id/proposals" element={<ProposalList />} />
         <Route path="/contractVerify/:contractId" element={<ContractVerification />} />
 
       </Routes>
