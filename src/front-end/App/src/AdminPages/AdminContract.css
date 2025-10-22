@@ -2,7 +2,6 @@
 .contracts-container {
     background: #f7f9fc;
     min-height: 100vh;
-    padding: 24px 40px;
     font-family: "Inter", "Segoe UI", sans-serif;
     color: #1f2937;
 }
@@ -15,6 +14,7 @@
     border-bottom: 3px solid #4f46e5;
     display: inline-block;
     padding-bottom: 6px;
+    margin-left: 40px;
 }
 
 /* ========== Khung hợp đồng ========== */
@@ -26,6 +26,7 @@
     margin-bottom: 24px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     border-left: 5px solid #4f46e5;
+    margin-left: 50px;
 }
 
 .contract-card:hover {
