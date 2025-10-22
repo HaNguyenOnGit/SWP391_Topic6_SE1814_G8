@@ -7,11 +7,6 @@ namespace BusinessLogicLayer.Services
 {
     public class ReservationService
     {
-
-        public bool DeleteReservation(int reservationId)
-        {
-            return _reservationRepo.DeleteReservation(reservationId);
-        }
         private readonly ReservationRepository _reservationRepo;
 
         public ReservationService()

@@ -9,15 +9,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/reservation")]
     public class ReservationController : ControllerBase
     {
-
-        // DELETE api/reservation/{reservationId}
-        [HttpDelete("{reservationId}")]
-        public IActionResult DeleteReservation(int reservationId)
-        {
-            var result = _reservationService.DeleteReservation(reservationId);
-            if (!result) return NotFound(new { Error = "Không tìm thấy đặt lịch." });
-            return Ok(new { Message = "Xoá đặt lịch thành công." });
-        }
         private readonly ReservationService _reservationService;
 
         public ReservationController()
@@ -67,17 +58,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             try
             {
                 var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date);
-                var result = reservations.Select(r => new {
-                    r.ReservationId,
-                    r.ContractId,
-                    r.UserId,
-                    UserName = r.User?.FullName,
-                    r.StartTime,
-                    r.EndTime,
-                    r.Status,
-                    r.CreatedAt
-                });
-                return Ok(result);
+                return Ok(reservations);
             }
             catch (Exception ex)
             {

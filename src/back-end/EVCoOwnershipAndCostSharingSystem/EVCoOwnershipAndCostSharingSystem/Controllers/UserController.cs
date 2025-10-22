@@ -1,10 +1,10 @@
-﻿using BusinessLogicLayer.Services;
+﻿using BusinessLogicLayer.Others;
+using BusinessLogicLayer.Services;
 using DataAccessLayer.Entities;
-using Microsoft.AspNetCore.Mvc;
-using BusinessLogicLayer.Others;
 using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
 {
@@ -34,6 +34,33 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok(userList);
         }
 
+        //Dang ky
+        [HttpPost("add")]
+        public IActionResult AddUser([FromBody] User user)
+        {
+            _us.AddUser(
+                user.FullName,
+                user.Email,
+                user.CitizenId,
+                user.DriverLicenseId,
+                user.BankName,
+                user.BankAccount,
+                user.Role,
+                user.PhoneNumber,
+                user.Password,
+                user.FrontIdImage,
+                user.BackIdImage,
+                user.FrontLicenseImage,
+                user.BackLicenseImage,
+                user.Status
+            );
+
+            // Gửi mã xác nhận luôn
+            var code = _us.GenerateEmailConfirmationCode(user.Email);
+
+            return Ok("User added successfully. Please check your email to confirm.");
+        }
+
         //Dang nhap
         [HttpPost("login")]
         public ActionResult GetUser([FromBody] LoginRequest request)
@@ -49,7 +76,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             // Generate JWT token
             var token = _authService.GenerateJwtToken(user);
 
-            // Return token and minimal user info (no password)
+            // Return token and extended user info (exclude password and all image fields)
             return Ok(new
             {
                 Token = token,
@@ -58,7 +85,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                     user.UserId,
                     user.FullName,
                     user.Role,
-                    user.Status,
                 }
             });
         }
@@ -74,6 +100,18 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return NotFound($"User with phone number {phoneNumber} not found");
             }
             return Ok(user.FullName);
+        }
+
+        //API nay chi dung de lay userId tu fullName
+        [HttpGet("getUserIdByFullName/{fullName}")]
+        public ActionResult<int> GetUserIdByFullName(string fullName)
+        {
+            int userId = _us.GetUserIdByFullName(fullName);
+            if (userId == -1)
+            {
+                return NotFound($"User with full name {fullName} not found");
+            }
+            return Ok(userId);
         }
 
         //Cap nhat mat khau
@@ -97,46 +135,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             {
                 _us.ConfirmEmail(email, code);
                 return Ok("Email confirmed successfully!");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        [HttpPost("add")]
-        public IActionResult AddUser([FromBody] User user)
-        {
-            _us.AddUser(
-                user.FullName,
-                user.Email,
-                user.CitizenId,
-                user.DriverLicenseId,
-                user.BankName,
-                user.BankAccount,
-                user.Role,
-                user.PhoneNumber,
-                user.Password,
-                user.FrontIdImage,
-                user.BackIdImage,
-                user.FrontLicenseImage,
-                user.BackLicenseImage
-            );
-
-            // Gửi mã xác nhận luôn
-            var code = _us.GenerateEmailConfirmationCode(user.Email);
-
-            return Ok("User added successfully. Please check your email to confirm.");
-        }
-
-        // Enable user account by ID
-        [HttpPut("{userId}/enable")]
-        public IActionResult EnableUser(int userId)
-        {
-            try
-            {
-                _us.EnableUserById(userId);
-                return Ok(new { UserId = userId, Status = "Enabled" });
             }
             catch (Exception ex)
             {
@@ -192,8 +190,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                     user.BankAccount,
                     user.Role,
                     user.IsEmailConfirmed,
-                    user.PhoneNumber,
-                    user.Status,
+                    user.PhoneNumber
                 }
             });
         }

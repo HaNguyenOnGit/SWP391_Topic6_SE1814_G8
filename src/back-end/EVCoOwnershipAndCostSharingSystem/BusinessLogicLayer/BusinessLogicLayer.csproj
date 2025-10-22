@@ -9,8 +9,5 @@
   <ItemGroup>
     <ProjectReference Include="..\DataAccessLayer\DataAccessLayer.csproj" />
   </ItemGroup>
-  <ItemGroup>
-  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
-  </ItemGroup>
 
 </Project>

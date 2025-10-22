@@ -21,8 +21,6 @@ public partial class User
 
     public string Role { get; set; } = null!;
 
-    public string Status { get; set; } = null!;
-
     public bool IsEmailConfirmed { get; set; }
 
     public string? EmailConfirmationCode { get; set; }
@@ -41,7 +39,11 @@ public partial class User
 
     public string? BackLicenseImage { get; set; }
 
+    public string Status { get; set; } = null!;
+
     public virtual ICollection<ContractMember> ContractMembers { get; set; } = new List<ContractMember>();
+
+    public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
     public virtual ICollection<ExpenseAllocation> ExpenseAllocations { get; set; } = new List<ExpenseAllocation>();
 
@@ -57,7 +59,5 @@ public partial class User
 
     public virtual ICollection<Settlement> SettlementReceivers { get; set; } = new List<Settlement>();
 
-    public virtual ICollection<UsageLog> UsageLogUsers { get; set; } = new List<UsageLog>();
-
-    public virtual ICollection<UsageLog> UsageLogVerifiedByNavigations { get; set; } = new List<UsageLog>();
+    public virtual ICollection<UsageLog> UsageLogs { get; set; } = new List<UsageLog>();
 }

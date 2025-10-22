@@ -17,7 +17,11 @@ public partial class Contract
 
     public string? VehicleName { get; set; }
 
+    public int Creator { get; set; }
+
     public virtual ICollection<ContractMember> ContractMembers { get; set; } = new List<ContractMember>();
+
+    public virtual User? CreatorNavigation { get; set; }
 
     public virtual ICollection<ExpenseProposal> ExpenseProposals { get; set; } = new List<ExpenseProposal>();
 
