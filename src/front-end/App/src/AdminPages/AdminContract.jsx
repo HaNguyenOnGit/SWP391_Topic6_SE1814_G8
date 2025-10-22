@@ -1,5 +1,7 @@
 import { useState } from "react";
 import AdminNavbar from "./ANavbar";
+import "./AdminContract.css";
+
 
 export default function AdminContracts() {
     const users = [
@@ -36,19 +38,22 @@ export default function AdminContracts() {
     };
 
     return (
-        <div>
+
+        <div className="contracts-container">
             <AdminNavbar adminName="Admin" />
 
-            <div className="p-6">
-                <h1 className="text-xl font-semibold mb-4">Quản lý hợp đồng</h1>
+            <h1>Quản lý hợp đồng</h1>
 
-                {contracts.map((c) => (
-                    <div key={c.id} className="border p-4 rounded mb-4 bg-gray-50">
-                        <h2 className="font-semibold">Hợp đồng #{c.id}</h2>
+            {contracts.map((c) => (
+                <div key={c.id} className="contract-card">
+                    <div className="contract-info">
+                        <h2>Hợp đồng #{c.id}</h2>
                         <p><strong>Xe:</strong> {c.vehicle.name} ({c.vehicle.license})</p>
                         <p><strong>Ngày tạo:</strong> {c.createDate}</p>
+                    </div>
 
-                        <h3 className="mt-2">Người đồng sở hữu:</h3>
+                    <div className="coowners">
+                        <p><strong>Người đồng sở hữu:</strong></p>
                         {c.owners.map((o, i) => {
                             const user = users.find((u) => u.phone === o.phone);
                             return (
@@ -57,49 +62,29 @@ export default function AdminContracts() {
                                 </p>
                             );
                         })}
-
-                        <p>
-                            <strong>Trạng thái:</strong>{" "}
-                            <span style={{ color: c.status === "Đã kết thúc" ? "red" : "green" }}>
-                                {c.status}
-                            </span>
-                        </p>
-
-                        {/* --- Các nút thao tác theo yêu cầu --- */}
-                        <div className="flex gap-2 mt-2">
-                            {c.status === "Đang hoạt động" && (
-                                <button
-                                    onClick={() => handleEndContract(c.id)}
-                                    className="bg-yellow-500 text-white px-3 py-1 rounded"
-                                >
-                                    Ngừng hợp đồng
-                                </button>
-                            )}
-
-                            <button
-                                onClick={() => alert("Tính năng trích xuất chi tiêu đang phát triển!")}
-                                className="bg-blue-500 text-white px-3 py-1 rounded"
-                            >
-                                Trích xuất chi tiêu
-                            </button>
-
-                            <button
-                                onClick={() => alert("Tính năng chỉnh sửa thành viên đang phát triển!")}
-                                className="bg-green-500 text-white px-3 py-1 rounded"
-                            >
-                                Chỉnh sửa thành viên
-                            </button>
-
-                            <button
-                                onClick={() => handleDeleteContract(c.id)}
-                                className="bg-red-700 text-white px-3 py-1 rounded"
-                            >
-                                Xóa
-                            </button>
-                        </div>
                     </div>
-                ))}
-            </div>
+
+                    <p>
+                        <strong>Trạng thái:</strong>{" "}
+                        <span className={c.status === "Đã kết thúc" ? "status-ended" : "status-active"}>
+                            {c.status}
+                        </span>
+                    </p>
+
+                    <div className="actions">
+                        {c.status === "Đang hoạt động" && (
+                            <button onClick={() => handleEndContract(c.id)} className="btn-stop">
+                                Ngừng hợp đồng
+                            </button>
+                        )}
+                        <button className="btn-export">Trích xuất chi tiêu</button>
+                        <button className="btn-edit">Chỉnh sửa thành viên</button>
+                        <button onClick={() => handleDeleteContract(c.id)} className="btn-delete">
+                            Xóa
+                        </button>
+                    </div>
+                </div>
+            ))}
         </div>
     );
 }
