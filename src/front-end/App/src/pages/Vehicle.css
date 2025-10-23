@@ -41,3 +41,10 @@
     text-decoration: underline;
     color: #3498db;
 }
+
+
+@media (max-width: 1048px) {
+    .action-menu {
+        width: 300px;
+    }
+}
