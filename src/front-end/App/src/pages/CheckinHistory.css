@@ -76,7 +76,6 @@
 .history-item+.history-item {
     padding-top: 25px;
     margin-top: 0;
-    border-top: 1px solid #eee;
 }
 
 .history-time-range {

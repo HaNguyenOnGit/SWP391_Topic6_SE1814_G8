@@ -193,53 +193,55 @@ export default function Booking() {
                     </div>
 
                     {/* --- CỘT PHẢI: Đặt lịch --- */}
-                    <div className="booking-right">
-                        <div className="booking-list">
-                            {bookings.length === 0 ? (
-                                <div className="empty-booking">Chưa có lịch đặt trong ngày này.</div>
-                            ) : (
-                                bookings.map((b) => (
-                                    <div key={b.reservationId} className="booking-item">
-                                        <span>
-                                            <b>{b.userName}</b> {b.startTime.slice(11, 16)} - {b.endTime.slice(11, 16)}
-                                        </span>
-                                        {b.userId === parseInt(userId) && (
-                                            <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
-                                        )}
-                                    </div>
-                                ))
-                            )}
-                        </div>
+                    <div className="booking-container">
+                        <div className="booking-right">
+                            <div className="booking-list">
+                                {bookings.length === 0 ? (
+                                    <div className="empty-booking">Chưa có lịch đặt trong ngày này.</div>
+                                ) : (
+                                    bookings.map((b) => (
+                                        <div key={b.reservationId} className="booking-item">
+                                            <span>
+                                                <b>{b.userName}</b> {b.startTime.slice(11, 16)} - {b.endTime.slice(11, 16)}
+                                            </span>
+                                            {b.userId === parseInt(userId) && (
+                                                <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
 
-                        <div className="booking-bar">
-                            <b>Đặt lịch cho bạn</b>
-                            <div className="time-inputs">
-                                <input
-                                    type="text"
-                                    placeholder="Từ (hh:mm)"
-                                    maxLength={5}
-                                    value={fromTime}
-                                    onChange={(e) => {
-                                        let val = e.target.value.replace(/\D/g, ""); // chỉ giữ số
-                                        if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
-                                        setFromTime(val);
-                                    }}
-                                />
-                                <b>→</b>
-                                <input
-                                    type="text"
-                                    placeholder="Đến (hh:mm)"
-                                    maxLength={5}
-                                    value={toTime}
-                                    onChange={(e) => {
-                                        let val = e.target.value.replace(/\D/g, ""); // chỉ giữ số
-                                        if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
-                                        setToTime(val);
-                                    }}
-                                />
-                                <button className="addBtn" onClick={handleAddBooking}>
-                                    +
-                                </button>
+                            <div className="booking-bar">
+                                <b>Đặt lịch cho bạn</b>
+                                <div className="time-inputs">
+                                    <input
+                                        type="text"
+                                        placeholder="Từ (hh:mm)"
+                                        maxLength={5}
+                                        value={fromTime}
+                                        onChange={(e) => {
+                                            let val = e.target.value.replace(/\D/g, ""); // chỉ giữ số
+                                            if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
+                                            setFromTime(val);
+                                        }}
+                                    />
+                                    <b>→</b>
+                                    <input
+                                        type="text"
+                                        placeholder="Đến (hh:mm)"
+                                        maxLength={5}
+                                        value={toTime}
+                                        onChange={(e) => {
+                                            let val = e.target.value.replace(/\D/g, ""); // chỉ giữ số
+                                            if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
+                                            setToTime(val);
+                                        }}
+                                    />
+                                    <button className="addBtn" onClick={handleAddBooking}>
+                                        +
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
