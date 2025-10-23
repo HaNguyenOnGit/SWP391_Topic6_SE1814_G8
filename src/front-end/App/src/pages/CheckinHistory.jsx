@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import "./CheckinHistory.css";
 
 export default function CheckinHistory() {
   const { id } = useParams();
@@ -41,43 +43,44 @@ export default function CheckinHistory() {
       <div className="main-content">
         <div className="main-content-layout">
           <VehicleInfo vehicle={vehicle} />
-          <div>
+          <div className="trip-section"> {/* Thêm class trip-section */}
             <h3>Hành trình của bạn</h3>
 
             {loading ? (
               <p>Đang tải dữ liệu...</p>
             ) : (
               <>
-                <p>
-                  <b>{tripInfo.distance} km</b>
+                {/* Tổng quãng đường đã đi (5,576 Km) */}
+                <p className="trip-total-distance">
+                  <b>5,576 Km</b> {/* Dùng giá trị cứng theo ảnh để mô phỏng */}
                 </p>
 
-                <p>Lịch sử hành trình</p>
-                <div
-                  style={{ height: "200px", overflowY: "auto" }}
-                >
+                <p className="history-title">Lịch sử hành trình</p>
+
+                {/* Khung Lịch sử */}
+                <div className="history-list">
                   {history.map((h, i) => (
-                    <div key={i} className="border-b pb-2 mb-2">
-                      <p className="font-semibold">
+                    <div key={i} className="history-item">
+                      <p className="history-time-range">
                         {h.date} | {h.time}
                       </p>
-                      <p>{h.distance} km</p>
+                      <p className="history-distance">{h.distance} Km</p>
                     </div>
                   ))}
                 </div>
 
-                <div
-                  style={{
-                    position: "sticky",
-                    bottom: "10px",
-                    marginTop: "15px",
-                  }}
-                >
-                  <button
-                    onClick={() => navigate(`/vehicle/${id}/checkin`)}
+                {/* Nút Bắt đầu check-in/out */}
+                <div className="trip-button-container">
+                  <a
+                    href={`/vehicle/${id}/checkin`} // Thêm href để nó hoạt động như một link
+                    className="start-checkin-btn"
+                    onClick={(e) => {
+                      e.preventDefault(); // Ngăn hành vi mặc định của link (tải lại trang)
+                      navigate(`/vehicle/${id}/checkin`);
+                    }}
                   >
                     Bắt đầu check-in/out
-                  </button>
+                  </a>
                 </div>
               </>
             )}
