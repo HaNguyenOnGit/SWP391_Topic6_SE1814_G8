@@ -1,401 +1,96 @@
-/* =========================================
-1. Cấu hình cơ bản (Basic Configuration)
-=========================================
-*/
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+/* Nền tổng thể nhẹ nhàng */
+body {
+    background: #f8f9fa;
+}
 
-.registration-page {
-    font-family: 'Inter', sans-serif;
-    background-color: #f4f7f9;
+/* Card nhẹ nhàng có đổ bóng mềm */
+.card {
+    border-radius: 12px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Tiêu đề form */
+.card-title {
+    font-weight: 600;
+    color: #333;
+}
+
+/* Label form đậm nhẹ */
+.form-label {
+    font-weight: 500;
+    color: #444;
+}
+
+/* Input focus nổi bật hơn */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.4);
+}
+
+/* Input-group icon nền xám nhẹ */
+.input-group-text {
+    background: #f1f1f1;
+    border-radius: 6px 0 0 6px;
+}
+
+/* File label hiển thị đẹp hơn */
+small.text-muted {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+}
+
+/* Button đăng ký đẹp hơn */
+.btn-primary {
+    border-radius: 6px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+}
+
+/* Button cancel nhẹ nhàng */
+.btn-outline-secondary {
+    border-radius: 6px;
+    transition: 0.3s;
+}
+
+.btn-outline-secondary:hover {
+    background: #f1f1f1;
+}
+
+/* Modal backdrop mờ */
+.modal-backdrop {
+    background: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Modal đẹp hơn */
+.modal-dialog .modal-content {
+    border-radius: 12px;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* OTP input focus */
+.modal-content input.form-control:focus {
+    border-color: #198754;
+    box-shadow: 0 0 6px rgba(25, 135, 84, 0.5);
+}
+
+/* Footer nhỏ */
+.card-footer {
+    font-size: 0.85rem;
+    background: #fff;
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+}
+
+.registration-bg {
+    background: #D9D9D9;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    /* Căn giữa theo chiều dọc */
-    padding: 20px;
-    box-sizing: border-box;
-    /* Bù trừ padding 30px từ body bên ngoài */
-    margin: -30px;
-}
-
-/* =========================================
-2. Layout Chính (Image + Form)
-=========================================
-*/
-.registration-page {
-    /* Sử dụng flexbox để tạo layout 2 cột */
-    display: flex;
-    flex-wrap: wrap;
-    /* Cho phép xuống dòng trên mobile */
-    gap: 30px;
-    /* Khoảng cách giữa ảnh và form */
-    max-width: 1200px;
-    /* Giới hạn chiều rộng tổng thể */
-    margin: -30px auto 0 auto;
-    /* Bù trừ padding và căn giữa */
-    padding: 40px 20px;
-}
-
-.registration-page .image-container {
-    flex: 1;
-    /* Chiếm 1 phần */
-    min-width: 300px;
-    /* Chiều rộng tối thiểu cho ảnh */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
-    border-radius: 16px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12);
-    padding: 30px;
-}
-
-.registration-page .image-container img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 12px;
-}
-
-.registration-page .form {
-    flex: 2;
-    /* Chiếm 2 phần, form sẽ rộng hơn */
-    background-color: #ffffff;
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12), 0 5px 15px rgba(0, 0, 0, 0.05);
-    border: 2px solid rgba(199, 125, 206, 0.3);
-    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-    max-width: 600px;
-    /* Giới hạn chiều rộng của form */
-}
-
-.registration-page .form:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-    border-color: rgba(199, 125, 206, 0.6);
-}
-
-.registration-page h2 {
-    color: #1e3a8a;
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 30px;
-    text-align: center;
-    position: relative;
-    padding-bottom: 15px;
-}
-
-.registration-page h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 25%;
-    width: 50%;
-    height: 3px;
-    background: linear-gradient(to right, #8CC8E7, #C77DCE);
-    border-radius: 2px;
-}
-
-/* =========================================
-3. Input Fields & Labels
-=========================================
-*/
-.registration-page label {
-    display: block;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
-    font-size: 0.95rem;
-}
-
-.registration-page .txtInput {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 1rem;
-    color: #374151;
-    transition: border-color 0.3s, box-shadow 0.3s;
-    box-sizing: border-box;
-}
-
-.registration-page .txtInput:focus {
-    border-color: #8CC8E7;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(140, 200, 231, 0.4);
-}
-
-.registration-page p {
-    color: #ef4444;
-    /* Màu đỏ cho lỗi */
-    font-size: 0.85rem;
-    margin-top: -10px;
-    /* Đẩy lỗi lên gần input */
-    margin-bottom: 10px;
-}
-
-/* =========================================
-4. File Upload Buttons
-=========================================
-*/
-.registration-page .form>div>button {
-    /* Chọn các nút nằm trực tiếp trong div của form */
-    cursor: pointer;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    color: white;
-    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
-    transition: all 0.3s ease-in-out;
-    margin-bottom: 10px;
-    width: 100%;
-    /* Chiếm toàn bộ chiều rộng */
-    box-shadow: 0 4px 10px rgba(199, 125, 206, 0.4);
-}
-
-.registration-page .form>div>button:hover {
-    background: linear-gradient(135deg, #C77DCE 0%, #8CC8E7 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(199, 125, 206, 0.5);
-}
-
-.registration-page .form>div span {
-    margin-left: 10px;
-    font-size: 0.9rem;
-    color: #4b5563;
-}
-
-/* =========================================
-5. Action Buttons (Đăng ký, Hủy)
-=========================================
-*/
-.registration-page .btnInput,
-.registration-page .btnReturn {
-    cursor: pointer;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 1.05rem;
-    color: white;
-    transition: all 0.3s ease-in-out;
-    width: calc(50% - 5px);
-    /* Chia đôi cho 2 nút, trừ khoảng cách */
-    box-sizing: border-box;
-}
-
-.registration-page .btnInput {
-    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
-    box-shadow: 0 6px 20px rgba(199, 125, 206, 0.4);
-}
-
-.registration-page .btnInput:hover {
-    background: linear-gradient(135deg, #C77DCE 0%, #8CC8E7 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(199, 125, 206, 0.6);
-}
-
-.registration-page .btnReturn {
-    background: #6b7280;
-    /* Màu xám cho nút Hủy */
-    box-shadow: 0 6px 20px rgba(107, 114, 128, 0.3);
-}
-
-.registration-page .btnReturn:hover {
-    background: #4b5563;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
-}
-
-/* Form message */
-.registration-page .form-message {
-    padding: 12px;
-    margin-top: 20px;
-    border-radius: 8px;
-    font-weight: 500;
-    font-size: 0.95rem;
-    text-align: center;
-    background-color: #e6f4ff;
-    /* Nền nhẹ nhàng */
-    border: 1px solid #8CC8E7;
-    /* Border theo màu mới */
-    color: #1e3a8a;
-}
-
-.registration-page .form-message.error {
-    background-color: #fee2e2;
-    border-color: #ef4444;
-    color: #991b1b;
-}
-
-.registration-page .form-message.success {
-    background-color: #d1fae5;
-    border-color: #10b981;
-    color: #065f46;
-}
-
-/* =========================================
-6. OTP Pop-up (Overlay & Content)
-=========================================
-*/
-.otp-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.6);
-    /* Nền tối hơn một chút */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    /* Đảm bảo nổi lên trên cùng */
-}
-
-.otp-popup {
-    background: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 350px;
-    border: 2px solid rgba(199, 125, 206, 0.4);
-}
-
-.otp-popup h3 {
-    color: #1e3a8a;
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-}
-
-.otp-popup p {
-    color: #4b5563;
-    margin-bottom: 20px;
-}
-
-.otp-popup input[type="number"] {
-    width: calc(100% - 24px);
-    /* Chiếm gần hết chiều rộng, trừ padding */
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    text-align: center;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: border-color 0.3s, box-shadow 0.3s;
-}
-
-.otp-popup input[type="number"]:focus {
-    border-color: #8CC8E7;
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(140, 200, 231, 0.4);
-}
-
-.otp-popup button {
-    cursor: pointer;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: white;
-    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
-    box-shadow: 0 4px 10px rgba(199, 125, 206, 0.4);
-    transition: all 0.3s ease-in-out;
-    margin: 5px;
-    width: calc(50% - 10px);
-    /* Chia đôi cho 2 nút */
-    box-sizing: border-box;
-}
-
-.otp-popup button:hover:not(:disabled) {
-    background: linear-gradient(135deg, #C77DCE 0%, #8CC8E7 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(199, 125, 206, 0.5);
-}
-
-.otp-popup .resend-otp-btn {
-    color: #C77DCE;
-    /* Màu tím cho nút gửi lại mã */
-    background: none;
-    border: none;
-    box-shadow: none;
-    font-weight: 500;
-    margin-top: 15px;
-    width: auto;
-    display: inline-block;
-    padding: 0;
-    text-decoration: underline;
-    font-size: 0.9rem;
-}
-
-.otp-popup .resend-otp-btn:hover:not(:disabled) {
-    color: #b359c2;
-    transform: none;
-    text-decoration: none;
-    box-shadow: none;
-}
-
-.otp-popup .resend-otp-btn:disabled {
-    color: #9ca3af;
-    cursor: not-allowed;
-    text-decoration: none;
-}
-
-
-/* =========================================
-7. Responsive Design (Dành cho Mobile)
-=========================================
-*/
-@media (max-width: 900px) {
-    .registration-page {
-        flex-direction: column;
-        /* Đổi thành 1 cột */
-        align-items: center;
-        padding: 30px 15px;
-        margin: -30px auto 0 auto;
-    }
-
-    .registration-page .image-container {
-        width: 100%;
-        max-width: 500px;
-        margin-bottom: 20px;
-    }
-
-    .registration-page .form {
-        width: 100%;
-        padding: 30px;
-        max-width: 500px;
-    }
-
-    .registration-page h2 {
-        font-size: 1.6rem;
-        margin-bottom: 25px;
-    }
-}
-
-@media (max-width: 500px) {
-    .registration-page .form {
-        padding: 20px;
-    }
-
-    .registration-page h2 {
-        font-size: 1.4rem;
-    }
-
-    .registration-page .btnInput,
-    .registration-page .btnReturn,
-    .otp-popup button {
-        width: 100%;
-        margin-right: 0;
-        margin-bottom: 10px;
-        /* Thêm khoảng cách giữa các nút */
-    }
-
-    .otp-popup button:last-of-type {
-        margin-bottom: 0;
-    }
 }
