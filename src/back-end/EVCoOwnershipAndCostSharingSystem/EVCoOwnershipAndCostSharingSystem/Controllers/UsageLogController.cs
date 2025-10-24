@@ -99,11 +99,12 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 ContractId = req.ContractId,
                 UserId = req.UserId,
                 OdometerStart = req.Odometer,
-                CheckOutTime = DateTime.Now,
+                CheckInTime = DateTime.Now,
                 ProofImageStart = req.ProofImage
             };
             context.UsageLogs.Add(usageLog);
             contract.UsingBy = req.UserId;
+            contract.Status = "Active"; // Set status to Active on checkin
             context.SaveChanges();
             return Ok("Checkin thành công!");
         }
@@ -120,16 +121,17 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest("Bạn không phải người đang sử dụng xe!");
             // Tìm usage log gần nhất chưa có checkout
             var usageLog = context.UsageLogs
-                .Where(u => u.ContractId == req.ContractId && u.UserId == req.UserId && u.CheckInTime == default)
-                .OrderByDescending(u => u.CheckOutTime)
+                .Where(u => u.ContractId == req.ContractId && u.UserId == req.UserId && u.CheckOutTime == null)
+                .OrderByDescending(u => u.CheckInTime)
                 .FirstOrDefault();
             if (usageLog == null)
                 return BadRequest("Không tìm thấy phiên checkin phù hợp!");
             usageLog.OdometerEnd = req.Odometer;
-            usageLog.CheckInTime = DateTime.Now;
+            usageLog.CheckOutTime = DateTime.Now;
             usageLog.ProofImageEnd = req.ProofImage;
             usageLog.Distance = usageLog.OdometerEnd - usageLog.OdometerStart;
             contract.UsingBy = null;
+            contract.Status = "Available"; // Set status to Available on checkout
             context.SaveChanges();
             return Ok("Checkout thành công!");
         }

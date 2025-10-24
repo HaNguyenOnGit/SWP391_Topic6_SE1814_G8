@@ -59,5 +59,4 @@ public partial class User
 
     public virtual ICollection<UsageLog> UsageLogUsers { get; set; } = new List<UsageLog>();
 
-    public virtual ICollection<UsageLog> UsageLogVerifiedByNavigations { get; set; } = new List<UsageLog>();
 }
