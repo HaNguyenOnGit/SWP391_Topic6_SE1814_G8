@@ -35,12 +35,6 @@ namespace DataAccessLayer.Repositories
             return _context.Users.ToList();
         }
 
-        public int GetUserIdByName(string fullName)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.FullName == fullName);
-            return user != null ? user.UserId : -1;
-        }
-
         public User? GetUserByPhone(string phoneNumber)
         {
             return _context.Users.FirstOrDefault(x => x.PhoneNumber == phoneNumber);
@@ -58,6 +52,15 @@ namespace DataAccessLayer.Repositories
 
         public void UpdateUser(User user)
         {
+            _context.Users.Update(user);
+            _context.SaveChanges();
+        }
+
+        public void EnableUserById(int userId)
+        {
+            var user = GetUserById(userId);
+            if (user == null) throw new Exception("User not found");
+            user.Status = "Enabled";
             _context.Users.Update(user);
             _context.SaveChanges();
         }

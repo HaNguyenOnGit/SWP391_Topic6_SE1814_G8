@@ -12,13 +12,17 @@ namespace BusinessLogicLayer.Services
     public class ContractMemberService
     {
         private readonly ContractMemberRepository _cmr;
-
         public ContractMemberService()
         {
             _cmr = new ContractMemberRepository();
         }
 
-        public void AddContractMember(int contractId, int userId, decimal sharePercent, DateTime joinedAt, string status) 
+        public bool UpdateMemberStatus(int contractId, int userId, string status)
+        {
+            return _cmr.UpdateMemberStatus(contractId, userId, status);
+        }
+
+        public void AddContractMember(int contractId, int userId, decimal sharePercent, DateTime joinedAt, string status)
         {
             ContractMember contractMember = new ContractMember
             {
@@ -31,14 +35,9 @@ namespace BusinessLogicLayer.Services
             _cmr.AddContractMember(contractMember);
         }
 
-        public int GetContractIdByMemberName(string fullName)
+        public List<int> GetContractIdsByUserId(int userId)
         {
-            return _cmr.GetContractIdByMemberName(fullName);
-        }
-
-        public List<ContractMember> GetCoOwnerList(int contractId)
-        {
-            return _cmr.GetCoOwnerList(contractId);
+            return _cmr.GetContractIdsByUserId(userId);
         }
     }
 }

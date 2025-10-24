@@ -9,6 +9,25 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/contract")]
     public class ContractController : ControllerBase
     {
+
+        [HttpPost("update-member-status")]
+        public IActionResult UpdateMemberStatus([FromBody] UpdateMemberStatusRequest req)
+        {
+            // req gồm: contractId, userId, status
+            var allowedStatus = new[] { "Rejected", "Confirmed" };
+            if (!allowedStatus.Contains(req.Status))
+                return BadRequest("Invalid status value");
+            var result = _cms.UpdateMemberStatus(req.ContractId, req.UserId, req.Status);
+            if (!result) return NotFound("Member not found in contract");
+            return Ok("Status updated successfully");
+        }
+
+        public class UpdateMemberStatusRequest
+        {
+            public int ContractId { get; set; }
+            public int UserId { get; set; }
+            public string Status { get; set; }
+        }
         private readonly ContractService _cs;
         private readonly UserService _us;
         private readonly ContractMemberService _cms;
@@ -19,7 +38,58 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _cms = new ContractMemberService();
         }
 
-        // Create contract with members
+        [HttpGet("contract-detail/{contractId}")]
+        public IActionResult GetContractDetail(int contractId)
+        {
+            var contract = _cs.GetContractById(contractId);
+            if (contract == null)
+                return NotFound("Contract not found");
+
+            // Lấy danh sách member
+            var members = contract.ContractMembers.Select(cm => new
+            {
+                cm.UserId,
+                cm.User.FullName,
+                cm.User.PhoneNumber,
+                cm.SharePercent,
+                cm.Status,
+                cm.JoinedAt
+            }).ToList();
+
+            var result = new
+            {
+                contract.ContractId,
+                contract.VehicleName,
+                contract.LicensePlate,
+                contract.Model,
+                contract.StartDate,
+                contract.Status,
+                Members = members
+            };
+            return Ok(result);
+        }
+
+        [HttpGet("user-contracts/{userId}")]
+        public IActionResult GetContractsByUserId(int userId)
+        {
+            // Lấy danh sách contractId mà user này tham gia
+            var contractIds = _cms.GetContractIdsByUserId(userId);
+            var contracts = new List<object>();
+            foreach (var contractId in contractIds)
+            {
+                var contract = _cs.GetContractById(contractId);
+                if (contract != null)
+                {
+                    contracts.Add(new
+                    {
+                        contract.ContractId,
+                        contract.VehicleName,
+                        contract.Status
+                    });
+                }
+            }
+            return Ok(contracts);
+        }
         [HttpPost("contractRequest")]
         public IActionResult CreateContract([FromBody] ContractRequest contractRequest)
         {
@@ -29,14 +99,13 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             string model = contractRequest.Model;
             DateOnly startDate = contractRequest.StartDate;
             string status = contractRequest.Status;
-            int creator = contractRequest.Creator;
-            _cs.CreateContract(vehicleName, licensePlate, model, startDate, status, creator);
+            _cs.CreateContract(vehicleName, licensePlate, model, startDate, status);
             // Extract member details
             List<MemberRequest> members = contractRequest.Members;
             var contract = _cs.GetContractByPlate(licensePlate);
             foreach (var member in members)
             {
-                var user = _us.GetUserByPhone(member.PhoneNumber);             
+                var user = _us.GetUserByPhone(member.PhoneNumber);
                 // Assuming contract is not null since it was just created
                 int contractId = contract.ContractId;
                 int userId = user.UserId;
@@ -46,47 +115,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 _cms.AddContractMember(contractId, userId, sharePercent, joinedAt, coOwnerStatus);
             }
             return Ok("Contract and members added successfully.");
-        }
-
-        // Get contract by user ID
-        // After login, create token to get userId
-        // This API is used to get contract info after login
-        // Only the user who creates the contract can get contract info
-        // May need to change later
-        [HttpGet("getContract/{userId}")]
-        public ActionResult<Contract?> GetContractById([FromRoute] int userId)
-        {
-            var contract = _cs.GetContractById(userId);
-            if (contract == null)
-            {
-                return NotFound("Contract not found for the given user.");
-            }
-            return Ok(contract);
-        }
-
-        // Get co-owner list by user ID (the one who creates the contract)
-        // After getting contract
-        // Get userId first, then get contractId, then get co-owner list
-        // Used in checkin and checkout to show co-owners
-        // And also be used to show co-owners in contract detail page
-        [HttpGet("getCoOwner/{userId}")]
-        public ActionResult<List<ContractMember>> GetCoOwnerList([FromRoute] int userId)
-        {
-           int contractId = _cs.GetContractId(userId);
-           var coOwners = _cms.GetCoOwnerList(contractId);
-           return Ok(coOwners);
-        }
-
-        //Get contractId by member name
-        //Find user in user table first to get userId by fullName
-        //Then use this id to find contractId in contractMember table
-        //Use this in choosing member for checkin and checkout
-        //This API do this
-        [HttpGet("getContractIdByMemberName/{fullName}")]
-        public ActionResult<int> GetContractIdByMemberName([FromRoute] string fullName)
-        {
-            int contractId = _cms.GetContractIdByMemberName(fullName);
-            return Ok(contractId);
         }
     }
 }

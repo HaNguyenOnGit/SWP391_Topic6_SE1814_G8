@@ -40,14 +40,9 @@ namespace BusinessLogicLayer.Services
             return _ur.GetUserByPhone(phoneNumber);
         }
 
-        public int GetUserIdByFullName(string fullName)
-        {
-            return _ur.GetUserIdByName(fullName);
-        }
-
         public void AddUser(string fullName, string email, string citizenId, string drivingLicenseId,
                             string bankName, string bankAccount, string role,
-                            string phoneNumber, string password, string frontIdImage, string backIdImage, string frontLicenseImage, string backLicenseImage, string status)
+                            string phoneNumber, string password, string frontIdImage, string backIdImage, string frontLicenseImage, string backLicenseImage)
         {
             // ✅ Validate Gmail format
             if (!new EmailAddressAttribute().IsValid(email) ||
@@ -63,6 +58,7 @@ namespace BusinessLogicLayer.Services
                 BankName = bankName,
                 BankAccount = bankAccount,
                 Role = role,
+                Status = "Disabled",
                 IsEmailConfirmed = false,
                 EmailConfirmationCode = null,
                 EmailConfirmationExpiry = null,
@@ -71,8 +67,7 @@ namespace BusinessLogicLayer.Services
                 FrontIdImage = frontIdImage,
                 BackIdImage = backIdImage,
                 FrontLicenseImage = frontLicenseImage,
-                BackLicenseImage = backLicenseImage,
-                Status = status
+                BackLicenseImage = backLicenseImage
             };
 
             _ur.AddUser(user);
@@ -147,6 +142,15 @@ namespace BusinessLogicLayer.Services
             user.EmailConfirmationCode = null;
             user.EmailConfirmationExpiry = null;
 
+            _ur.UpdateUser(user);
+        }
+
+        public void EnableUserById(int userId)
+        {
+            var user = _ur.GetUserById(userId);
+            if (user == null)
+                throw new Exception("User not found");
+            user.Status = "Enabled";
             _ur.UpdateUser(user);
         }
         

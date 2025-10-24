@@ -1,4 +1,4 @@
-﻿using BusinessLogicLayer.Others;
+using BusinessLogicLayer.Others;
 using BusinessLogicLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,8 +23,8 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             int distance = odometerEnd - odometerStart;
             DateTime checkOutTime = usageLogRequest.CheckOutTime;
             DateTime checkInTime = usageLogRequest.CheckInTime;
-            string proofImageStart = usageLogRequest.ProofImageStart;
-            string proofImageEnd = usageLogRequest.ProofImageEnd;
+            string proofImageStart = usageLogRequest.ProofImageStart ?? string.Empty;
+            string proofImageEnd = usageLogRequest.ProofImageEnd ?? string.Empty;
             _uls.AddUsageLog(contractId, userId, odometerStart, odometerEnd,
                              checkOutTime, checkInTime, distance,
                              proofImageStart, proofImageEnd);

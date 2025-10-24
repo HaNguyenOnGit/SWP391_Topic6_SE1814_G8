@@ -9,6 +9,16 @@ namespace DataAccessLayer.Repositories
 {
     public class ContractMemberRepository
     {
+
+
+        public bool UpdateMemberStatus(int contractId, int userId, string status)
+        {
+            var member = _context.ContractMembers.FirstOrDefault(cm => cm.ContractId == contractId && cm.UserId == userId);
+            if (member == null) return false;
+            member.Status = status;
+            _context.SaveChanges();
+            return true;
+        }
         private readonly EvcoOwnershipAndCostSharingSystemContext _context;
         public ContractMemberRepository()
         {
@@ -20,21 +30,13 @@ namespace DataAccessLayer.Repositories
             _context.SaveChanges();
         }
 
-        public List<ContractMember> GetCoOwnerList(int contractId)
+        public List<int> GetContractIdsByUserId(int userId)
         {
             return _context.ContractMembers
-                .Where(cm => cm.ContractId == contractId)
+                .Where(cm => cm.UserId == userId)
+                .Select(cm => cm.ContractId)
+                .Distinct()
                 .ToList();
-        }
-
-        public int GetContractIdByMemberName(string fullName)
-        {
-            //Lay id truoc do mọi thu deu dung id
-            var user = _context.Users.FirstOrDefault(u => u.FullName == fullName);
-            int userId = user != null ? user.UserId : -1;
-            var contractMember = _context.ContractMembers.FirstOrDefault(cm => cm.UserId == userId);
-            int contractId = contractMember != null ? contractMember.ContractId : -1;
-            return contractId;
         }
     }
 }
