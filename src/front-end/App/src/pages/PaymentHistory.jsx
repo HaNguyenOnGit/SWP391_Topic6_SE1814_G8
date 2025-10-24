@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import "./PaymentHistory.css";
 
 export default function PaymentHistory() {
     const { id } = useParams();
@@ -47,35 +48,25 @@ export default function PaymentHistory() {
             <div className="main-content">
                 <div className="main-content-layout">
                     <VehicleInfo vehicle={vehicle} />
-                    <div>
-                        <h2 className="text-xl font-semibold mt-6 mb-3">Lịch sử thanh toán</h2>
-                        <div className="border rounded-lg p-4 max-h-80 overflow-y-auto space-y-4 bg-gray-50">
+                    <div className="payment-container">
+                        <h2 className="payment-title">Lịch sử chi tiêu</h2>
+                        <div className="payment-list">
                             {payments.map((p) => (
-                                <div
-                                    key={p.id}
-                                    className="p-3 border rounded-md bg-white shadow-sm hover:shadow-md transition"
-                                >
-                                    <div className="flex justify-between font-medium text-gray-800">
-                                        <span>{p.name}</span>
-                                        <span>{p.total}</span>
+                                <div key={p.id} className="payment-item">
+                                    <div className="payment-info">
+                                        <div className="payment-name">{p.name}</div>
+                                        <div className="payment-meta">{p.date}</div>
+                                        <div className="payment-meta">{p.proposer}</div>
                                     </div>
-                                    <div className="text-sm text-gray-600 mt-1">
-                                        <div>{p.date}</div>
-                                        <div>
-                                            <span
-                                                className={
-                                                    p.paid.startsWith("-") ? "text-red-600 font-semibold" : "text-green-600"
-                                                }
-                                            >
-                                                {p.paid}
-                                            </span>
-                                        </div>
-                                        <div>{p.proposer}</div>
+                                    <div className="payment-amount">
+                                        <div>{p.paid}</div>
+                                        <div>-150.000đ</div> {/* Nếu bạn muốn giữ dòng này giống mẫu */}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>

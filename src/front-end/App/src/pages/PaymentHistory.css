@@ -1,0 +1,87 @@
+.payment-container {
+    flex-grow: 1;
+    padding: 30px;
+    max-width: 550px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-left: 40px;
+}
+
+.payment-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 25px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #000;
+    text-align: left;
+}
+
+.payment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.payment-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 10px;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.payment-item:hover {
+    background-color: #f8faff;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    border-bottom-color: transparent;
+}
+
+.payment-item:last-child {
+    border-bottom: none;
+}
+
+.payment-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    gap: 3px;
+}
+
+.payment-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    line-height: 1.4;
+}
+
+.payment-meta {
+    font-size: 13px;
+    color: #555;
+    /* updated */
+}
+
+.payment-amount {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    line-height: 1.4;
+}
+
+.payment-amount>div:first-child {
+    font-size: 17px;
+    font-weight: 700;
+    color: #cc3333;
+}
+
+.payment-amount>div:last-child {
+    font-size: 13px;
+    color: #555;
+    /* updated */
+    margin-top: 3px;
+}
