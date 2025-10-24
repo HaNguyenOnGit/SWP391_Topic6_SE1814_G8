@@ -15,7 +15,11 @@ public partial class Contract
 
     public string Status { get; set; } = null!;
 
+
     public string? VehicleName { get; set; }
+
+    // UserId của người đang sử dụng xe (null nếu xe đang rảnh)
+    public int? UsingBy { get; set; }
 
     public virtual ICollection<ContractMember> ContractMembers { get; set; } = new List<ContractMember>();
 
