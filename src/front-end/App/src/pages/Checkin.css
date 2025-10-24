@@ -1,0 +1,187 @@
+/* ------------------------------------------------------------------ */
+/* --- CHECK-IN / CHECK-OUT SECTION — ĐỒNG BỘ PHONG CÁCH TRIP SECTION --- */
+/* ------------------------------------------------------------------ */
+
+.check-form-content {
+    flex-basis: 45%;
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+    animation: fadeInSlideUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    opacity: 0;
+}
+
+/* --- Tiêu đề chính --- */
+.check-form-title {
+    font-size: 32px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 5px;
+}
+
+/* --- Tổng quãng đường (giống trip-section) --- */
+.checkin-distance {
+    font-size: 24px;
+    font-weight: 300;
+    color: #ff6f00;
+    margin-top: 0;
+    margin-bottom: 40px;
+}
+
+.checkin-distance b {
+    font-weight: 800;
+    color: #ff6f00;
+}
+
+/* --- Bố cục ngang giữa ảnh và form km --- */
+.checkin-main-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 40px;
+    flex-wrap: nowrap;
+    margin-top: 10px;
+    padding-left: 0;
+}
+
+/* --- Camera Upload Box --- */
+.camera-box {
+    width: 150px;
+    height: 150px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #777;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.camera-box:hover {
+    border-color: #ff6f00;
+    color: #ff6f00;
+    background-color: #fff;
+}
+
+.camera-box.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.odo-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 14px;
+    color: #555;
+    gap: 6px;
+}
+
+.hidden-input {
+    display: none;
+}
+
+.change-photo-btn {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #333;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Nhóm nhập Km --- */
+.km-action-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.km-label {
+    font-weight: 600;
+    color: #222;
+    font-size: 17px;
+}
+
+.km-input {
+    border: 1.5px solid #ccc;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 16px;
+    width: 180px;
+    transition: border-color 0.3s ease;
+}
+
+.km-input:focus {
+    border-color: #ff6f00;
+    outline: none;
+}
+
+/* --- Nút xác nhận --- */
+.confirm-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.confirm-btn.ready {
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    color: white;
+}
+
+.confirm-btn.ready:hover {
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+}
+
+.confirm-btn.disabled {
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    color: #fafafa;
+    cursor: not-allowed;
+}
+
+/* --- Trạng thái & lỗi --- */
+.confirmed-message {
+    font-size: 14px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.error-message {
+    color: #d32f2f;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* --- Hiệu ứng load đồng bộ với CheckinHistory --- */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

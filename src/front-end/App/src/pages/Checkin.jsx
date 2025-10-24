@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import "./Checkin.css";
 
+// ========== COMPONENT UPLOAD ẢNH Ô-ĐÔ ==========
 function OdoUpload({ value, onChange, disabled }) {
   const [preview, setPreview] = useState(value || null);
+
   const handleFile = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -16,33 +19,30 @@ function OdoUpload({ value, onChange, disabled }) {
 
   return (
     <div
-      className={`relative w-40 h-40 border rounded overflow-hidden flex items-center justify-center bg-gray-50 ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-        }`}
+      className={`camera-box ${disabled ? "disabled" : ""}`}
       onClick={() => !disabled && document.getElementById("odoInput").click()}
     >
       {preview ? (
-        <img src={preview} alt="Odo" className="object-cover w-full h-full" />
+        <img src={preview} alt="Odo" className="odo-image" />
       ) : (
-        <span className="text-gray-500 text-sm text-center px-2">
-          Upload ảnh ô-đô
-        </span>
+        <div className="upload-text">
+          <span>📸</span>
+          <span>Upload ảnh ô-đô</span>
+        </div>
       )}
       <input
         id="odoInput"
         type="file"
         accept="image/*"
         onChange={handleFile}
-        className="hidden"
+        className="hidden-input"
       />
-      {!disabled && preview && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-white text-xs px-2 py-0.5 rounded shadow">
-          Thay đổi ảnh
-        </span>
-      )}
+      {!disabled && preview && <span className="change-photo-btn">Thay đổi ảnh</span>}
     </div>
   );
 }
 
+// ========== COMPONENT NHẬP KM ==========
 function KmInput({ value, onChange, disabled }) {
   const handleChange = (e) => {
     const raw = e.target.value.replace(/\D/g, "");
@@ -51,18 +51,30 @@ function KmInput({ value, onChange, disabled }) {
   };
 
   return (
-    <input
-      type="text"
-      value={value}
-      disabled={disabled}
-      onChange={handleChange}
-      className="border p-2 rounded w-40"
-      placeholder="Số km"
-    />
+    <div className="km-action-group">
+      <label className="km-label">Số Km</label>
+      <input
+        type="text"
+        value={value}
+        disabled={disabled}
+        onChange={handleChange}
+        className="km-input"
+        placeholder="Nhập số km"
+      />
+    </div>
   );
 }
 
-function CheckForm({ type, data, setData, onConfirm, checkinKm, lastTripKm, disabled = false }) {
+// ========== FORM CHECK-IN / CHECK-OUT ==========
+function CheckForm({
+  type,
+  data,
+  setData,
+  onConfirm,
+  checkinKm,
+  lastTripKm,
+  disabled = false,
+}) {
   const isReady = data.image && data.km;
   const kmValue = Number(data.km.replace(/,/g, ""));
   let error = "";
@@ -73,31 +85,43 @@ function CheckForm({ type, data, setData, onConfirm, checkinKm, lastTripKm, disa
     error = "Số km check-out phải ≥ check-in";
 
   return (
-    <div className="mt-4 space-y-3">
-      <h3 className="font-semibold text-lg">
-        {type === "checkin" ? "Check-in" : "Check-out"}
-      </h3>
-      <OdoUpload value={data.image} onChange={(file) => setData({ ...data, image: file })} disabled={disabled} />
-      <KmInput value={data.km} onChange={(val) => setData({ ...data, km: val })} disabled={disabled} />
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      {!disabled ? (
-        <button
-          disabled={!isReady || !!error}
-          className={`px-4 py-2 rounded text-white font-semibold ${isReady && !error ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
-            }`}
-          onClick={onConfirm}
-        >
-          Xác nhận
-        </button>
-      ) : (
-        <p className="text-sm text-gray-600">
-          Đã xác nhận lúc {new Date().toLocaleTimeString("vi-VN")}
-        </p>
-      )}
+    <div className="checkin-main-group">
+      {/* Cột trái: Upload ảnh */}
+      <OdoUpload
+        value={data.image}
+        onChange={(file) => setData({ ...data, image: file })}
+        disabled={disabled}
+      />
+
+      {/* Cột phải: nhập Km + nút xác nhận */}
+      <div className="km-action-group">
+        <h3 className="km-label">{type === "checkin" ? "Check-in" : "Check-out"}</h3>
+        <KmInput
+          value={data.km}
+          onChange={(val) => setData({ ...data, km: val })}
+          disabled={disabled}
+        />
+        {error && <p className="error-message">{error}</p>}
+
+        {!disabled ? (
+          <button
+            disabled={!isReady || !!error}
+            className={`confirm-btn ${isReady && !error ? "ready" : "disabled"}`}
+            onClick={onConfirm}
+          >
+            Xác nhận
+          </button>
+        ) : (
+          <p className="confirmed-message">
+            Đã xác nhận lúc {new Date().toLocaleTimeString("vi-VN")}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
 
+// ========== TRANG CHÍNH ==========
 export default function Checkin() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -117,11 +141,7 @@ export default function Checkin() {
       status: "Đang sử dụng",
     };
     const mockTrip = { distance: 1234 };
-    const mockHistory = [
-      { endKm: 10200 },
-      { endKm: 10170 },
-      { endKm: 10150 },
-    ];
+    const mockHistory = [{ endKm: 10200 }, { endKm: 10170 }, { endKm: 10150 }];
     setVehicle(mockVehicle);
     setTripInfo(mockTrip);
     setHistory(mockHistory);
@@ -153,16 +173,18 @@ export default function Checkin() {
       <div className="main-content">
         <div className="main-content-layout">
           <VehicleInfo vehicle={vehicle} />
-          <div>
+
+          <div className="check-form-content">
             {tripInfo && (
               <>
-                <h3 className="mt-4 font-semibold text-lg">Hành trình của bạn</h3>
-                <p className="mb-2">
-                  <b>{tripInfo.distance} km</b>
+                <h3 className="check-form-title">Hành trình của bạn</h3>
+                <p className="checkin-distance">
+                  <b>{tripInfo.distance} Km</b>
                 </p>
               </>
             )}
 
+            {/* Check-in */}
             {phase === "checkin" && (
               <CheckForm
                 type="checkin"
@@ -176,9 +198,16 @@ export default function Checkin() {
               />
             )}
 
+            {/* Check-in & Check-out */}
             {phase === "checked" && (
               <>
-                <CheckForm type="checkin" data={checkinData} setData={setCheckinData} lastTripKm={lastTripKm} disabled />
+                <CheckForm
+                  type="checkin"
+                  data={checkinData}
+                  setData={setCheckinData}
+                  lastTripKm={lastTripKm}
+                  disabled
+                />
                 <CheckForm
                   type="checkout"
                   data={checkoutData}

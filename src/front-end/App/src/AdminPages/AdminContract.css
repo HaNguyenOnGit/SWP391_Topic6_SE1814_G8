@@ -155,3 +155,24 @@
         width: 100%;
     }
 }
+
+.search-bar {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.search-bar input {
+    width: 60%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.search-bar input:focus {
+    border-color: #4f46e5;
+    outline: none;
+    box-shadow: 0 0 4px rgba(79, 70, 229, 0.3);
+}
