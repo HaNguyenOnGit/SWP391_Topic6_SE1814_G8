@@ -200,16 +200,22 @@ export default function NewContract() {
                       value={o.ratio}
                       onChange={e => updateRatio(i, Number(e.target.value))}
                     />
-                    <input
-                      className="pTxtInput"
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={o.ratio}
-                      onChange={e => updateRatio(i, Number(e.target.value))}
-                      style={{ width: "50px", marginLeft: "8px" }}
-                    />
-                    <span>%</span>
+                    <div style={{ display: "flex", alignItems: "center", marginLeft: "8px", gap: "2px" }}>
+                      <input
+                        className="pTxtInput"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={o.ratio === 0 ? 0 : String(o.ratio).replace(/^0+(?=\d)/, "")}
+                        onChange={e => {
+                          let v = e.target.value.replace(/^0+(?=\d)/, "");
+                          if (v === "") v = "0";
+                          if (Number(v) > 100) v = "100";
+                          updateRatio(i, Number(v));
+                        }}
+                      />
+                      <span style={{ fontSize: "25px", fontWeight: 500 }}>%</span>
+                    </div>
                   </div>
                 </div>
               ))}
