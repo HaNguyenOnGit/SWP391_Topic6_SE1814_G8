@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import { useAuth } from "../auth/AuthContext";
+import axios from "axios";
 import "./Checkin.css";
 
-// ========== COMPONENT UPLOAD ẢNH Ô-ĐÔ ==========
 function OdoUpload({ value, onChange, disabled }) {
   const [preview, setPreview] = useState(value || null);
 
@@ -27,7 +28,7 @@ function OdoUpload({ value, onChange, disabled }) {
       ) : (
         <div className="upload-text">
           <span>📸</span>
-          <span>Upload ảnh ô-đô</span>
+          <span>Upload ảnh ô-đô (tùy chọn)</span>
         </div>
       )}
       <input
@@ -42,7 +43,6 @@ function OdoUpload({ value, onChange, disabled }) {
   );
 }
 
-// ========== COMPONENT NHẬP KM ==========
 function KmInput({ value, onChange, disabled }) {
   const handleChange = (e) => {
     const raw = e.target.value.replace(/\D/g, "");
@@ -65,7 +65,6 @@ function KmInput({ value, onChange, disabled }) {
   );
 }
 
-// ========== FORM CHECK-IN / CHECK-OUT ==========
 function CheckForm({
   type,
   data,
@@ -75,7 +74,7 @@ function CheckForm({
   lastTripKm,
   disabled = false,
 }) {
-  const isReady = data.image && data.km;
+  const isReady = data.km; // ảnh không bắt buộc
   const kmValue = Number(data.km.replace(/,/g, ""));
   let error = "";
 
@@ -86,14 +85,12 @@ function CheckForm({
 
   return (
     <div className="checkin-main-group">
-      {/* Cột trái: Upload ảnh */}
       <OdoUpload
         value={data.image}
         onChange={(file) => setData({ ...data, image: file })}
         disabled={disabled}
       />
 
-      {/* Cột phải: nhập Km + nút xác nhận */}
       <div className="km-action-group">
         <h3 className="km-label">{type === "checkin" ? "Check-in" : "Check-out"}</h3>
         <KmInput
@@ -121,9 +118,9 @@ function CheckForm({
   );
 }
 
-// ========== TRANG CHÍNH ==========
 export default function Checkin() {
   const { id } = useParams();
+  const { userId } = useAuth();
   const navigate = useNavigate();
 
   const [vehicle, setVehicle] = useState(null);
@@ -134,35 +131,77 @@ export default function Checkin() {
   const [checkoutData, setCheckoutData] = useState({ km: "", image: null });
 
   useEffect(() => {
-    const mockVehicle = {
-      id,
-      name: "Xe Honda City",
-      plate: "59D3 - 23456",
-      status: "Đang sử dụng",
+    const fetchData = async () => {
+      try {
+        const [historyRes, checkinState] = await Promise.all([
+          axios.get(`/api/check/usage-history?userId=${userId}&contractId=${id}`),
+          axios.get(`/api/check/is-checked-in?contractId=${id}`),
+        ]);
+
+        const data = historyRes.data;
+        const trips = data.Trips || [];
+        // ✅ mỗi trip có CheckOutTime, CheckInTime, Distance
+        // => ta chỉ cần tổng Distance
+        setHistory(trips.map((t) => ({ endKm: t.Distance || 0 })));
+        setTripInfo({ distance: data.TotalDistance || 0 });
+
+        const isCheckedIn = checkinState.data.isCheckedIn; // ✅ fix key đúng
+
+        setVehicle({
+          id,
+          name: "Xe trong hợp đồng #" + id,
+          status: isCheckedIn ? "Đang sử dụng" : "Sẵn sàng",
+        });
+
+        if (isCheckedIn) setPhase("checked"); // ✅ sửa key và logic
+      } catch (err) {
+        console.error("Lỗi tải dữ liệu:", err);
+      }
     };
-    const mockTrip = { distance: 1234 };
-    const mockHistory = [{ endKm: 10200 }, { endKm: 10170 }, { endKm: 10150 }];
-    setVehicle(mockVehicle);
-    setTripInfo(mockTrip);
-    setHistory(mockHistory);
-  }, [id]);
+    fetchData();
+  }, [id, userId]);
 
   const lastTripKm = history.length ? Math.max(...history.map((h) => h.endKm)) : 0;
 
-  useEffect(() => {
-    const saved = localStorage.getItem("checkinData");
-    if (saved) {
-      setPhase("checked");
-      setCheckinData(JSON.parse(saved));
-    }
-  }, []);
+  const handleCheckin = async () => {
+    try {
+      const kmValue = Number(checkinData.km.replace(/,/g, ""));
+      let base64Image = null;
+      if (checkinData.image) base64Image = await toBase64(checkinData.image);
 
-  const reset = () => {
-    localStorage.removeItem("checkinData");
-    setPhase("checkin");
-    setCheckinData({ km: "", image: null });
-    setCheckoutData({ km: "", image: null });
-    navigate(`/vehicle/${id}/checkinHistory`);
+      await axios.post("/api/check/checkin", {
+        ContractId: Number(id),
+        UserId: userId,
+        Odometer: kmValue,
+        ProofImage: base64Image,
+      });
+
+      alert("Check-in thành công!");
+      setPhase("checked");
+      setCheckinData({ km: checkinData.km, image: checkinData.image });
+    } catch (err) {
+      alert("Lỗi khi check-in: " + (err.response?.data || err.message));
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const kmValue = Number(checkoutData.km.replace(/,/g, ""));
+      let base64Image = null;
+      if (checkoutData.image) base64Image = await toBase64(checkoutData.image);
+
+      await axios.post("/api/check/checkout", {
+        ContractId: Number(id),
+        UserId: userId,
+        Odometer: kmValue,
+        ProofImage: base64Image,
+      });
+
+      alert("Checkout thành công!");
+      navigate(`/vehicle/${id}/checkinHistory`);
+    } catch (err) {
+      alert("Lỗi khi checkout: " + (err.response?.data || err.message));
+    }
   };
 
   if (!vehicle) return <h2>Không tìm thấy phương tiện</h2>;
@@ -184,21 +223,16 @@ export default function Checkin() {
               </>
             )}
 
-            {/* Check-in */}
             {phase === "checkin" && (
               <CheckForm
                 type="checkin"
                 data={checkinData}
                 setData={setCheckinData}
                 lastTripKm={lastTripKm}
-                onConfirm={() => {
-                  localStorage.setItem("checkinData", JSON.stringify(checkinData));
-                  setPhase("checked");
-                }}
+                onConfirm={handleCheckin}
               />
             )}
 
-            {/* Check-in & Check-out */}
             {phase === "checked" && (
               <>
                 <CheckForm
@@ -213,10 +247,7 @@ export default function Checkin() {
                   data={checkoutData}
                   setData={setCheckoutData}
                   checkinKm={Number(checkinData.km.replace(/,/g, ""))}
-                  onConfirm={() => {
-                    alert("Đã hoàn tất check-out!");
-                    reset();
-                  }}
+                  onConfirm={handleCheckout}
                 />
               </>
             )}
@@ -225,4 +256,14 @@ export default function Checkin() {
       </div>
     </div>
   );
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = (error) => reject(error);
+  });
 }
