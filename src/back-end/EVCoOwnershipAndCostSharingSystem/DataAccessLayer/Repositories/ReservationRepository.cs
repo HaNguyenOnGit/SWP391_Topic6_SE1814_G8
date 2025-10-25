@@ -47,5 +47,16 @@ namespace DataAccessLayer.Repositories
                             r.StartTime.Date == date.Date)
                 .ToList();
         }
+        public void DeleteReservation(int contractId, DateTime startTime)
+        {
+            var reservation = _context.Reservations
+                .FirstOrDefault(r => r.ContractId == contractId && r.StartTime == startTime);
+
+            if (reservation == null)
+                throw new Exception("Không tìm thấy lịch đặt để xóa.");
+
+            _context.Reservations.Remove(reservation);
+            _context.SaveChanges();
+        }
     }
 }
