@@ -59,6 +59,19 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             });
         }
 
+        // API: Tổng quãng đường của một contract (theo tất cả usage logs)
+        [HttpGet("contract-total-distance")]
+        public IActionResult GetContractTotalDistance([FromQuery] int contractId)
+        {
+            var context = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            // Sum distance, handle null and empty sets
+            var totalDistance = context.UsageLogs
+                .Where(u => u.ContractId == contractId)
+                .Sum(u => (int?)u.Distance) ?? 0;
+
+            return Ok(new { ContractId = contractId, TotalDistance = totalDistance });
+        }
+
         // API: Check quyền checkin (userId phải trùng UsingBy hoặc UsingBy null)
         [HttpGet("can-checkin")]
         public IActionResult CanCheckin([FromQuery] int contractId, [FromQuery] int userId)
