@@ -15,7 +15,7 @@ export default function CheckinHistory() {
   const [tripInfo, setTripInfo] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [canCheckin, setCanCheckin] = useState(false); // ✅ thêm state kiểm tra quyền
+  const [canCheckin, setCanCheckin] = useState(false);
 
   // --- Gọi API usage-history ---
   useEffect(() => {
@@ -28,24 +28,36 @@ export default function CheckinHistory() {
         ]);
 
         const data = usageRes.data || {};
-        setCanCheckin(checkinRes.data?.canCheckin ?? false); // ✅ lưu quyền checkin
+        setCanCheckin(checkinRes.data?.canCheckin ?? false);
 
         const trips = Array.isArray(data.trips)
           ? data.trips.map((t) => {
-            const checkOut = new Date(t.checkOutTime);
-            const checkIn = new Date(t.checkInTime);
-            const date = checkOut.toLocaleDateString("vi-VN");
-            const timeRange = `${checkOut.toLocaleTimeString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })} - ${checkIn.toLocaleTimeString("vi-VN", {
-              hour: "2-digit",
-              minute: "2-digit",
-            })}`;
+            const checkIn = t.checkInTime ? new Date(t.checkInTime) : null;
+            const checkOut = t.checkOutTime ? new Date(t.checkOutTime) : null;
+
+            const date = checkIn
+              ? checkIn.toLocaleDateString("vi-VN")
+              : checkOut
+                ? checkOut.toLocaleDateString("vi-VN")
+                : "Không rõ";
+
+            const timeRange = checkIn
+              ? `${checkIn.toLocaleTimeString("vi-VN", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })} - ${checkOut
+                ? checkOut.toLocaleTimeString("vi-VN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+                : ""
+              }`
+              : "";
+
             return {
               date,
               time: timeRange,
-              distance: t.distance,
+              distance: t.distance || 0,
             };
           })
           : [];
@@ -82,12 +94,11 @@ export default function CheckinHistory() {
 
             {/* Tổng quãng đường */}
             <p className="trip-total-distance">
-              <b>{tripInfo?.distance ?? 0} Km</b>
+              <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
             </p>
 
             <p className="history-title">Lịch sử hành trình</p>
 
-            {/* Lịch sử hành trình */}
             <div className="history-list">
               {history.length > 0 ? (
                 history.map((h, i) => (
@@ -95,7 +106,9 @@ export default function CheckinHistory() {
                     <p className="history-time-range">
                       {h.date} | {h.time}
                     </p>
-                    <p className="history-distance">{h.distance} Km</p>
+                    <p className="history-distance">
+                      {h.distance.toLocaleString("vi-VN")} Km
+                    </p>
                   </div>
                 ))
               ) : (

@@ -71,15 +71,17 @@ function CheckForm({
   setData,
   onConfirm,
   checkinKm,
-  lastTripKm,
+  contractTotalKm,
   disabled = false,
+  checkinTime = null,
 }) {
-  const isReady = data.km; // ảnh không bắt buộc
+  const isReady = data.km;
   const kmValue = Number(data.km.replace(/,/g, ""));
   let error = "";
 
-  if (type === "checkin" && kmValue <= lastTripKm)
-    error = `Số km check-in phải lớn hơn ${lastTripKm.toLocaleString()} km`;
+  // RÀNG BUỘC
+  if (type === "checkin" && kmValue < contractTotalKm)
+    error = `Số km check-in phải ≥ tổng số km hợp đồng (${contractTotalKm.toLocaleString()} km)`;
   if (type === "checkout" && kmValue < checkinKm)
     error = "Số km check-out phải ≥ check-in";
 
@@ -91,16 +93,26 @@ function CheckForm({
         disabled={disabled}
       />
 
-      <div className="km-action-group">
-        <h3 className="km-label">{type === "checkin" ? "Check-in" : "Check-out"}</h3>
-        <KmInput
-          value={data.km}
-          onChange={(val) => setData({ ...data, km: val })}
-          disabled={disabled}
-        />
-        {error && <p className="error-message">{error}</p>}
+      {/* Nếu form bị disable (đã checkin) thì chỉ hiển thị thời gian xác nhận */}
+      {disabled ? (
+        <p className="confirmed-message">
+          Đã xác nhận lúc{" "}
+          {checkinTime
+            ? new Date(checkinTime).toLocaleTimeString("vi-VN")
+            : "Không xác định"}
+        </p>
+      ) : (
+        <div className="km-action-group">
+          <h3 className="km-label">
+            {type === "checkin" ? "Check-in" : "Check-out"}
+          </h3>
+          <KmInput
+            value={data.km}
+            onChange={(val) => setData({ ...data, km: val })}
+            disabled={disabled}
+          />
+          {error && <p className="error-message">{error}</p>}
 
-        {!disabled ? (
           <button
             disabled={!isReady || !!error}
             className={`confirm-btn ${isReady && !error ? "ready" : "disabled"}`}
@@ -108,12 +120,8 @@ function CheckForm({
           >
             Xác nhận
           </button>
-        ) : (
-          <p className="confirmed-message">
-            Đã xác nhận lúc {new Date().toLocaleTimeString("vi-VN")}
-          </p>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -125,43 +133,53 @@ export default function Checkin() {
 
   const [vehicle, setVehicle] = useState(null);
   const [tripInfo, setTripInfo] = useState(null);
-  const [history, setHistory] = useState([]);
   const [phase, setPhase] = useState("checkin");
   const [checkinData, setCheckinData] = useState({ km: "", image: null });
   const [checkoutData, setCheckoutData] = useState({ km: "", image: null });
+  const [contractTotalKm, setContractTotalKm] = useState(0);
+  const [checkinTime, setCheckinTime] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
+      if (!userId) return;
       try {
-        const [historyRes, checkinState] = await Promise.all([
+        const [usageRes, checkinState, contractKmRes] = await Promise.all([
           axios.get(`/api/check/usage-history?userId=${userId}&contractId=${id}`),
           axios.get(`/api/check/is-checked-in?contractId=${id}`),
+          axios.get(`/api/check/contract-total-distance?contractId=${id}`),
         ]);
 
-        const data = historyRes.data;
-        const trips = data.Trips || [];
-        // ✅ mỗi trip có CheckOutTime, CheckInTime, Distance
-        // => ta chỉ cần tổng Distance
-        setHistory(trips.map((t) => ({ endKm: t.Distance || 0 })));
-        setTripInfo({ distance: data.TotalDistance || 0 });
+        const data = usageRes.data || {};
+        const trips = Array.isArray(data.trips)
+          ? data.trips.map((t) => ({
+            checkInTime: t.checkInTime,
+            checkOutTime: t.checkOutTime,
+            distance: t.distance || 0,
+          }))
+          : [];
 
-        const isCheckedIn = checkinState.data.isCheckedIn; // ✅ fix key đúng
+        setTripInfo({ distance: data.totalDistance || 0 });
+        setContractTotalKm(contractKmRes.data.totalDistance || 0);
 
+        const activeTrip = trips.find((t) => !t.checkOutTime);
+        if (activeTrip) {
+          setCheckinTime(activeTrip.checkInTime);
+          setPhase("checked");
+        }
+
+        const isCheckedIn = checkinState.data.isCheckedIn;
         setVehicle({
           id,
           name: "Xe trong hợp đồng #" + id,
           status: isCheckedIn ? "Đang sử dụng" : "Sẵn sàng",
         });
-
-        if (isCheckedIn) setPhase("checked"); // ✅ sửa key và logic
       } catch (err) {
         console.error("Lỗi tải dữ liệu:", err);
       }
     };
+
     fetchData();
   }, [id, userId]);
-
-  const lastTripKm = history.length ? Math.max(...history.map((h) => h.endKm)) : 0;
 
   const handleCheckin = async () => {
     try {
@@ -178,7 +196,6 @@ export default function Checkin() {
 
       alert("Check-in thành công!");
       setPhase("checked");
-      setCheckinData({ km: checkinData.km, image: checkinData.image });
     } catch (err) {
       alert("Lỗi khi check-in: " + (err.response?.data || err.message));
     }
@@ -217,9 +234,12 @@ export default function Checkin() {
             {tripInfo && (
               <>
                 <h3 className="check-form-title">Hành trình của bạn</h3>
-                <p className="checkin-distance">
-                  <b>{tripInfo.distance} Km</b>
+                <p className="trip-total-distance">
+                  <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
                 </p>
+                {/* <p className="checkin-distance">
+                  <b>{tripInfo.distance} Km</b>
+                </p> */}
               </>
             )}
 
@@ -228,7 +248,7 @@ export default function Checkin() {
                 type="checkin"
                 data={checkinData}
                 setData={setCheckinData}
-                lastTripKm={lastTripKm}
+                contractTotalKm={contractTotalKm}
                 onConfirm={handleCheckin}
               />
             )}
@@ -239,14 +259,16 @@ export default function Checkin() {
                   type="checkin"
                   data={checkinData}
                   setData={setCheckinData}
-                  lastTripKm={lastTripKm}
                   disabled
+                  contractTotalKm={contractTotalKm}
+                  checkinTime={checkinTime}
                 />
                 <CheckForm
                   type="checkout"
                   data={checkoutData}
                   setData={setCheckoutData}
                   checkinKm={Number(checkinData.km.replace(/,/g, ""))}
+                  contractTotalKm={contractTotalKm}
                   onConfirm={handleCheckout}
                 />
               </>
