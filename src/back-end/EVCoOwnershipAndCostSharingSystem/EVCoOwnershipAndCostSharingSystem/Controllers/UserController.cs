@@ -24,6 +24,58 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _authService = authService;
         }
 
+        //Liet ke nguoi dung co role la co-owner
+        //Chi hien thi ten, so dien thoai, email, role, status
+        //Cho staff va admin xem
+        [HttpGet("userSummary")]
+        public ActionResult<List<UserSummary>> GetUserSummaries()
+        {
+            var userList = _us.GetAllUsers();
+            List<UserSummary> summaries = new List<UserSummary>();
+            foreach (var user in userList)
+            {
+                UserSummary summary = new UserSummary
+                {
+                    UserId = user.UserId,
+                    FullName = user.FullName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    Role = user.Role,
+                    Status = user.Status
+                };
+                summaries.Add(summary);
+            }
+            return Ok(summaries);
+        }
+
+        //Hien thi tat ca thong tin cua 1 nguoi dung 
+        [HttpGet("userDetail/{userId}")]
+        public ActionResult<User> GetUserById([FromRoute] int userId)
+        {
+            var user = _us.GetUserById(userId);
+            if (user == null)
+            {
+                return NotFound($"User with ID {userId} not found");
+            }
+            UserDetail ud = new UserDetail
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                PhoneNumber = user.PhoneNumber,
+                CitizenId = user.CitizenId,
+                DriverLicenseId = user.DriverLicenseId,
+                BankName = user.BankName,
+                BankAccount = user.BankAccount,
+                Role = user.Role,
+                Status = user.Status,
+                FrontIdImage = user.FrontIdImage,
+                BackIdImage = user.BackIdImage,
+                FrontLicenseImage = user.FrontLicenseImage,
+                BackLicenseImage = user.BackLicenseImage
+            };
+            return Ok(ud);
+        }
+
         // Lấy tất cả người dùng
         // Dung trong dang ky nguoi dung moi
         // De phong truong hop trung so dien thoai

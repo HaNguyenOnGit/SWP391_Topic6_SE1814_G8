@@ -40,6 +40,11 @@ namespace BusinessLogicLayer.Services
             return _ur.GetUserByPhone(phoneNumber);
         }
 
+        public User? GetUserById(int userId)
+        {
+            return _ur.GetUserById(userId);
+        }
+
         public void AddUser(string fullName, string email, string citizenId, string drivingLicenseId,
                             string bankName, string bankAccount, string role,
                             string phoneNumber, string password, string frontIdImage, string backIdImage, string frontLicenseImage, string backLicenseImage)
