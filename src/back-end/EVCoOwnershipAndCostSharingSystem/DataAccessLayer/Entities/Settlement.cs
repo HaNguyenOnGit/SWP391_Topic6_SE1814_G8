@@ -26,4 +26,8 @@ public partial class Settlement
     public virtual User Payer { get; set; } = null!;
 
     public virtual User Receiver { get; set; } = null!;
+
+    // Add missing properties for repository usage
+    public string? Status { get; set; }
+    public string? ProofImageUrl { get; set; }
 }
