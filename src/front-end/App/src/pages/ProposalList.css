@@ -18,14 +18,18 @@
     cursor: pointer;
     transition: all 0.25s ease-in-out;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.4s forwards;
 }
 
 .proposal-item:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: #000;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
 
+/* ====== Thông tin đề xuất ====== */
 .proposal-info {
     display: flex;
     flex-direction: column;
@@ -80,6 +84,9 @@
     border-radius: 14px;
     border: 1px solid #000;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    opacity: 0;
+    transform: translateY(10px);
+    animation: fadeUp 0.4s forwards;
 }
 
 .detail-container h3 {
@@ -98,7 +105,9 @@
     width: 6px;
     height: 100%;
     background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    background-size: 200% 200%;
     border-radius: 3px;
+    animation: gradient-move 2s ease infinite alternate;
 }
 
 .detail-container strong {
@@ -124,9 +133,12 @@
     font-weight: 600;
 }
 
-.detail-container tr:hover {}
+.detail-container table tr:hover {
+    background: #f3f6fa;
+    transform: scale(1.01);
+}
 
-/* Nút quay lại */
+/* ====== Nút quay lại ====== */
 .back-btn {
     background: linear-gradient(135deg, #8CC8E7, #C77DCE);
     color: white;
@@ -137,15 +149,15 @@
     margin-top: 24px;
     font-size: 15px;
     font-weight: 500;
-    transition: all 0.25s ease-in-out;
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
 }
 
 .back-btn:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
 }
 
-/* Wrapper bên phải */
+/* ====== Wrapper bên phải ====== */
 .All {
     max-width: 600px;
     width: 100%;
@@ -159,17 +171,9 @@ h2 {
     color: #222;
 }
 
-/* Hiệu ứng chung */
+/* ====== Hiệu ứng chung ====== */
 * {
     transition: all 0.3s ease-in-out;
-}
-
-/* Hiệu ứng xuất hiện nhẹ khi render */
-.proposal-item,
-.detail-container {
-    opacity: 0;
-    transform: translateY(10px);
-    animation: fadeUp 0.4s forwards;
 }
 
 @keyframes fadeUp {
@@ -179,30 +183,6 @@ h2 {
     }
 }
 
-/* Hover proposal - nhẹ nhàng nhưng chuyên nghiệp */
-.proposal-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
-    border-color: #aaa;
-}
-
-/* Hiệu ứng nổi cho nút quay lại */
-.back-btn {
-    transition: transform 0.2s ease, box-shadow 0.3s ease;
-}
-
-.back-btn:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-}
-
-/* Hiệu ứng hover từng dòng bảng */
-.detail-container table tr:hover {
-    background: #f3f6fa;
-    transform: scale(1.01);
-}
-
-/* (Tuỳ chọn) Hiệu ứng chuyển động rất nhẹ cho thanh gradient tiêu đề */
 @keyframes gradient-move {
     0% {
         background-position: 0% 50%;
@@ -211,10 +191,4 @@ h2 {
     100% {
         background-position: 100% 50%;
     }
-}
-
-.detail-container h3::before {
-    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
-    background-size: 200% 200%;
-    animation: gradient-move 2s ease infinite alternate;
 }
