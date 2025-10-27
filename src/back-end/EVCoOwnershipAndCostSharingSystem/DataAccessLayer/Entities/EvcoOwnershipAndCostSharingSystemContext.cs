@@ -37,19 +37,7 @@ public partial class EvcoOwnershipAndCostSharingSystemContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlServer(GetConnectionString());
-    }
-    private string GetConnectionString()
-    {
-        IConfiguration config = new ConfigurationBuilder()
-             .SetBasePath(AppContext.BaseDirectory)
-                    .AddJsonFile("appsettings.json", true, true)
-                    .Build();
-        var strConn = config["ConnectionStrings:DefaultConnection"];
-
-        return strConn;
-    }
+    => optionsBuilder.UseSqlServer("Server=tcp:evcosystem.database.windows.net,1433;Database=EVCoOwnershipAndCostSharingSystem;Persist Security Info=False;User ID=evcosystem;Password=EV123456#;MultipleActiveResultSets=False;Encrypt=False;TrustServerCertificate=True;Connection Timeout=30;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
