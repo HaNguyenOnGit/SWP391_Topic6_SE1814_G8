@@ -73,7 +73,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         {
             try
             {
-                var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date);
+                    var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date.ToString("yyyy-MM-dd"));
                 var result = reservations.Select(r => new {
                     r.ReservationId,
                     r.ContractId,
