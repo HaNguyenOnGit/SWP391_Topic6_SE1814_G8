@@ -41,3 +41,36 @@
     text-decoration: underline;
     color: #3498db;
 }
+
+
+@media (max-width: 1048px) {
+    .action-menu {
+        width: 300px;
+    }
+}
+
+/* ========================= */
+/*   THÔNG BÁO TRẠNG THÁI   */
+/* ========================= */
+.status-error {
+    border: 1px solid #000;
+    border-radius: 20px;
+    padding: 60px 20px;
+    max-width: 450px;
+    width: 100%;
+    margin-right: 50px;
+    text-align: center;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    font-weight: 600;
+    font-size: 20px;
+}
+
+@media (max-width: 1048px) {
+    .status-error {
+        width: 300px;
+    }
+}

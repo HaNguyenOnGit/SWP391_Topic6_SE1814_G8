@@ -171,29 +171,52 @@ export default function NewContract() {
             {ownerError && <p style={{ color: "red" }}>{ownerError}</p>}
             <div>
               {owners.map((o, i) => (
-                <div key={i} className="pSlider">
-                  <span className="pSlider-name">
-                    {o.fullName}
-                  </span>
-                  <br />
-                  <input
-                    className="slider"
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={o.ratio}
-                    onChange={e => updateRatio(i, Number(e.target.value))}
-                  />
-                  <input
-                    className="pTxtInput"
-                    type="number"
-                    min="0"
-                    max="100"
-                    value={o.ratio}
-                    onChange={e => updateRatio(i, Number(e.target.value))}
-                    style={{ width: "50px", marginLeft: "8px" }}
-                  />
-                  <span>%</span>
+                <div key={i} className="pSlider" style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                    <span className="pSlider-name" style={{ fontWeight: 500 }}>
+                      {o.fullName}
+                    </span>
+                    <span
+                      style={{
+                        cursor: "pointer",
+                        color: "red",
+                        fontWeight: "bold",
+                        fontSize: "16px",
+                        lineHeight: "1",
+                        marginTop: "-2px"
+                      }}
+                      onClick={() => setOwners(owners.filter((_, idx) => idx !== i))}
+                    >
+                      ✕
+                    </span>
+                  </div>
+
+                  <div style={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
+                    <input
+                      className="slider"
+                      type="range"
+                      min="0"
+                      max="100"
+                      value={o.ratio}
+                      onChange={e => updateRatio(i, Number(e.target.value))}
+                    />
+                    <div style={{ display: "flex", alignItems: "center", marginLeft: "8px", gap: "2px" }}>
+                      <input
+                        className="pTxtInput"
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={o.ratio === 0 ? 0 : String(o.ratio).replace(/^0+(?=\d)/, "")}
+                        onChange={e => {
+                          let v = e.target.value.replace(/^0+(?=\d)/, "");
+                          if (v === "") v = "0";
+                          if (Number(v) > 100) v = "100";
+                          updateRatio(i, Number(v));
+                        }}
+                      />
+                      <span style={{ fontSize: "25px", fontWeight: 500 }}>%</span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

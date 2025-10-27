@@ -1,285 +1,357 @@
+/* ================================
+   🎯 BỐ CỤC CHÍNH
+================================ */
 .calendar-wrapper {
     display: flex;
+    justify-content: space-between;
     align-items: flex-start;
     gap: 40px;
-    margin-top: 20px;
+    padding: 0 40px;
+    flex-wrap: nowrap;
+    /* giữ 2 cột ngang, không xuống hàng */
+    box-sizing: border-box;
 }
 
+.left-section {
+    margin-top: 30px;
+}
+
+/* --- Cột lịch (bên trái) --- */
 .calendar-section {
     flex: 2;
+    border-radius: 20px;
+    padding: 25px 30px;
+    min-width: 320px;
+    width: 100%;
+    box-sizing: border-box;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* --- Cột đặt lịch (bên phải) --- */
 .booking-right {
     flex: 1;
-    max-width: 100%;
-}
-
-/* --- Thông tin xe --- */
-.vehicle-header {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-bottom: 20px;
+    justify-content: space-between;
+    /* phân bố đều giữa list và bar */
+    align-items: stretch;
+    padding: 30px 32px;
+    border: 2px solid #000;
+    border-radius: 16px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    min-height: 600px;
+    max-width: 420px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 2px;
+    /* căn cho thẳng hàng với calendar-section */
 }
 
-.vehicle-header h1 {
-    font-size: 22px;
-    font-weight: bold;
-    margin: 0;
-}
-
-.vehicle-header p {
-    font-size: 15px;
-    margin: 0;
-}
-
-/* --- Trạng thái xe --- */
-.vehicle-status {
-    font-weight: bold;
-    display: inline-flex;
+.booking-container {
+    display: flex;
     align-items: center;
-    gap: 6px;
-    border-radius: 8px;
-    padding: 3px 8px;
-    font-size: 13px;
-    color: #2ecc71;
-    background: none;
+    height: 100%;
 }
 
-/* --- Bộ lọc tháng - năm --- */
+/* ================================
+   📅 LỊCH NGÀY THÁNG
+================================ */
 .select-row {
     display: flex;
-    gap: 8px;
-    margin: 10px 0;
-
+    gap: 12px;
+    margin: 15px 0 20px;
 }
 
 .select-row select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #777;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #aaa;
+    font-size: 15px;
     background: none;
-    margin-left: 30px;
+    transition: all 0.2s ease;
 }
 
-/* --- Lịch --- */
+.select-row select:hover {
+    border-color: #79c7ff;
+}
+
 .calendar-header,
 .calendar-grid {
     display: grid;
-    grid-template-columns: repeat(7, 40px);
+    grid-template-columns: repeat(7, 1fr);
     text-align: center;
-    gap: 30px;
-    margin: 0 auto;
-    margin-left: 30px;
+    gap: 18px;
 }
 
 .calendar-header {
     font-weight: bold;
-    margin-bottom: 10px;
+    font-size: 16px;
+    margin-bottom: 8px;
 }
 
 .calendar-grid {
-    padding: 10px 0;
+    margin-top: 10px;
 }
 
 .day {
-    padding: 8px;
+    padding: 12px;
     border-radius: 50%;
     cursor: pointer;
+    font-size: 16px;
     transition: all 0.2s ease;
 }
 
 .day:hover {
-    background: #eee;
+    background: #f2f2f2;
 }
 
 .day.active {
-    background: linear-gradient(45deg, #d47dff, #79c7ff);
-    font-weight: bold;
+    background: linear-gradient(45deg, #8cc8e7, #d47dff);
     color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* --- Khung đặt lịch bên phải --- */
-.booking-right {
-    width: 280px;
-    flex: 1;
-    max-width: 3800px;
-    min-height: 500px;
-    border: 1px solid #000;
-    padding: 12px 15px;
-    border-radius: 18px;
-    padding: 25px 22px;
+/* ================================
+   🧾 DANH SÁCH LỊCH
+================================ */
+.booking-list {
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     justify-content: flex-start;
-    justify-content: space-between;
-    gap: 18px;
-    box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.15);
-    font-size: 15px;
-    margin-top: -140px;
-    margin-right: 30px;
+    margin-bottom: 20px;
+    /* tạo khoảng cách với khung đặt lịch */
 }
 
-/* --- Thanh tiêu đề đặt lịch --- */
-.booking-bar {
+.booking-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border: 1px solid #8d8080;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.booking-item:hover {
+    background: #f3f3f3;
+}
+
+.booking-item span {
+    flex: 1;
+    color: #333;
+}
+
+.booking-item b {
+    color: #555;
+    margin-right: 6px;
+}
+
+.booking-item button {
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.booking-item button:hover {
+    transform: scale(1.2);
+}
+
+/* ================================
+   🕓 KHUNG “ĐẶT LỊCH CHO BẠN”
+================================ */
+.booking-bar {
+    border: 1px solid #000;
+    border-radius: 12px;
+    padding: 18px;
+    margin-top: auto;
+    /* ép khung nằm dưới cùng */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .booking-bar .info {
     display: flex;
     flex-direction: column;
-    font-size: 14px;
+    gap: 8px;
 }
 
-/* --- Nút thêm lịch (Add) --- */
-.addBtn {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 27pt;
-    font-weight: 700;
-    color: #D9D9D9;
-    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
-    border: none;
-    margin-left: 20px;
-    cursor: pointer;
+.booking-bar b {
+    font-size: 16px;
+    color: #222;
+}
+
+.time-inputs {
     display: flex;
-    justify-content: center;
     align-items: center;
-    transition: all 0.2s ease;
+    gap: 8px;
 }
 
-.addBtn:hover {
-    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
-    transform: scale(1.05);
-}
-
-/* --- Nút nhỏ bên trong booking bar --- */
-.booking-right .addBtn {
-    width: 35px;
-    height: 35px;
-    font-size: 20pt;
-    margin-left: 0;
-}
-
-/* --- Form đặt lịch --- */
-.booking-right {
-    position: relative;
-    /* để form định vị tuyệt đối trong khung này */
-}
-
-.booking-form {
-    border: 1px solid #ccc;
-    padding: 15px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-    /* 💡 thêm phần dưới đây để form hiện phía trên */
-    position: absolute;
-    bottom: 80px;
-    /* đẩy form lên phía trên nút “+” */
-    left: 0;
-    right: 0;
-    width: 90%;
-    margin: 0 auto;
-    z-index: 10;
-    animation: slideUp 0.25s ease;
-}
-
-/* Hiệu ứng trượt nhẹ khi form bật lên */
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.booking-form label {
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-    margin-bottom: 4px;
-}
-
-.booking-form input,
-.booking-form select {
-    padding: 8px 10px;
+.time-inputs input {
+    width: 90px;
+    padding: 6px 8px;
     border-radius: 6px;
-    border: 1px solid #bbb;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.2s ease;
+    border: 1px solid #000;
+    font-size: 13px;
+    text-align: center;
+    box-sizing: border-box;
     background: none;
 }
 
-.booking-form input:focus,
-.booking-form select:focus {
+.time-inputs input:focus {
     border-color: #79c7ff;
-    box-shadow: 0 0 4px rgba(121, 199, 255, 0.6);
+    box-shadow: 0 0 4px rgba(121, 199, 255, 0.4);
 }
 
-/* --- Nút xác nhận đặt lịch --- */
+
+.time-inputs input:focus {
+    border-color: #79c7ff;
+    box-shadow: 0 0 4px rgba(121, 199, 255, 0.4);
+}
+
+/* ================================
+   📋 FORM POPUP (nếu có)
+================================ */
+.booking-form {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: slideUp 0.25s ease;
+}
+
+.booking-form label {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.booking-form input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #bbb;
+    font-size: 15px;
+}
+
 .booking-form button {
-    padding: 10px;
-    border-radius: 6px;
+    padding: 12px;
+    border-radius: 8px;
     border: none;
     background: linear-gradient(135deg, #79c7ff, #d47dff);
     color: white;
-    font-weight: bold;
+    font-weight: 600;
     cursor: pointer;
-    font-size: 14px;
     transition: all 0.2s ease;
 }
 
 .booking-form button:hover {
-    background: linear-gradient(135deg, #68b5e8, #c36ae8);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    transform: scale(1.03);
 }
 
-/* --- Danh sách lịch đã đặt --- */
-.booking-list {
-    margin-top: 10px;
-    font-size: 14px;
-    padding-top: 10px;
+/* ================================
+   📱 RESPONSIVE
+================================ */
+@media (max-width: 900px) {
+    .calendar-wrapper {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 30px;
+        padding: 0 20px;
+    }
+
+    .calendar-section,
+    .booking-right {
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .booking-right {
+        min-height: auto;
+        padding: 24px;
+    }
+}
+
+/* ================================
+   🚫 THÔNG BÁO XE KHÔNG KHẢ DỤNG
+================================ */
+.vehicle-unavailable-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 50vh;
+    /* Giúp block ở giữa chiều dọc khung */
+    margin-top: 20px;
+    padding: 40px 0;
+    box-sizing: border-box;
+}
+
+/* Hộp thông báo */
+.vehicle-unavailable {
+    border: 2px solid #000;
+    border-radius: 16px;
+    padding: 40px 30px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+    max-width: 500px;
+    width: 100%;
+    min-height: 300px;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-}
-
-.booking-list .booking-item {
-    display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 6px 0;
+    text-align: center;
 }
 
-.booking-list .booking-item span {
-    flex: 1;
+/* Icon cảnh báo */
+.vehicle-unavailable::before {
+    content: "⚠️";
+    font-size: 42px;
+    margin-bottom: 14px;
 }
 
-/* ✅ Cố định vị trí giờ sang phải */
-.booking-list .booking-item span b {
-    font-weight: 500;
-    margin-right: 8px;
+/* Tiêu đề */
+.vehicle-unavailable h2 {
+    color: #333;
+    font-weight: 700;
+    font-size: 22px;
+    margin-bottom: 10px;
 }
 
-.booking-list .booking-item button {
-    background: none;
-    border: none;
-    color: red;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 0;
-    margin-left: 8px;
+/* Mô tả */
+.vehicle-unavailable p {
+    color: #1f1f1f;
+    font-size: 16px;
+    line-height: 1.6;
+    max-width: 460px;
+}
+
+/* ================================
+   📱 Responsive
+================================ */
+@media (max-width: 900px) {
+    .vehicle-unavailable-wrapper {
+        padding: 20px;
+        min-height: 40vh;
+    }
+
+    .vehicle-unavailable {
+        padding: 30px 20px;
+        min-height: 240px;
+    }
+
+    .vehicle-unavailable h2 {
+        font-size: 18px;
+    }
+
+    .vehicle-unavailable p {
+        font-size: 14px;
+    }
 }

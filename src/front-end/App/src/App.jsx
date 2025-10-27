@@ -20,13 +20,14 @@ import ContractDetails from "./pages/ContractDetails";
 import UserManagement from "./AdminPages/UserManagement";
 import AdminContracts from "./AdminPages/AdminContract";
 import ProposalList from "./pages/ProposalList";
+import ContractVerification from "./pages/ContractVerification";
 
 export default function App() {
   return (
     <BrowserRouter>
 
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Navigate to="/vehicles" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/newContract" element={<NewContract />} />
         <Route path="/register" element={<RegistrationForm />} />
@@ -46,7 +47,8 @@ export default function App() {
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/contracts" element={<AdminContracts />} />
 
-        <Route path="/proposals" element={<ProposalList />} />
+        <Route path="/vehicle/:id/proposals" element={<ProposalList />} />
+        <Route path="/contractVerify/:contractId" element={<ContractVerification />} />
 
       </Routes>
     </BrowserRouter>

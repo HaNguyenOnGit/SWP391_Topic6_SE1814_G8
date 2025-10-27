@@ -1,38 +1,131 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../NavBar";
+import axios from "axios";
+import { useAuth } from "../auth/AuthContext";
 import "./Booking.css";
 
 export default function Booking() {
-    const { id } = useParams();
+    const { id } = useParams(); // contractId
+    const { userId } = useAuth();
 
-    const vehicles = [
-        { id: 1, name: "Xe Honda City", plate: "51H-12345", status: "Đang sử dụng" },
-        { id: 2, name: "Xe Toyota Vios", plate: "60A-67890", status: "Đang trống" },
-        { id: 3, name: "Xe Ford Ranger", plate: "43C-24680", status: "Chưa kích hoạt hợp đồng" },
-    ];
-
-    const vehicle = vehicles.find((v) => v.id === parseInt(id));
-    const today = new Date();
-
-    const [selectedDay, setSelectedDay] = useState(today.getDate());
-    const [selectedMonth, setSelectedMonth] = useState(today.getMonth() + 1);
-    const [selectedYear, setSelectedYear] = useState(today.getFullYear());
-    const [showBooking, setShowBooking] = useState(false);
+    const [vehicle, setVehicle] = useState(null);
+    const [bookings, setBookings] = useState([]);
     const [fromTime, setFromTime] = useState("");
     const [toTime, setToTime] = useState("");
-    const [bookings, setBookings] = useState({});
+    const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+    const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-    const fakeBookings = {
-        "2025-10-01": [
-            { id: 1, user: "user 1", from: "06h", to: "10h" },
-            { id: 2, user: "user 2", from: "12h", to: "14h" },
-            { id: 3, user: "user 3", from: "17h", to: "20h" },
-        ],
+    const translateStatus = (status) => {
+        switch (status?.toLowerCase()) {
+            case "active": return "Đang sử dụng";
+            case "available": return "Đang trống";
+            case "pending": return "Chờ kích hoạt";
+            case "cancelled": return "Đã hủy";
+            default: return status || "";
+        }
     };
 
     const getDateKey = () =>
         `${selectedYear}-${String(selectedMonth).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`;
+
+    // Lấy thông tin xe (từ contract)
+    useEffect(() => {
+        const fetchVehicle = async () => {
+            try {
+                const res = await axios.get(`/api/contract/contract-detail/${id}`);
+                const data = res.data;
+                setVehicle({
+                    name: data.vehicleName,
+                    plate: data.licensePlate,
+                    model: data.model,
+                    status: translateStatus(data.status),
+                });
+            } catch (err) {
+                console.error("Lỗi khi tải hợp đồng:", err);
+            }
+        };
+        fetchVehicle();
+    }, [id]);
+
+    // Lấy danh sách đặt lịch theo ngày
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                const date = getDateKey();
+                const res = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
+                setBookings(res.data || []);
+            } catch (err) {
+                console.error("Lỗi khi tải danh sách đặt lịch:", err);
+            }
+        };
+        fetchBookings();
+    }, [id, selectedDay, selectedMonth, selectedYear]);
+
+    const parseTime = (str) => {
+        const match = str.match(/(\d{1,2})h?(\d{0,2})p?/);
+        if (!match) return NaN;
+        const h = parseInt(match[1] || "0", 10);
+        const m = parseInt(match[2] || "0", 10);
+        return h * 60 + m;
+    };
+
+    const handleAddBooking = async () => {
+        if (!fromTime || !toTime) {
+            alert("Vui lòng nhập cả giờ bắt đầu và kết thúc!");
+            return;
+        }
+
+        const from = parseTime(fromTime);
+        const to = parseTime(toTime);
+        if (isNaN(from) || isNaN(to) || from >= to) {
+            alert("Khoảng thời gian không hợp lệ!");
+            return;
+        }
+
+        try {
+            const date = getDateKey();
+            const start = `${date}T${String(Math.floor(from / 60)).padStart(2, "0")}:${String(from % 60).padStart(2, "0")}:00`;
+            const end = `${date}T${String(Math.floor(to / 60)).padStart(2, "0")}:${String(to % 60).padStart(2, "0")}:00`;
+
+            const res = await axios.post("/api/reservation/reservationRequest", {
+                contractId: parseInt(id),
+                userId: parseInt(userId),
+                startTime: start,
+                endTime: end,
+            });
+
+            alert(res.data.message || "Đặt lịch thành công!");
+            setFromTime("");
+            setToTime("");
+
+            // reload bookings
+            const bookingsRes = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
+            setBookings(bookingsRes.data || []);
+        } catch (err) {
+            if (err.response?.status === 409)
+                alert(err.response.data?.error || "Trùng lịch!");
+            else
+                alert("Có lỗi xảy ra khi đặt lịch!");
+        }
+    };
+
+    const handleDeleteBooking = async (bookingId) => {
+        const confirmDel = window.confirm("Bạn có chắc muốn xóa lịch này?");
+        if (!confirmDel) return;
+
+        try {
+            await axios.delete(`/api/reservation/${bookingId}`);
+            alert("Xóa lịch thành công!");
+            const date = getDateKey();
+            const res = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
+            setBookings(res.data || []);
+        } catch (err) {
+            alert("Lỗi khi xóa lịch!");
+            console.error(err);
+        }
+    };
 
     const daysInMonth = (month, year) => new Date(year, month, 0).getDate();
     const getStartOffset = () => {
@@ -40,225 +133,146 @@ export default function Booking() {
         return firstDay === 0 ? 6 : firstDay - 1;
     };
 
-    const handleAddBooking = () => {
-        if (!fromTime || !toTime) {
-            alert("Vui lòng chọn cả giờ bắt đầu và kết thúc!");
-            return;
-        }
+    if (!vehicle) return <p>Đang tải thông tin xe...</p>;
 
-        const from = parseInt(fromTime.replace("h", ""), 10);
-        const to = parseInt(toTime.replace("h", ""), 10);
-
-        if (isNaN(from) || isNaN(to)) {
-            alert("Giờ không hợp lệ!");
-            return;
-        }
-
-        if (from >= to) {
-            alert("Giờ bắt đầu phải nhỏ hơn giờ kết thúc!");
-            return;
-        }
-
-        const key = getDateKey();
-        const allBookings = [
-            ...(fakeBookings[key] || []),
-            ...(bookings[key] || []),
-        ];
-
-        const overlap = allBookings.some((b) => {
-            const bFrom = parseInt(b.from.replace("h", ""), 10);
-            const bTo = parseInt(b.to.replace("h", ""), 10);
-            // kiểm tra khoảng thời gian giao nhau
-            return !(to <= bFrom || from >= bTo);
-        });
-
-        if (overlap) {
-            alert("Khoảng thời gian này đã có người đặt rồi!");
-            return;
-        }
-
-        const newBooking = { id: Date.now(), user: "Bạn", from: fromTime, to: toTime };
-        setBookings((prev) => ({
-            ...prev,
-            [key]: [...(prev[key] || []), newBooking],
-        }));
-
-        setShowBooking(false);
-        setFromTime("");
-        setToTime("");
-        alert("Đặt lịch thành công!");
-    };
-
-
-    const handleDeleteBooking = (id) => {
-        const confirmDelete = window.confirm("Bạn có chắc muốn xóa lịch này không?");
-        if (!confirmDelete) return; // nếu người dùng bấm Hủy thì thoát hàm
-
-        const key = getDateKey();
-        setBookings((prev) => ({
-            ...prev,
-            [key]: prev[key].filter((b) => b.id !== id),
-        }));
-    };
-
-    const key = getDateKey();
-    const currentBookings = [
-        ...(fakeBookings[key] || []),
-        ...(bookings[key] || []),
-    ];
-
-    const getStatusColor = (status) => {
-        if (status === "Đang sử dụng") return "green";
-        if (status === "Đang trống") return "orange";
-        if (status === "Chưa kích hoạt hợp đồng") return "red";
-        return "black";
-    };
-
-
+    const isUnavailable = vehicle.status === "Chờ kích hoạt" || vehicle.status === "Đã hủy";
 
     return (
         <div className="main-container">
             <Navbar username="Username" />
-
             <div className="main-content">
-                <div style={{ marginLeft: "30px" }}>
-                    <h1>{vehicle.name}</h1>
-                    <p>{vehicle.plate}</p>
-                    <br />
-                    <div>
-                        <span style={{ color: getStatusColor(vehicle.status), fontWeight: "bold" }}>
-                            ● {vehicle.status}
-                        </span>
-                    </div>
-                </div>
-
-
-                {/* --- Bộ lọc tháng năm --- */}
-                <div className="select-row">
-                    <select
-                        value={selectedMonth}
-                        onChange={(e) => setSelectedMonth(parseInt(e.target.value))}
-                    >
-                        {[...Array(12)].map((_, i) => (
-                            <option key={i + 1} value={i + 1}>
-                                Tháng {i + 1}
-                            </option>
-                        ))}
-                    </select>
-
-                    <select
-                        value={selectedYear}
-                        onChange={(e) => setSelectedYear(parseInt(e.target.value))}
-                    >
-                        {[2024, 2025, 2026].map((y) => (
-                            <option key={y} value={y}>
-                                {y}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                {/* --- Bọc lịch và khung đặt lịch thành 2 cột --- */}
                 <div className="calendar-wrapper">
-
-                    {/* --- Khu vực Lịch (Cột trái) --- */}
-                    <div className="calendar-section">
-                        <div className="calendar-header">
-                            {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
-                                <div key={i}>{d}</div>
-                            ))}
-                        </div>
-
-                        <div className="calendar-grid">
-                            {Array.from({ length: getStartOffset() }).map((_, i) => (
-                                <div key={`empty-${i}`} />
-                            ))}
-                            {Array.from(
-                                { length: daysInMonth(selectedMonth, selectedYear) },
-                                (_, i) => (
-                                    <div
-                                        key={i + 1}
-                                        className={`day ${selectedDay === i + 1 ? "active" : ""}`}
-                                        onClick={() => setSelectedDay(i + 1)}
-                                    >
-                                        {String(i + 1).padStart(2, "0")}
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    </div>
-
-                    {/* --- Cột phải: danh sách + đặt lịch --- */}
-                    <div className="booking-right">
-
-                        {/* --- Danh sách lịch (fake data + bạn đặt) --- */}
-                        <div className="booking-list">
-                            {currentBookings.map((b) => (
-                                <div key={b.id} className="booking-item">
-                                    <span>
-                                        <b>{b.user}</b> {b.from} - {b.to}
-                                    </span>
-                                    {b.user === "Bạn" && (
-                                        <button onClick={() => handleDeleteBooking(b.id)}>✕</button>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* --- Thanh “Đặt lịch cho bạn” --- */}
-                        <div className="booking-bar">
-                            <div className="info">
-                                <b>Đặt lịch cho bạn</b>
-                                <div>Từ - Đến</div>
-                            </div>
-
-                            <button
-                                className="addBtn"
-                                onClick={() => setShowBooking(!showBooking)}
+                    <div className="left-section">
+                        {/* Luôn hiện thông tin xe */}
+                        <div className="vehicle-header">
+                            <h1>{vehicle.name}</h1>
+                            <p>{vehicle.plate}</p>
+                            <span
+                                style={{
+                                    color:
+                                        vehicle.status === "Đang sử dụng"
+                                            ? "green"
+                                            : vehicle.status === "Đang trống"
+                                                ? "orange"
+                                                : "red",
+                                }}
                             >
-                                {showBooking ? "−" : "+"}
-                            </button>
+                                ● {vehicle.status}
+                            </span>
                         </div>
 
-                        {/* --- Form đặt lịch --- */}
-                        {showBooking && (
-                            <div className="booking-form">
-                                <label>
-                                    Từ:
-                                    <select
-                                        value={fromTime}
-                                        onChange={(e) => setFromTime(e.target.value)}
-                                    >
-                                        <option value="">-- Chọn giờ --</option>
-                                        {[...Array(24)].map((_, i) => (
-                                            <option key={i} value={`${String(i).padStart(2, "0")}h`}>
-                                                {String(i).padStart(2, "0")}h
+                        {/* Nếu khả dụng mới hiển thị lịch */}
+                        {!isUnavailable && (
+                            <>
+                                <div className="select-row">
+                                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))}>
+                                        {[...Array(12)].map((_, i) => (
+                                            <option key={i + 1} value={i + 1}>
+                                                Tháng {i + 1}
                                             </option>
                                         ))}
                                     </select>
-                                </label>
-
-                                <label>
-                                    Đến:
-                                    <select
-                                        value={toTime}
-                                        onChange={(e) => setToTime(e.target.value)}
-                                    >
-                                        <option value="">-- Chọn giờ --</option>
-                                        {[...Array(24)].map((_, i) => (
-                                            <option key={i} value={`${String(i).padStart(2, "0")}h`}>
-                                                {String(i).padStart(2, "0")}h
+                                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))}>
+                                        {[2024, 2025, 2026].map((y) => (
+                                            <option key={y} value={y}>
+                                                {y}
                                             </option>
                                         ))}
                                     </select>
-                                </label>
+                                </div>
 
-                                <button onClick={handleAddBooking}>Lưu lịch</button>
-                            </div>
+                                <div className="calendar-section">
+                                    <div className="calendar-header">
+                                        {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
+                                            <div key={i}>{d}</div>
+                                        ))}
+                                    </div>
+                                    <div className="calendar-grid">
+                                        {Array.from({ length: getStartOffset() }).map((_, i) => (
+                                            <div key={`empty-${i}`} />
+                                        ))}
+                                        {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => (
+                                            <div
+                                                key={i + 1}
+                                                className={`day ${selectedDay === i + 1 ? "active" : ""}`}
+                                                onClick={() => setSelectedDay(i + 1)}
+                                            >
+                                                {String(i + 1).padStart(2, "0")}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
                         )}
                     </div>
+
+                    {/* Cột phải (ẩn nếu không khả dụng) */}
+                    {!isUnavailable && (
+                        <div className="booking-container">
+                            <div className="booking-right">
+                                <div className="booking-list">
+                                    {bookings.length === 0 ? (
+                                        <div className="empty-booking">Chưa có lịch đặt trong ngày này.</div>
+                                    ) : (
+                                        bookings.map((b) => (
+                                            <div key={b.reservationId} className="booking-item">
+                                                <span>
+                                                    <b>{b.userName}</b> {b.startTime.slice(11, 16)} - {b.endTime.slice(11, 16)}
+                                                </span>
+                                                {b.userId === parseInt(userId) && (
+                                                    <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+
+                                <div className="booking-bar">
+                                    <b>Đặt lịch cho bạn</b>
+                                    <div className="time-inputs">
+                                        <input
+                                            type="text"
+                                            placeholder="Từ (hh:mm)"
+                                            maxLength={5}
+                                            value={fromTime}
+                                            onChange={(e) => {
+                                                let val = e.target.value.replace(/\D/g, "");
+                                                if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
+                                                setFromTime(val);
+                                            }}
+                                        />
+                                        <b>→</b>
+                                        <input
+                                            type="text"
+                                            placeholder="Đến (hh:mm)"
+                                            maxLength={5}
+                                            value={toTime}
+                                            onChange={(e) => {
+                                                let val = e.target.value.replace(/\D/g, "");
+                                                if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
+                                                setToTime(val);
+                                            }}
+                                        />
+                                        <button className="addBtn" onClick={handleAddBooking}>
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
+
+                {isUnavailable && (
+                    <div className="vehicle-unavailable-wrapper">
+                        <div className="vehicle-unavailable">
+                            <h2>Xe hiện đang ở trạng thái không khả dụng.</h2>
+                            <p>Hợp đồng này chưa kích hoạt hoặc đã bị hủy — bạn không thể đặt lịch.</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
+
 }

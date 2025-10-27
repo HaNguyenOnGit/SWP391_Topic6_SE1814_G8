@@ -2,6 +2,9 @@
 using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
 using BusinessLogicLayer.Others;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
 {
@@ -9,9 +12,9 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/user")]
     public class UserController : ControllerBase
     {
-    private readonly UserService _us;
-    private readonly EmailService _emailService;
-    private readonly AuthService _authService;
+        private readonly UserService _us;
+        private readonly EmailService _emailService;
+        private readonly AuthService _authService;
 
         // Inject cả UserService và EmailService
         public UserController(UserService us, EmailService emailService, AuthService authService)
@@ -46,15 +49,15 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             // Generate JWT token
             var token = _authService.GenerateJwtToken(user);
 
-            // Return token and minimal user info (no password)
-            return Ok(new {
+            // Return token and extended user info (exclude password and all image fields)
+            return Ok(new
+            {
                 Token = token,
-                User = new {
+                User = new
+                {
                     user.UserId,
                     user.FullName,
-                    user.Email,
-                    user.PhoneNumber,
-                    user.Role
+                    user.Role,
                 }
             });
         }
@@ -100,7 +103,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-    [HttpPost("add")]
+        [HttpPost("add")]
         public IActionResult AddUser([FromBody] User user)
         {
             _us.AddUser(
@@ -113,9 +116,9 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 user.Role,
                 user.PhoneNumber,
                 user.Password,
-                user.FrontIdImage, 
-                user.BackIdImage, 
-                user.FrontLicenseImage, 
+                user.FrontIdImage,
+                user.BackIdImage,
+                user.FrontLicenseImage,
                 user.BackLicenseImage
             );
 
@@ -138,8 +141,45 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // Lấy thông tin người dùng hiện tại từ JWT
+        [HttpGet("me")]
+        [Authorize]
+        public ActionResult GetMe()
+        {
+            // Lấy phone từ claim unique_name (hoặc ClaimTypes.Name)
+            var userClaims = HttpContext.User;
+            var phone = userClaims?.FindFirst(JwtRegisteredClaimNames.UniqueName)?.Value
+                        ?? userClaims?.FindFirst(ClaimTypes.Name)?.Value;
+
+            if (string.IsNullOrEmpty(phone))
+            {
+                return Unauthorized("Invalid token");
+            }
+
+            var user = _us.GetUserByPhone(phone);
+            if (user == null)
+            {
+                return NotFound("User not found");
+            }
+
+            return Ok(new
+            {
+                User = new
+                {
+                    user.UserId,
+                    user.FullName,
+                    user.Email,
+                    user.CitizenId,
+                    user.DriverLicenseId,
+                    user.BankName,
+                    user.BankAccount,
+                    user.Role,
+                    user.IsEmailConfirmed,
+                    user.PhoneNumber
+                }
+            });
+        }
     }
 }
-
-
 

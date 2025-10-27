@@ -9,7 +9,7 @@ export default function CostDetail() {
     const { id } = useParams();
 
     const vehicles = [
-        { id: "1", name: "Xe Honda City", plate: "59D3 - 23456", status: "Đang sử dụng" },
+        { id: "6", name: "Xe Honda City", plate: "59D3 - 23456", status: "Đang sử dụng" },
         { id: "2", name: "Xe Toyota Vios", plate: "60A - 56789", status: "Đang trống" },
         { id: "3", name: "Xe Ford Ranger", plate: "61C - 11122", status: "Chưa kích hoạt hợp đồng" },
     ];

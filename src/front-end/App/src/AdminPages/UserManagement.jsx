@@ -1,8 +1,56 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import {
+    Search,
+    KeyRound,
+    CheckCircle,
+    AlertTriangle,
+    Shield,
+    Loader2,
+    UserCog,
+} from "lucide-react";
 import AdminNavbar from "./ANavbar";
 import "./UserManagement.css";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+
+// --- Helper ---
+const mapStatusLabel = (status) => {
+    switch ((status || "").toLowerCase()) {
+        case "enabled":
+            return "Đang hoạt động";
+        case "disabled":
+        default:
+            return "Chờ phê duyệt";
+    }
+};
+
+const mapUserFromApi = (u) => ({
+    id: u.userId,
+    fullName: u.fullName,
+    phone: u.phoneNumber ?? "",
+    email: u.email ?? "",
+    cccd: u.citizenId ?? "",
+    license: u.driverLicenseId ?? "",
+    cccdFront: u.frontIdImage ?? "",
+    cccdBack: u.backIdImage ?? "",
+    licenseFront: u.frontLicenseImage ?? "",
+    licenseBack: u.backLicenseImage ?? "",
+    bankName: u.bankName ?? "",
+    bankNumber: u.bankAccount ?? "",
+    role: u.role ?? "",
+    status: mapStatusLabel(u.status ?? ""),
+});
+
+const getStatusClass = (status) => {
+    const s = (status || "").toLowerCase();
+    return s === "đang hoạt động" ? "status-active" : "status-pending";
+};
+
 export default function UserManagement() {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+
     const [searchTerm, setSearchTerm] = useState("");
     const [filterPending, setFilterPending] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -11,136 +59,23 @@ export default function UserManagement() {
     const [newPassword, setNewPassword] = useState("");
     const [newStatus, setNewStatus] = useState("");
 
-    const users = [
-        {
-            id: 1,
-            fullName: "Nguyen Van A",
-            phone: "0901234567",
-            email: "nguyenvana@example.com",
-            cccd: "123456789012",
-            license: "B2",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "Vietcombank",
-            bankNumber: "0123456789",
-            registerDate: "2025-09-20",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 2,
-            fullName: "Tran Thi B",
-            phone: "0987654321",
-            email: "tranthib@example.com",
-            cccd: "987654321098",
-            license: "C",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "Techcombank",
-            bankNumber: "5678901234",
-            registerDate: "2025-09-25",
-            status: "Chờ phê duyệt",
-        },
-        {
-            id: 3,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 4,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 5,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 6,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 7,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 8,
-            fullName: "Le Van C",
-            phone: "0907654321",
-            email: "levanc@example.com",
-            cccd: "112233445566",
-            license: "A1",
-            cccdFront: "https://via.placeholder.com/150?text=CCCD+Front",
-            cccdBack: "https://via.placeholder.com/150?text=CCCD+Back",
-            licenseFront: "https://via.placeholder.com/150?text=License+Front",
-            licenseBack: "https://via.placeholder.com/150?text=License+Back",
-            bankName: "ACB",
-            bankNumber: "9988776655",
-            registerDate: "2025-09-27",
-            status: "Đang hoạt động",
-        },
-    ];
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setLoading(true);
+            setError("");
+            try {
+                const res = await fetch(`${API_BASE}/api/user/all`);
+                if (!res.ok) throw new Error(await res.text());
+                const data = await res.json();
+                setUsers(Array.isArray(data) ? data.map(mapUserFromApi) : []);
+            } catch (e) {
+                setError(e.message || "Đã có lỗi xảy ra");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchUsers();
+    }, []);
 
     const filteredUsers = useMemo(() => {
         return users.filter((user) => {
@@ -152,120 +87,218 @@ export default function UserManagement() {
                 : true;
             return matchesSearch && matchesFilter;
         });
-    }, [searchTerm, filterPending]);
+    }, [users, searchTerm, filterPending]);
 
-    const handleApprove = () => {
-        alert(`Đã phê duyệt người dùng: ${selectedUser.fullName}`);
-        setSelectedUser({ ...selectedUser, status: "Đang hoạt động" });
+    const enableUser = async (userId) => {
+        const res = await fetch(`${API_BASE}/api/user/${userId}/enable`, {
+            method: "PUT",
+        });
+        if (!res.ok) throw new Error(await res.text());
     };
 
-    const handlePasswordChange = () => {
-        alert(`Đổi mật khẩu cho ${selectedUser.fullName} thành "${newPassword}"`);
-        setShowPasswordModal(false);
-        setNewPassword("");
+    const updatePassword = async (userId, password) => {
+        const res = await fetch(`${API_BASE}/api/user/updateUserRequest`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId, newPassword: password }),
+        });
+        if (!res.ok) throw new Error(await res.text());
     };
 
-    const handleStatusChange = () => {
-        alert(`Trạng thái mới: ${newStatus}`);
-        setShowStatusModal(false);
-        setNewStatus("");
+    const handleApprove = async () => {
+        try {
+            await enableUser(selectedUser.id);
+            setUsers((prev) =>
+                prev.map((u) =>
+                    u.id === selectedUser.id ? { ...u, status: "Đang hoạt động" } : u
+                )
+            );
+            alert(`✅ Đã phê duyệt: ${selectedUser.fullName}`);
+        } catch (e) {
+            alert(e.message || "Phê duyệt thất bại");
+        }
+    };
+
+    const handlePasswordChange = async () => {
+        if (!newPassword) return alert("Vui lòng nhập mật khẩu mới");
+        try {
+            await updatePassword(selectedUser.id, newPassword);
+            alert(`🔑 Đổi mật khẩu cho ${selectedUser.fullName} thành công`);
+            setShowPasswordModal(false);
+            setNewPassword("");
+        } catch (e) {
+            alert(e.message || "Đổi mật khẩu thất bại");
+        }
+    };
+
+    const handleStatusChange = async () => {
+        try {
+            if (newStatus === "Đang hoạt động") {
+                await enableUser(selectedUser.id);
+                setUsers((prev) =>
+                    prev.map((u) =>
+                        u.id === selectedUser.id ? { ...u, status: "Đang hoạt động" } : u
+                    )
+                );
+                alert("✅ Cập nhật trạng thái thành công");
+            } else {
+                alert("Chỉ hỗ trợ chuyển sang 'Đang hoạt động'");
+            }
+        } catch (e) {
+            alert(e.message || "Cập nhật trạng thái thất bại");
+        } finally {
+            setShowStatusModal(false);
+            setNewStatus("");
+        }
     };
 
     return (
-        <div className="user-management">
+        <div className="admin-container">
+            {/* --- Thanh navbar --- */}
             <AdminNavbar adminName="Admin" />
 
-            <h2>Danh sách người dùng</h2>
-            <div className="user-controls">
-                <input
-                    type="text"
-                    placeholder="Tìm theo số điện thoại hoặc email"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <button onClick={() => setFilterPending(!filterPending)}>
-                    Cần phê duyệt
-                </button>
-            </div>
+            {/* --- Nội dung chính --- */}
+            <main className="admin-content">
+                {/* Tiêu đề trang */}
+                <header className="page-header">
+                    <h1 className="title">
+                        <UserCog className="icon" /> Quản lý người dùng
+                    </h1>
+                </header>
 
-            <div className="user-content">
-                {/* Danh sách user bên trái */}
-                <div className="user-list">
-                    <table className="user-table">
-                        <thead>
-                            <tr>
-                                <th>Tên</th>
-                                <th>SĐT</th>
-                                <th>Email</th>
-                                <th>Ngày đăng ký</th>
-                                <th>Trạng thái</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {filteredUsers.map((u) => (
-                                <tr
-                                    key={u.id}
-                                    onClick={() => setSelectedUser(u)}
-                                    style={{
-                                        backgroundColor:
-                                            selectedUser?.id === u.id
-                                                ? "#e0e7ff"
-                                                : "transparent",
-                                    }}
-                                >
-                                    <td>{u.fullName}</td>
-                                    <td>{u.phone}</td>
-                                    <td>{u.email}</td>
-                                    <td>{u.registerDate}</td>
-                                    <td>{u.status}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Thông tin chi tiết bên phải */}
-                {selectedUser ? (
-                    <div className="user-detail">
-                        <h2>Thông tin chi tiết</h2>
-                        <div className="user-info">
-                            <div>
-                                <p><strong>Họ tên:</strong> {selectedUser.fullName}</p>
-                                <p><strong>Số điện thoại:</strong> {selectedUser.phone}</p>
-                                <p><strong>Email:</strong> {selectedUser.email}</p>
-                                <p><strong>Ngày đăng ký:</strong> {selectedUser.registerDate}</p>
-                                <p><strong>Trạng thái:</strong> {selectedUser.status}</p>
-                                <p><strong>CCCD:</strong> {selectedUser.cccd}</p>
-                                <p><strong>Bằng lái:</strong> {selectedUser.license}</p>
-                                <p><strong>Ngân hàng:</strong> {selectedUser.bankName}</p>
-                                <p><strong>Số tài khoản:</strong> {selectedUser.bankNumber}</p>
-                            </div>
-
-                            <div className="image-gallery">
-                                <img src={selectedUser.cccdFront} alt="CCCD Front" />
-                                <img src={selectedUser.cccdBack} alt="CCCD Back" />
-                                <img src={selectedUser.licenseFront} alt="License Front" />
-                                <img src={selectedUser.licenseBack} alt="License Back" />
-                            </div>
-                        </div>
-                        <div className="user-actions">
-                            <button onClick={() => setShowPasswordModal(true)}>Đổi mật khẩu</button>
-                            <button onClick={() => setShowStatusModal(true)}>Thay đổi trạng thái</button>
-                            {selectedUser.status === "Chờ phê duyệt" && (
-                                <button onClick={handleApprove}>Phê duyệt</button>
-                            )}
-                        </div>
+                {/* Bộ điều khiển tìm kiếm + lọc */}
+                <section className="controls">
+                    <div className="search-box">
+                        <Search className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Tìm theo số điện thoại hoặc email"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                ) : (
-                    <p style={{ flex: "0 0 20%", textAlign: "center", marginTop: "50px" }}>
-                        Chọn một user để xem thông tin chi tiết
-                    </p>
-                )}
-            </div>
-            {/* Modal đổi mật khẩu */}
+
+                    <button
+                        className={`filter-btn ${filterPending ? "active" : ""}`}
+                        onClick={() => setFilterPending(!filterPending)}
+                    >
+                        {filterPending ? "Hiển thị tất cả" : "Cần phê duyệt"}
+                    </button>
+                </section>
+
+                {/* Bố cục 2 cột: danh sách + chi tiết */}
+                <section className="main-grid">
+                    {/* --- Cột trái: Danh sách người dùng --- */}
+                    <div className="user-list">
+                        {loading ? (
+                            <div className="loading">
+                                <Loader2 className="spin" /> Đang tải...
+                            </div>
+                        ) : error ? (
+                            <p className="error">{error}</p>
+                        ) : (
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tên</th>
+                                        <th>SĐT</th>
+                                        <th>Email</th>
+                                        <th>Vai trò</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.map((u) => (
+                                        <tr
+                                            key={u.id}
+                                            className={selectedUser?.id === u.id ? "selected" : ""}
+                                            onClick={() => setSelectedUser(u)}
+                                        >
+                                            <td>{u.fullName}</td>
+                                            <td>{u.phone || "—"}</td>
+                                            <td>{u.email || "—"}</td>
+                                            <td>{u.role || "Người dùng"}</td>
+                                            <td>
+                                                <span className={getStatusClass(u.status)}>
+                                                    {u.status}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    {/* --- Cột phải: Thông tin chi tiết --- */}
+                    <div className="user-detail">
+                        {selectedUser ? (
+                            <>
+                                <h2 className="detail-title">
+                                    <Shield className="icon" /> Thông tin chi tiết
+                                </h2>
+
+                                <div className="info-grid">
+                                    <p><b>Họ tên:</b> {selectedUser.fullName}</p>
+                                    <p><b>SĐT:</b> {selectedUser.phone}</p>
+                                    <p><b>Email:</b> {selectedUser.email}</p>
+                                    <p><b>Vai trò:</b> {selectedUser.role}</p>
+                                    <p>
+                                        <b>Trạng thái:</b>{" "}
+                                        <span className={getStatusClass(selectedUser.status)}>
+                                            {selectedUser.status}
+                                        </span>
+                                    </p>
+                                    <p><b>CCCD:</b> {selectedUser.cccd}</p>
+                                    <p><b>Bằng lái:</b> {selectedUser.license}</p>
+                                    <p><b>Ngân hàng:</b> {selectedUser.bankName}</p>
+                                    <p><b>Số TK:</b> {selectedUser.bankNumber}</p>
+                                </div>
+
+                                {/* Ảnh giấy tờ */}
+                                <div className="image-grid">
+                                    {selectedUser.cccdFront && (
+                                        <img src={selectedUser.cccdFront} alt="CCCD Trước" />
+                                    )}
+                                    {selectedUser.cccdBack && (
+                                        <img src={selectedUser.cccdBack} alt="CCCD Sau" />
+                                    )}
+                                    {selectedUser.licenseFront && (
+                                        <img src={selectedUser.licenseFront} alt="Bằng lái Trước" />
+                                    )}
+                                    {selectedUser.licenseBack && (
+                                        <img src={selectedUser.licenseBack} alt="Bằng lái Sau" />
+                                    )}
+                                </div>
+
+                                {/* Nút hành động */}
+                                <div className="actions">
+                                    <button onClick={() => setShowPasswordModal(true)}>
+                                        <KeyRound /> Đổi mật khẩu
+                                    </button>
+                                    <button onClick={() => setShowStatusModal(true)}>
+                                        <AlertTriangle /> Thay đổi trạng thái
+                                    </button>
+                                    {selectedUser.status === "Chờ phê duyệt" && (
+                                        <button className="approve" onClick={handleApprove}>
+                                            <CheckCircle /> Phê duyệt
+                                        </button>
+                                    )}
+                                </div>
+                            </>
+                        ) : (
+                            <p className="placeholder">
+                                Chọn người dùng để xem chi tiết
+                            </p>
+                        )}
+                    </div>
+                </section>
+            </main>
+
+            {/* --- Modal: Đổi mật khẩu --- */}
             {showPasswordModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal">
                         <h3>Đổi mật khẩu</h3>
                         <input
                             type="password"
@@ -273,7 +306,7 @@ export default function UserManagement() {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                         />
-                        <div>
+                        <div className="modal-buttons">
                             <button onClick={() => setShowPasswordModal(false)}>Hủy</button>
                             <button onClick={handlePasswordChange}>Xác nhận</button>
                         </div>
@@ -281,10 +314,10 @@ export default function UserManagement() {
                 </div>
             )}
 
-            {/* Modal thay đổi trạng thái */}
+            {/* --- Modal: Thay đổi trạng thái --- */}
             {showStatusModal && (
                 <div className="modal-overlay">
-                    <div className="modal-content">
+                    <div className="modal">
                         <h3>Thay đổi trạng thái</h3>
                         <select
                             value={newStatus}
@@ -292,10 +325,9 @@ export default function UserManagement() {
                         >
                             <option value="">-- Chọn trạng thái --</option>
                             <option value="Đang hoạt động">Đang hoạt động</option>
-                            <option value="Bị khóa">Bị khóa</option>
                             <option value="Chờ phê duyệt">Chờ phê duyệt</option>
                         </select>
-                        <div>
+                        <div className="modal-buttons">
                             <button onClick={() => setShowStatusModal(false)}>Hủy</button>
                             <button onClick={handleStatusChange}>Xác nhận</button>
                         </div>
@@ -304,4 +336,5 @@ export default function UserManagement() {
             )}
         </div>
     );
+
 }
