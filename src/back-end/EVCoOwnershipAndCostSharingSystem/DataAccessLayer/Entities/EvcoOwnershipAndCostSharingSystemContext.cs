@@ -278,8 +278,6 @@ public partial class EvcoOwnershipAndCostSharingSystemContext : DbContext
             entity.Property(e => e.Distance).HasComputedColumnSql("([OdometerEnd]-[OdometerStart])", true);
             entity.Property(e => e.ProofImageEnd).HasMaxLength(255);
             entity.Property(e => e.ProofImageStart).HasMaxLength(255);
-            entity.Property(e => e.Purpose).HasMaxLength(200);
-            entity.Property(e => e.ReservationId).HasColumnName("ReservationID");
             entity.Property(e => e.UserId).HasColumnName("UserID");
 
             entity.HasOne(d => d.Contract).WithMany(p => p.UsageLogs)
@@ -287,18 +285,11 @@ public partial class EvcoOwnershipAndCostSharingSystemContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__UsageLogs__Contr__00200768");
 
-            entity.HasOne(d => d.Reservation).WithMany(p => p.UsageLogs)
-                .HasForeignKey(d => d.ReservationId)
-                .HasConstraintName("FK__UsageLogs__Reser__02084FDA");
-
             entity.HasOne(d => d.User).WithMany(p => p.UsageLogUsers)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__UsageLogs__UserI__01142BA1");
 
-            entity.HasOne(d => d.VerifiedByNavigation).WithMany(p => p.UsageLogVerifiedByNavigations)
-                .HasForeignKey(d => d.VerifiedBy)
-                .HasConstraintName("FK__UsageLogs__Verif__02FC7413");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -345,6 +336,10 @@ public partial class EvcoOwnershipAndCostSharingSystemContext : DbContext
                 .HasMaxLength(12)
                 .IsUnicode(false);
             entity.Property(e => e.Role).HasMaxLength(20);
+            entity.Property(e => e.Status)
+                .HasMaxLength(12)
+                .IsUnicode(false)
+                .HasDefaultValue("Disabled");
         });
 
         OnModelCreatingPartial(modelBuilder);

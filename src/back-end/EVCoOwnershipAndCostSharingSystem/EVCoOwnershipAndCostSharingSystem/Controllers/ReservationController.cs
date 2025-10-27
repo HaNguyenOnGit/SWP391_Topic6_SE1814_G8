@@ -10,6 +10,15 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/reservation")]
     public class ReservationController : ControllerBase
     {
+
+        // DELETE api/reservation/{reservationId}
+        [HttpDelete("{reservationId}")]
+        public IActionResult DeleteReservation(int reservationId)
+        {
+            var result = _reservationService.DeleteReservation(reservationId);
+            if (!result) return NotFound(new { Error = "Không tìm thấy đặt lịch." });
+            return Ok(new { Message = "Xoá đặt lịch thành công." });
+        }
         private readonly ReservationService _reservationService;
 
         public ReservationController()
@@ -43,6 +52,39 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                         reservation.Status
                     }
                 });
+            }
+            catch (ArgumentException ex) // lỗi do input
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+            catch (InvalidOperationException ex) // lỗi nghiệp vụ (vd: trùng lịch)
+            {
+                return Conflict(new { Error = ex.Message });
+            }
+            catch (Exception ex) // lỗi hệ thống
+            {
+                return StatusCode(500, new { Error = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        // GET api/reservation/contract/{contractId}?date=yyyy-MM-dd
+        [HttpGet("contract/{contractId}")]
+        public IActionResult GetReservationsByContract(int contractId, [FromQuery] DateTime date)
+        {
+            try
+            {
+                var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date);
+                var result = reservations.Select(r => new {
+                    r.ReservationId,
+                    r.ContractId,
+                    r.UserId,
+                    UserName = r.User?.FullName,
+                    r.StartTime,
+                    r.EndTime,
+                    r.Status,
+                    r.CreatedAt
+                });
+                return Ok(result);
             }
             catch (Exception ex)
             {

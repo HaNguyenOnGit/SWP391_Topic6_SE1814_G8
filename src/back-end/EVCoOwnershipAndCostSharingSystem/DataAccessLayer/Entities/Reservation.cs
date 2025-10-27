@@ -21,7 +21,6 @@ public partial class Reservation
 
     public virtual Contract Contract { get; set; } = null!;
 
-    public virtual ICollection<UsageLog> UsageLogs { get; set; } = new List<UsageLog>();
 
     public virtual User User { get; set; } = null!;
 }

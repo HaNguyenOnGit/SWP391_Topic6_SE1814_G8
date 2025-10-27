@@ -21,6 +21,8 @@ public partial class User
 
     public string Role { get; set; } = null!;
 
+    public string Status { get; set; } = null!;
+
     public bool IsEmailConfirmed { get; set; }
 
     public string? EmailConfirmationCode { get; set; }
@@ -57,5 +59,4 @@ public partial class User
 
     public virtual ICollection<UsageLog> UsageLogUsers { get; set; } = new List<UsageLog>();
 
-    public virtual ICollection<UsageLog> UsageLogVerifiedByNavigations { get; set; } = new List<UsageLog>();
 }
