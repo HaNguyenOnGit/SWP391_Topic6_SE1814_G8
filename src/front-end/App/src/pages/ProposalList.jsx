@@ -4,6 +4,7 @@ import Navbar from "../NavBar";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
 import VehicleInfo from "../VehicleInfo";
+import "./ProposalList.css";
 
 export default function ProposalList() {
     const { id } = useParams();
@@ -114,69 +115,68 @@ export default function ProposalList() {
             <div className="main-content">
                 <div className="main-content-layout">
                     <VehicleInfo />
-                    <div>
+                    <div className="All">
                         <h2>Đề xuất chi tiêu</h2>
 
                         {!selected ? (
-                            <div
-                                style={{
-                                    maxHeight: "400px",
-                                    overflowY: "auto",
-                                    paddingRight: "8px",
-                                }}
-                            >
+                            <div className="proposal-list">
                                 {proposals.length === 0 ? (
                                     <p>Chưa có đề xuất nào.</p>
                                 ) : (
                                     proposals.map((p) => (
-                                        <div key={p.proposalId} onClick={() => setSelected(p)}>
-                                            <div>
-                                                <div>
-                                                    <strong style={{ fontSize: "1.05rem" }}>
-                                                        {p.description ?? "Không có mô tả"}
-                                                    </strong>
-                                                    <div>{p.allocationRule ?? p.AllocationRule}</div>
-                                                    <div>{p.proposedBy ?? p.ProposedBy}</div>
-                                                </div>
+                                        <div
+                                            key={p.proposalId}
+                                            className="proposal-item"
+                                            onClick={() => setSelected(p)}
+                                        >
+                                            <div className="proposal-info">
+                                                <strong>{p.description ?? "Không có mô tả"}</strong>
+                                                <div className="proposal-meta">{p.allocationRule ?? p.AllocationRule}</div>
+                                                <div className="proposal-meta">{p.proposedBy ?? p.ProposedBy}</div>
+                                            </div>
 
-                                                <div>
-                                                    {pendingIds.includes(p.proposalId) ? (
-                                                        <div>
-                                                            <span>Chờ bạn xác nhận</span>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleVote(p.proposalId, "Rejected");
-                                                                }}
-                                                                className="btn btn-danger btn-sm"
-                                                            >
-                                                                ❌
-                                                            </button>
-                                                            <button
-                                                                onClick={(e) => {
-                                                                    e.stopPropagation();
-                                                                    handleVote(p.proposalId, "Accepted");
-                                                                }}
-                                                                className="btn btn-success btn-sm"
-                                                            >
-                                                                ✔️
-                                                            </button>
-                                                        </div>
-                                                    ) : (
-                                                        <span>
-                                                            {p.status === "Approved"
-                                                                ? "Hoàn thành"
-                                                                : p.status}
-                                                        </span>
-                                                    )}
-                                                </div>
+                                            <div>
+                                                {pendingIds.includes(p.proposalId) ? (
+                                                    <div className="action-buttons">
+                                                        <span>Chờ bạn xác nhận</span>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleVote(p.proposalId, "Rejected");
+                                                            }}
+                                                            className="btn btn-danger btn-sm"
+                                                        >
+                                                            ❌
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleVote(p.proposalId, "Accepted");
+                                                            }}
+                                                            className="btn btn-success btn-sm"
+                                                        >
+                                                            ✔️
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span
+                                                        className={`status-text ${p.status === "Approved"
+                                                            ? "status-approved"
+                                                            : p.status === "Rejected"
+                                                                ? "status-rejected"
+                                                                : "status-pending"
+                                                            }`}
+                                                    >
+                                                        {p.status === "Approved" ? "Hoàn thành" : p.status}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     ))
                                 )}
                             </div>
                         ) : (
-                            <div>
+                            <div className="detail-container">
                                 <h3>Chi tiết đề xuất</h3>
                                 {detail?.error ? (
                                     <p style={{ color: "red" }}>{detail.error}</p>
@@ -187,7 +187,8 @@ export default function ProposalList() {
                                             <strong>Biển số:</strong> {contract?.plate ?? "-"}
                                         </div>
                                         <div>
-                                            <strong>Tổng chi phí đề xuất:</strong> {detail.proposal?.expectedAmount?.toLocaleString("vi-VN") ?? "-"} ₫
+                                            <strong>Tổng chi phí đề xuất:</strong>{" "}
+                                            {detail.proposal?.expectedAmount?.toLocaleString("vi-VN") ?? "-"} ₫
                                         </div>
                                         <div>
                                             <strong>Cách chia:</strong> {detail.proposal?.allocationRule ?? "-"}
@@ -203,7 +204,7 @@ export default function ProposalList() {
                                         </div>
                                         <div>
                                             <strong>Danh sách thành viên & chi tiết chi phí:</strong>
-                                            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                                            <table>
                                                 <thead>
                                                     <tr>
                                                         <th>Tên</th>
@@ -217,7 +218,7 @@ export default function ProposalList() {
                                                     {detail.allocations?.map((a, idx) => {
                                                         const isCurrentUser = a.userId === userId;
                                                         return (
-                                                            <tr key={idx} style={{ borderBottom: "1px solid #ccc" }}>
+                                                            <tr key={idx}>
                                                                 <td>{a.fullName}</td>
                                                                 <td>{a.payPercent}</td>
                                                                 <td>{a.amount?.toLocaleString("vi-VN")}</td>
@@ -227,13 +228,17 @@ export default function ProposalList() {
                                                                         <>
                                                                             <button
                                                                                 className="btn btn-danger btn-sm"
-                                                                                onClick={() => handleVote(detail.proposal.proposalId, "Rejected")}
+                                                                                onClick={() =>
+                                                                                    handleVote(detail.proposal.proposalId, "Rejected")
+                                                                                }
                                                                             >
                                                                                 ❌ Reject
                                                                             </button>
                                                                             <button
                                                                                 className="btn btn-success btn-sm"
-                                                                                onClick={() => handleVote(detail.proposal.proposalId, "Accepted")}
+                                                                                onClick={() =>
+                                                                                    handleVote(detail.proposal.proposalId, "Accepted")
+                                                                                }
                                                                             >
                                                                                 ✔️ Accept
                                                                             </button>
@@ -247,14 +252,18 @@ export default function ProposalList() {
                                             </table>
                                         </div>
                                         <div style={{ marginTop: "16px" }}>
-                                            <strong>Số tiền của bạn:</strong> {
-                                                (() => {
-                                                    const alloc = detail.allocations?.find(a => a.userId === userId);
-                                                    return alloc ? alloc.amount?.toLocaleString("vi-VN") + " ₫" : "-";
-                                                })()
-                                            }
+                                            <strong>Số tiền của bạn:</strong>{" "}
+                                            {(() => {
+                                                const alloc = detail.allocations?.find(a => a.userId === userId);
+                                                return alloc
+                                                    ? alloc.amount?.toLocaleString("vi-VN") + " ₫"
+                                                    : "-";
+                                            })()}
                                         </div>
-                                        <button className="btn btn-secondary" onClick={() => setSelected(null)} style={{ marginTop: "16px" }}>
+                                        <button
+                                            className="back-btn"
+                                            onClick={() => setSelected(null)}
+                                        >
                                             ⬅ Quay lại danh sách
                                         </button>
                                     </div>
@@ -264,6 +273,7 @@ export default function ProposalList() {
                             </div>
                         )}
                     </div>
+
                 </div>
             </div>
         </div>
