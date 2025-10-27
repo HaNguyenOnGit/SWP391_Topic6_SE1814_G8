@@ -123,6 +123,24 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        // ✅ API 5: Lấy chi tiết thanh toán (theo SettlementId)
+        [HttpGet("settlement/{settlementId}")]
+        public IActionResult GetPaymentDetails(int settlementId)
+        {
+            try
+            {
+                var result = _ps.GetPaymentDetails(settlementId);
+                if (result == null)
+                    return NotFound($"Không tìm thấy thanh toán với ID {settlementId}");
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
     }
 }

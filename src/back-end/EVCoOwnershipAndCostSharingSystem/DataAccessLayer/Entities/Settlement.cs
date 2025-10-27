@@ -21,6 +21,10 @@ public partial class Settlement
 
     public string? Reference { get; set; }
 
+    public string? Status { get; set; }         // Pending, Completed, Rejected...
+
+    public string? ProofImageUrl { get; set; }
+
     public virtual ExpenseAllocation Allocation { get; set; } = null!;
 
     public virtual User Payer { get; set; } = null!;
