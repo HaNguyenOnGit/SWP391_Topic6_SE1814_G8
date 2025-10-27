@@ -22,6 +22,7 @@ export default function Booking() {
             case "active": return "Đang sử dụng";
             case "available": return "Đang trống";
             case "pending": return "Chờ kích hoạt";
+            case "cancelled": return "Đã hủy";
             default: return status || "";
         }
     };
@@ -117,8 +118,6 @@ export default function Booking() {
         try {
             await axios.delete(`/api/reservation/${bookingId}`);
             alert("Xóa lịch thành công!");
-
-            // refresh lại danh sách
             const date = getDateKey();
             const res = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
             setBookings(res.data || []);
@@ -136,117 +135,144 @@ export default function Booking() {
 
     if (!vehicle) return <p>Đang tải thông tin xe...</p>;
 
+    const isUnavailable = vehicle.status === "Chờ kích hoạt" || vehicle.status === "Đã hủy";
+
     return (
         <div className="main-container">
             <Navbar username="Username" />
-
             <div className="main-content">
                 <div className="calendar-wrapper">
-                    {/* --- CỘT TRÁI: Thông tin xe + Lịch --- */}
                     <div className="left-section">
+                        {/* Luôn hiện thông tin xe */}
                         <div className="vehicle-header">
                             <h1>{vehicle.name}</h1>
                             <p>{vehicle.plate}</p>
-                            <span style={{ color: vehicle.status === "Đang sử dụng" ? "green" : vehicle.status === "Đang trống" ? "orange" : "red" }}>
+                            <span
+                                style={{
+                                    color:
+                                        vehicle.status === "Đang sử dụng"
+                                            ? "green"
+                                            : vehicle.status === "Đang trống"
+                                                ? "orange"
+                                                : "red",
+                                }}
+                            >
                                 ● {vehicle.status}
                             </span>
                         </div>
 
-                        <div className="select-row">
-                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))}>
-                                {[...Array(12)].map((_, i) => (
-                                    <option key={i + 1} value={i + 1}>
-                                        Tháng {i + 1}
-                                    </option>
-                                ))}
-                            </select>
-                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))}>
-                                {[2024, 2025, 2026].map((y) => (
-                                    <option key={y} value={y}>
-                                        {y}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
+                        {/* Nếu khả dụng mới hiển thị lịch */}
+                        {!isUnavailable && (
+                            <>
+                                <div className="select-row">
+                                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))}>
+                                        {[...Array(12)].map((_, i) => (
+                                            <option key={i + 1} value={i + 1}>
+                                                Tháng {i + 1}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))}>
+                                        {[2024, 2025, 2026].map((y) => (
+                                            <option key={y} value={y}>
+                                                {y}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
 
-                        <div className="calendar-section">
-                            <div className="calendar-header">
-                                {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
-                                    <div key={i}>{d}</div>
-                                ))}
-                            </div>
-                            <div className="calendar-grid">
-                                {Array.from({ length: getStartOffset() }).map((_, i) => (
-                                    <div key={`empty-${i}`} />
-                                ))}
-                                {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => (
-                                    <div
-                                        key={i + 1}
-                                        className={`day ${selectedDay === i + 1 ? "active" : ""}`}
-                                        onClick={() => setSelectedDay(i + 1)}
-                                    >
-                                        {String(i + 1).padStart(2, "0")}
+                                <div className="calendar-section">
+                                    <div className="calendar-header">
+                                        {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
+                                            <div key={i}>{d}</div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
-                        </div>
+                                    <div className="calendar-grid">
+                                        {Array.from({ length: getStartOffset() }).map((_, i) => (
+                                            <div key={`empty-${i}`} />
+                                        ))}
+                                        {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => (
+                                            <div
+                                                key={i + 1}
+                                                className={`day ${selectedDay === i + 1 ? "active" : ""}`}
+                                                onClick={() => setSelectedDay(i + 1)}
+                                            >
+                                                {String(i + 1).padStart(2, "0")}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
 
-                    {/* --- CỘT PHẢI: Đặt lịch --- */}
-                    <div className="booking-container">
-                        <div className="booking-right">
-                            <div className="booking-list">
-                                {bookings.length === 0 ? (
-                                    <div className="empty-booking">Chưa có lịch đặt trong ngày này.</div>
-                                ) : (
-                                    bookings.map((b) => (
-                                        <div key={b.reservationId} className="booking-item">
-                                            <span>
-                                                <b>{b.userName}</b> {b.startTime.slice(11, 16)} - {b.endTime.slice(11, 16)}
-                                            </span>
-                                            {b.userId === parseInt(userId) && (
-                                                <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
-                                            )}
-                                        </div>
-                                    ))
-                                )}
-                            </div>
+                    {/* Cột phải (ẩn nếu không khả dụng) */}
+                    {!isUnavailable && (
+                        <div className="booking-container">
+                            <div className="booking-right">
+                                <div className="booking-list">
+                                    {bookings.length === 0 ? (
+                                        <div className="empty-booking">Chưa có lịch đặt trong ngày này.</div>
+                                    ) : (
+                                        bookings.map((b) => (
+                                            <div key={b.reservationId} className="booking-item">
+                                                <span>
+                                                    <b>{b.userName}</b> {b.startTime.slice(11, 16)} - {b.endTime.slice(11, 16)}
+                                                </span>
+                                                {b.userId === parseInt(userId) && (
+                                                    <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
+                                                )}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
 
-                            <div className="booking-bar">
-                                <b>Đặt lịch cho bạn</b>
-                                <div className="time-inputs">
-                                    <input
-                                        type="text"
-                                        placeholder="Từ (hh:mm)"
-                                        maxLength={5}
-                                        value={fromTime}
-                                        onChange={(e) => {
-                                            let val = e.target.value.replace(/\D/g, ""); // chỉ giữ số
-                                            if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
-                                            setFromTime(val);
-                                        }}
-                                    />
-                                    <b>→</b>
-                                    <input
-                                        type="text"
-                                        placeholder="Đến (hh:mm)"
-                                        maxLength={5}
-                                        value={toTime}
-                                        onChange={(e) => {
-                                            let val = e.target.value.replace(/\D/g, ""); // chỉ giữ số
-                                            if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
-                                            setToTime(val);
-                                        }}
-                                    />
-                                    <button className="addBtn" onClick={handleAddBooking}>
-                                        +
-                                    </button>
+                                <div className="booking-bar">
+                                    <b>Đặt lịch cho bạn</b>
+                                    <div className="time-inputs">
+                                        <input
+                                            type="text"
+                                            placeholder="Từ (hh:mm)"
+                                            maxLength={5}
+                                            value={fromTime}
+                                            onChange={(e) => {
+                                                let val = e.target.value.replace(/\D/g, "");
+                                                if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
+                                                setFromTime(val);
+                                            }}
+                                        />
+                                        <b>→</b>
+                                        <input
+                                            type="text"
+                                            placeholder="Đến (hh:mm)"
+                                            maxLength={5}
+                                            value={toTime}
+                                            onChange={(e) => {
+                                                let val = e.target.value.replace(/\D/g, "");
+                                                if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
+                                                setToTime(val);
+                                            }}
+                                        />
+                                        <button className="addBtn" onClick={handleAddBooking}>
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
+
+                {isUnavailable && (
+                    <div className="vehicle-unavailable-wrapper">
+                        <div className="vehicle-unavailable">
+                            <h2>Xe hiện đang ở trạng thái không khả dụng.</h2>
+                            <p>Hợp đồng này chưa kích hoạt hoặc đã bị hủy — bạn không thể đặt lịch.</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
+
 }
