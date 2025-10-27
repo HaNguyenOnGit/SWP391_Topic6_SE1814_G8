@@ -91,7 +91,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok(contracts);
         }
         [HttpPost("contractRequest")]
-        public IActionResult CreateContract([FromBody] ContractRequest contractRequest)
+        public async Task<IActionResult> CreateContract([FromBody] ContractRequest contractRequest)
         {
             // Extract data from the request
             string vehicleName = contractRequest.VehicleName;
@@ -113,6 +113,8 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 DateTime joinedAt = DateTime.Now;
                 string coOwnerStatus = "Pending";
                 _cms.AddContractMember(contractId, userId, sharePercent, joinedAt, coOwnerStatus);
+                // Send notification to member
+                await _cms.SendNotificationToMember(userId, contractId);
             }
             return Ok("Contract and members added successfully.");
         }

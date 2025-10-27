@@ -224,7 +224,7 @@ namespace BusinessLogicLayer.Services
                     Type = "Custom",
                     ExpenseDate = DateOnly.FromDateTime(DateTime.Now),
                     CreatedBy = proposal.ProposedBy,
-                    Status = "Pending"
+                    //Status = "Pending"
                 };
 
                 _db.Expenses.Add(expense);
@@ -259,7 +259,7 @@ namespace BusinessLogicLayer.Services
                         PayerId = alloc.UserId,
                         ReceiverId = proposal.ProposedBy,
                         Amount = alloc.Amount,
-                        Status = "Pending",
+                        //Status = "Pending",
                         Method = "Banking"
                     });
                 }
@@ -267,7 +267,7 @@ namespace BusinessLogicLayer.Services
                 _db.Settlements.AddRange(settlements);
                 _db.SaveChanges();
 
-                expense.Status = "AwaitingPayment";
+                //expense.Status = "AwaitingPayment";
                 _db.Expenses.Update(expense);
                 _db.SaveChanges();
 

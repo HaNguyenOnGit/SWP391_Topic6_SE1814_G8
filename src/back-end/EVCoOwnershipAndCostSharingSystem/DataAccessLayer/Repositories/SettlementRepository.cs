@@ -39,9 +39,9 @@ namespace DataAccessLayer.Repositories
             if (s == null)
                 throw new Exception("Settlement not found");
 
-            s.Status = newStatus;
-            _context.Settlements.Update(s);
-            _context.SaveChanges();
+            //s.Status = newStatus;
+            //_context.Settlements.Update(s);
+            //_context.SaveChanges();
         }
 
         // Cập nhật ảnh chứng minh thanh toán
@@ -51,7 +51,7 @@ namespace DataAccessLayer.Repositories
             if (s == null)
                 throw new Exception("Settlement not found");
 
-            s.ProofImageUrl = proofImageUrl;
+            //s.ProofImageUrl = proofImageUrl;
             _context.Settlements.Update(s);
             _context.SaveChanges();
         }
