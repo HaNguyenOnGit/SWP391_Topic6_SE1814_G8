@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "../NavBar";
@@ -7,31 +6,60 @@ import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./Payment.css";
 
-
 export default function PaymentHistory() {
     const { id } = useParams(); // contractId
     const { userId } = useAuth();
     const [vehicle, setVehicle] = useState(null);
     const [payments, setPayments] = useState([]);
+    const [unpaidPayments, setUnpaidPayments] = useState([]);
+    const [paidPayments, setPaidPayments] = useState([]);
     const [selectedPayment, setSelectedPayment] = useState(null);
     const [step, setStep] = useState("list");
     const [method, setMethod] = useState("Chuyển khoản ngân hàng");
     const [file, setFile] = useState(null);
     const [bankInfo, setBankInfo] = useState(null);
+    const [qrUrl, setQrUrl] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const reloadPayments = async () => {
+        try {
+            const res = await axios.get(`/api/payment/contract/${id}/user/${userId}`);
+            const list = Array.isArray(res.data) ? res.data : [];
+
+            // Normalize status
+            const normalize = (s) => (s || "").toLowerCase();
+
+            // CHƯA THANH TOÁN (pending + unpaid)
+            const unpaid = list
+                .filter(p => ["pending", "unpaid"].includes(normalize(p.status)))
+                .sort((a, b) => new Date(a.expense.expenseDate) - new Date(b.expense.expenseDate));
+
+            // ĐÃ THANH TOÁN
+            const paid = list
+                .filter(p => normalize(p.status) === "paid")
+                .sort((a, b) => new Date(b.expense.expenseDate) - new Date(a.expense.expenseDate));
+
+            setPayments(list);
+            setUnpaidPayments(unpaid);
+            setPaidPayments(paid);
+
+        } catch (err) {
+            console.error(err);
+            setPayments([]);
+            setUnpaidPayments([]);
+            setPaidPayments([]);
+        }
+    };
+
 
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
             try {
-                // Lấy thông tin xe
                 const contractRes = await axios.get(`/api/contract/contract-detail/${id}`);
                 setVehicle(contractRes.data);
-
-                // Lấy danh sách các khoản thanh toán của user trong hợp đồng
-                const paymentsRes = await axios.get(`/api/payment/contract/${id}/user/${userId}`);
-                setPayments(Array.isArray(paymentsRes.data) ? paymentsRes.data : []);
+                await reloadPayments();
             } catch (err) {
                 setError("Không thể tải dữ liệu thanh toán.");
             } finally {
@@ -41,17 +69,27 @@ export default function PaymentHistory() {
         fetchData();
     }, [id, userId]);
 
+
+    const buildQR = (info, amount, desc) => {
+        // API public VietQR
+        return `https://img.vietqr.io/image/${info.bankName}-${info.bankAccount}-compact.png?amount=${amount}&addInfo=${desc}`;
+    }
+
     const handleBack = () => {
         setStep("list");
         setSelectedPayment(null);
         setFile(null);
+        setQrUrl("");
     };
 
+    if (loading)
+        return <div style={{ textAlign: "center", padding: "20px" }}>Đang tải dữ liệu...</div>;
 
-    if (loading) return <div style={{ textAlign: "center", color: "#555" }}>Đang tải dữ liệu...</div>;
-    if (error) return <div style={{ color: "red", textAlign: "center" }}>{error}</div>;
-    if (!vehicle || payments.length === 0)
-        return <div style={{ textAlign: "center", color: "#555" }}>Không có dữ liệu thanh toán.</div>;
+    if (error)
+        return <div style={{ textAlign: "center", color: "red" }}>{error}</div>;
+
+    if (!vehicle)
+        return <div style={{ textAlign: "center" }}>Không tìm thấy hợp đồng.</div>;
 
     return (
         <div className="main-container">
@@ -62,14 +100,19 @@ export default function PaymentHistory() {
 
                     {step === "list" && (
                         <div className="payment-section fade-slide-in">
-                            <h3>Chọn khoản thanh toán</h3>
-                            <div className="payment-list">
-                                {payments.map((p) => (
-                                    <div
-                                        key={p.settlementId}
-                                        className="payment-item"
-                                        onClick={async () => {
-                                            if (p.status === "Pending" || p.status === "Unpaid") {
+                            <h3>Danh sách thanh toán</h3>
+
+                            {/* ✅ CHƯA THANH TOÁN */}
+                            <h4 style={{ marginTop: 10 }}>Chưa thanh toán</h4>
+                            {unpaidPayments.length === 0 && <div>✔ Tất cả đã thanh toán!</div>}
+
+                            <div className="scroll-box">
+                                <div className="payment-list">
+                                    {unpaidPayments.map((p) => (
+                                        <div
+                                            key={p.settlementId}
+                                            className="payment-item"
+                                            onClick={async () => {
                                                 setSelectedPayment(p);
                                                 setStep("form");
                                                 try {
@@ -78,28 +121,48 @@ export default function PaymentHistory() {
                                                 } catch {
                                                     setBankInfo(null);
                                                 }
-                                            }
-                                        }}
-                                    >
-                                        <div className="left">
-                                            <span className="name">{p.expense?.description}</span>
-                                            <span className="date">{p.expense?.expenseDate}</span>
-                                            <span>{p.method}</span>
+                                            }}
+                                        >
+                                            <div className="left">
+                                                <span className="name">{p.expense?.description}</span>
+                                                <span className="date">{p.expense?.expenseDate}</span>
+                                            </div>
+                                            <div className="right">
+                                                <div className="amount red">{p.amount?.toLocaleString("vi-VN")}</div>
+                                                <div className="total">{p.expense?.amount?.toLocaleString("vi-VN")}</div>
+                                            </div>
                                         </div>
-                                        <div className="right">
-                                            <div className={`amount ${p.status === "Paid" ? "green" : "red"}`}>{p.amount?.toLocaleString("vi-VN")}</div>
-                                            <div className="total">{p.expense?.amount?.toLocaleString("vi-VN")}</div>
-                                            {p.proofImageUrl && (
-                                                <a href={p.proofImageUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>
-                                                    <span role="img" aria-label="bill">🧾</span>
-                                                </a>
-                                            )}
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* ✅ ĐÃ THANH TOÁN */}
+                            <h4 style={{ marginTop: 20 }}>Đã thanh toán</h4>
+                            {paidPayments.length === 0 && <div>Chưa có thanh toán nào!</div>}
+
+                            <div className="scroll-box">
+                                <div className="payment-list">
+                                    {paidPayments.map((p) => (
+                                        <div key={p.settlementId} className="payment-item paid">
+                                            <div className="left">
+                                                <span className="name">{p.expense?.description}</span>
+                                                <span className="date">{p.expense?.expenseDate}</span>
+                                            </div>
+                                            <div className="right">
+                                                <div className="amount green">{p.amount?.toLocaleString("vi-VN")}</div>
+                                                {p.proofImageUrl && (
+                                                    <a href={p.proofImageUrl} target="_blank" rel="noopener noreferrer" style={{ marginLeft: 8 }}>
+                                                        🧾
+                                                    </a>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     )}
+
 
                     {step === "form" && selectedPayment && (
                         <div className="payment-form fade-slide-in">
@@ -107,8 +170,11 @@ export default function PaymentHistory() {
                             <div className="payment-details">
                                 <div className="row-amount">
                                     <b>Tổng:</b>
-                                    <span className="total">{selectedPayment.totalAmount?.toLocaleString("vi-VN") || selectedPayment.expenseAmount?.toLocaleString("vi-VN") || selectedPayment.amount?.toLocaleString("vi-VN") || "-"} ₫</span>
+                                    <span className="total">
+                                        {selectedPayment.expense?.amount?.toLocaleString("vi-VN")} ₫
+                                    </span>
                                 </div>
+
                                 <div className="row-amount">
                                     <b>Số tiền của bạn:</b>
                                     <span className="user-amount">{selectedPayment.amount?.toLocaleString("vi-VN") || "-"} ₫</span>
@@ -133,14 +199,20 @@ export default function PaymentHistory() {
                                     </select>
                                 </div>
                                 <div className="row-recipient">
-                                    <b>Người nhận:</b>&nbsp; <span>{bankInfo?.accountName || "-"}</span>
+                                    <b>Người nhận:</b>&nbsp; <span>{bankInfo?.fullName || "-"}</span>
                                 </div>
                             </div>
                             <div className="payment-actions">
                                 <button className="payment-btn btn-cancel" onClick={handleBack}>
                                     Hủy
                                 </button>
-                                <button className="payment-btn btn-confirm" onClick={() => setStep("qr")}>Thanh toán</button>
+                                <button className="payment-btn btn-confirm" onClick={() => {
+                                    if (bankInfo) {
+                                        const desc = `EVCO-${selectedPayment.settlementId}`;
+                                        setQrUrl(buildQR(bankInfo, selectedPayment.amount, desc));
+                                    }
+                                    setStep("qr");
+                                }}>Thanh toán</button>
                             </div>
                         </div>
                     )}
@@ -148,12 +220,17 @@ export default function PaymentHistory() {
                     {step === "qr" && (
                         <div className="payment-qr fade-slide-in">
                             <h3>Thanh toán</h3>
-                            <div className="qr-box"></div>
-                            <div>{method}</div>
-                            <div>{bankInfo?.accountName}</div>
+
+                            <div className="qr-box">
+                                {qrUrl && <img src={qrUrl} alt="QR Banking" style={{ width: 200 }} />}
+                            </div>
+
+                            <div>{bankInfo?.fullName}</div>
                             <div>{bankInfo?.bankName}</div>
-                            <div>{bankInfo?.accountNumber}</div>
+                            <div>{bankInfo?.bankAccount}</div>
                             <div><b>Số tiền:</b> {selectedPayment?.amount?.toLocaleString("vi-VN") || "-"}</div>
+                            <div><b>Nội dung:</b> EVCO-{selectedPayment?.settlementId}</div>
+
                             <div className="payment-actions">
                                 <button className="payment-btn btn-cancel" onClick={handleBack}>Hủy</button>
                                 <button className="payment-btn btn-confirm" onClick={() => setStep("confirm")}>Xác nhận</button>
@@ -173,17 +250,19 @@ export default function PaymentHistory() {
                             <p>Upload bill chuyển khoản</p>
                             <div className="payment-actions">
                                 <button className="payment-btn btn-confirm" onClick={async () => {
-                                    // Gọi API xác nhận thanh toán
                                     if (!selectedPayment) return;
                                     const formData = new FormData();
                                     formData.append("settlementId", selectedPayment.settlementId);
                                     formData.append("payerId", userId);
                                     formData.append("amount", selectedPayment.amount);
-                                    // Luôn gửi method là tiếng Anh 'Banking'
                                     formData.append("method", "Banking");
+
                                     if (file) formData.append("proofImage", file);
+
                                     try {
                                         await axios.post("/api/payment/confirm", formData);
+                                        await reloadPayments();
+                                        setSelectedPayment(null);
                                         setStep("success");
                                     } catch {
                                         alert("Xác nhận thanh toán thất bại!");
@@ -195,7 +274,7 @@ export default function PaymentHistory() {
 
                     {step === "success" && (
                         <div className="payment-success fade-slide-in">
-                            Xác minh chuyển khoản thành công
+                            ✅ Xác minh chuyển khoản thành công
                         </div>
                     )}
                 </div>

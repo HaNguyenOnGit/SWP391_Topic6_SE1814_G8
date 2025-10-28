@@ -4,6 +4,7 @@
     padding: 20px 25px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 /* --- Tiêu đề --- */
@@ -75,7 +76,11 @@
     flex-direction: column;
     align-items: center;
     gap: 16px;
-    margin-right: 100px;
+    /* XÓA: margin-right: 100px; - Nguyên nhân gây tràn ngang */
+    margin-right: 0;
+    /* Hoặc chỉ dùng margin: auto; nếu cần căn giữa */
+    max-width: 400px;
+    /* Giới hạn kích thước để nó nằm gọn hơn */
 }
 
 .payment-qr h3 {
@@ -332,4 +337,96 @@
     color: #15b61d;
     font-weight: 600;
     font-size: 18px;
+}
+
+/* ===================== PAID PAYMENT LIST ===================== */
+
+.payment-list .payment-item.paid {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    cursor: default;
+    transition: all 0.2s ease;
+    /* nhẹ xanh thanh toán thành công */
+}
+
+/* Hover nhẹ như phần unpaid để đồng nhất UI */
+.payment-list .payment-item.paid:hover {
+    background-color: #f0fff3;
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-bottom-color: transparent;
+}
+
+/* LEFT BLOCK */
+.payment-list .payment-item.paid .left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+}
+
+.payment-list .payment-item.paid .left .name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #000;
+}
+
+.payment-list .payment-item.paid .left .date {
+    font-size: 13px;
+    color: #555;
+}
+
+/* RIGHT BLOCK */
+.payment-list .payment-item.paid .right {
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    gap: 6px;
+}
+
+/* Amount màu xanh kiểu success */
+.payment-list .payment-item.paid .amount.green {
+    color: #16a34a;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+/* Bill icon */
+.payment-list .payment-item.paid a {
+    font-size: 18px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.payment-list .payment-item.paid a:hover {
+    opacity: 0.8;
+    transform: scale(1.08);
+}
+
+/* --- Hộp cuộn cho danh sách khoản thanh toán --- */
+.scroll-box {
+    /* Đặt chiều cao tối đa để kích hoạt scroll */
+    max-height: 250px;
+    /* Giảm nhẹ chiều cao để hiển thị nhiều thông tin khác */
+    /* Tự động hiển thị thanh cuộn khi nội dung tràn */
+    overflow-y: auto;
+    margin-top: 10px;
+    /* Thêm khoảng cách với tiêu đề bên trên */
+    margin-bottom: 20px;
+    /* Thêm khoảng cách với phần bên dưới */
+    padding-right: 10px;
+}
+
+/* Tùy chỉnh thanh cuộn (cho các trình duyệt hỗ trợ) */
+.scroll-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.scroll-box::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
 }
