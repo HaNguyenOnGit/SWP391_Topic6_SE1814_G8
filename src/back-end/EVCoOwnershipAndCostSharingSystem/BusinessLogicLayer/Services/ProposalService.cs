@@ -324,21 +324,60 @@ namespace BusinessLogicLayer.Services
 
                 // ✅ 3️⃣ Tạo settlement tương ứng
                 var settlements = new List<Settlement>();
+
                 foreach (var alloc in allocations)
                 {
-                    settlements.Add(new Settlement
+                    bool isProposer = alloc.UserId == proposal.ProposedBy;
+
+                    var settlement = new Settlement
                     {
                         AllocationId = alloc.AllocationId,
                         PayerId = alloc.UserId,
                         ReceiverId = proposal.ProposedBy,
                         Amount = alloc.Amount,
-                        Status = "Pending",
                         Method = "Banking"
-                    });
+                    };
+
+                    // 🟢 Nếu là người tạo đề xuất → coi như đã thanh toán
+                    if (isProposer)
+                    {
+                        settlement.Status = "Paid";
+                        settlement.PaymentDate = DateTime.Now;
+                        settlement.ProofImageUrl = "/system/auto-approved"; // có thể đổi chuỗi này nếu muốn
+                        Console.WriteLine($"💰 Người tạo đề xuất (User {alloc.UserId}) được đánh dấu đã thanh toán tự động.");
+                    }
+                    else
+                    {
+                        settlement.Status = "Pending";
+                    }
+
+                    settlements.Add(settlement);
+                }
+
+                // 🟣 Trường hợp SelfPaid (chỉ 1 người duy nhất)
+                if (proposal.AllocationRule == "SelfPaid")
+                {
+                    var selfAlloc = allocations.First();
+                    var selfSettle = new Settlement
+                    {
+                        AllocationId = selfAlloc.AllocationId,
+                        PayerId = proposal.ProposedBy,
+                        ReceiverId = proposal.ProposedBy,
+                        Amount = selfAlloc.Amount,
+                        Method = "Banking",
+                        Status = "Paid",
+                        PaymentDate = DateTime.Now,
+                        ProofImageUrl = "/system/selfpaid"
+                    };
+
+                    settlements.Clear();
+                    settlements.Add(selfSettle);
+                    Console.WriteLine($"💸 SelfPaid: User {proposal.ProposedBy} được đánh dấu đã thanh toán toàn bộ.");
                 }
 
                 _db.Settlements.AddRange(settlements);
                 _db.SaveChanges();
+
 
                 expense.Status = "AwaitingPayment";
                 _db.Expenses.Update(expense);
