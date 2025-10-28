@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
+import "./Login.css";
+
 
 export default function LoginPage({ apiUrl }) {
     const [phone, setPhone] = useState("");
@@ -8,6 +11,7 @@ export default function LoginPage({ apiUrl }) {
     const [message, setMessage] = useState("");
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
+    const { setAuth } = useAuth();
 
     // Validate 1 field
     const validateField = (name, value) => {
@@ -75,12 +79,8 @@ export default function LoginPage({ apiUrl }) {
             const token = data?.Token || data?.token;
             const user = data?.User || data?.user || null;
 
-            if (token) {
-                localStorage.setItem("auth_token", token);
-            }
-            if (user) {
-                localStorage.setItem("auth_user", JSON.stringify(user));
-            }
+            // Store via AuthContext to update session-wide state
+            setAuth({ token, user });
 
             setMessage("Đăng nhập thành công!");
             setPhone("");
@@ -95,61 +95,63 @@ export default function LoginPage({ apiUrl }) {
     };
 
     return (
-        <form onSubmit={handleSubmit} noValidate>
-            <h2>Đăng Nhập</h2>
-            {message && <p>{message}</p>}
+        <div className="login-page">
+            <form onSubmit={handleSubmit} noValidate>
+                <h2>Đăng Nhập</h2>
+                {message && <p>{message}</p>}
 
-            <div style={{ marginBottom: "10px" }}>
-                <label>Số điện thoại</label>
-                <input
-                    type="text"
-                    name="phone"
-                    value={phone}
-                    onChange={handleChange}
-                    style={{
-                        width: "100%",
-                        padding: "8px",
-                        marginTop: "5px",
-                        borderColor: errors.phone ? "red" : "#ccc",
-                    }}
-                    required
-                />
-                {errors.phone && (
-                    <p style={{ color: "red", fontSize: "12px" }}>{errors.phone}</p>
-                )}
-            </div>
+                <div style={{ marginBottom: "10px" }}>
+                    <label>Số điện thoại</label>
+                    <input
+                        type="text"
+                        name="phone"
+                        value={phone}
+                        onChange={handleChange}
+                        style={{
+                            width: "100%",
+                            padding: "8px",
+                            marginTop: "5px",
+                            borderColor: errors.phone ? "red" : "#ccc",
+                        }}
+                        required
+                    />
+                    {errors.phone && (
+                        <p style={{ color: "red", fontSize: "12px" }}>{errors.phone}</p>
+                    )}
+                </div>
 
-            <div style={{ marginBottom: "10px" }}>
-                <label>Mật khẩu</label>
-                <input
-                    type="password"
-                    name="password"
-                    value={password}
-                    onChange={handleChange}
-                    style={{
-                        width: "100%",
-                        padding: "8px",
-                        marginTop: "5px",
-                        borderColor: errors.password ? "red" : "#ccc",
-                    }}
-                    required
-                />
-                {errors.password && (
-                    <p style={{ color: "red", fontSize: "12px" }}>{errors.password}</p>
-                )}
-            </div>
+                <div style={{ marginBottom: "10px" }}>
+                    <label>Mật khẩu</label>
+                    <input
+                        type="password"
+                        name="password"
+                        value={password}
+                        onChange={handleChange}
+                        style={{
+                            width: "100%",
+                            padding: "8px",
+                            marginTop: "5px",
+                            borderColor: errors.password ? "red" : "#ccc",
+                        }}
+                        required
+                    />
+                    {errors.password && (
+                        <p style={{ color: "red", fontSize: "12px" }}>{errors.password}</p>
+                    )}
+                </div>
 
-            <button
-                type="submit"
-                disabled={loading}
-                style={{ width: "100%", padding: "10px" }}
-            >
-                {loading ? "Đang xử lý..." : "Đăng nhập"}
-            </button>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    style={{ width: "100%", padding: "10px" }}
+                >
+                    {loading ? "Đang xử lý..." : "Đăng nhập"}
+                </button>
 
-            <p style={{ marginTop: "10px", textAlign: "center" }}>
-                Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
-            </p>
-        </form>
+                <p style={{ marginTop: "10px", textAlign: "center" }}>
+                    Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+                </p>
+            </form>
+        </div>
     );
 }

@@ -2,9 +2,13 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../NavBar";
 import VehicleInfo from "../VehicleInfo";
+import { useAuth } from "../auth/AuthContext";
+import axios from "axios";
+import "./Checkin.css";
 
 function OdoUpload({ value, onChange, disabled }) {
   const [preview, setPreview] = useState(value || null);
+
   const handleFile = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -16,29 +20,25 @@ function OdoUpload({ value, onChange, disabled }) {
 
   return (
     <div
-      className={`relative w-40 h-40 border rounded overflow-hidden flex items-center justify-center bg-gray-50 ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"
-        }`}
+      className={`camera-box ${disabled ? "disabled" : ""}`}
       onClick={() => !disabled && document.getElementById("odoInput").click()}
     >
       {preview ? (
-        <img src={preview} alt="Odo" className="object-cover w-full h-full" />
+        <img src={preview} alt="Odo" className="odo-image" />
       ) : (
-        <span className="text-gray-500 text-sm text-center px-2">
-          Upload ảnh ô-đô
-        </span>
+        <div className="upload-text">
+          <span>📸</span>
+          <span>Upload ảnh ô-đô (tùy chọn)</span>
+        </div>
       )}
       <input
         id="odoInput"
         type="file"
         accept="image/*"
         onChange={handleFile}
-        className="hidden"
+        className="hidden-input"
       />
-      {!disabled && preview && (
-        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-white text-xs px-2 py-0.5 rounded shadow">
-          Thay đổi ảnh
-        </span>
-      )}
+      {!disabled && preview && <span className="change-photo-btn">Thay đổi ảnh</span>}
     </div>
   );
 }
@@ -51,48 +51,76 @@ function KmInput({ value, onChange, disabled }) {
   };
 
   return (
-    <input
-      type="text"
-      value={value}
-      disabled={disabled}
-      onChange={handleChange}
-      className="border p-2 rounded w-40"
-      placeholder="Số km"
-    />
+    <div className="km-action-group">
+      <label className="km-label">Số Km</label>
+      <input
+        type="text"
+        value={value}
+        disabled={disabled}
+        onChange={handleChange}
+        className="km-input"
+        placeholder="Nhập số km"
+      />
+    </div>
   );
 }
 
-function CheckForm({ type, data, setData, onConfirm, checkinKm, lastTripKm, disabled = false }) {
-  const isReady = data.image && data.km;
+function CheckForm({
+  type,
+  data,
+  setData,
+  onConfirm,
+  checkinKm,
+  contractTotalKm,
+  disabled = false,
+  checkinTime = null,
+}) {
+  const isReady = data.km;
   const kmValue = Number(data.km.replace(/,/g, ""));
   let error = "";
 
-  if (type === "checkin" && kmValue <= lastTripKm)
-    error = `Số km check-in phải lớn hơn ${lastTripKm.toLocaleString()} km`;
+  // RÀNG BUỘC
+  if (type === "checkin" && kmValue < contractTotalKm)
+    error = `Số km check-in phải ≥ tổng số km hợp đồng (${contractTotalKm.toLocaleString()} km)`;
   if (type === "checkout" && kmValue < checkinKm)
     error = "Số km check-out phải ≥ check-in";
 
   return (
-    <div className="mt-4 space-y-3">
-      <h3 className="font-semibold text-lg">
-        {type === "checkin" ? "Check-in" : "Check-out"}
-      </h3>
-      <OdoUpload value={data.image} onChange={(file) => setData({ ...data, image: file })} disabled={disabled} />
-      <KmInput value={data.km} onChange={(val) => setData({ ...data, km: val })} disabled={disabled} />
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      {!disabled ? (
-        <button
-          disabled={!isReady || !!error}
-          className={`px-4 py-2 rounded text-white font-semibold ${isReady && !error ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-400 cursor-not-allowed"
-            }`}
-          onClick={onConfirm}
-        >
-          Xác nhận
-        </button>
-      ) : (
-        <p className="text-sm text-gray-600">
-          Đã xác nhận lúc {new Date().toLocaleTimeString("vi-VN")}
+    <div className="checkin-main-group">
+      <OdoUpload
+        value={data.image}
+        onChange={(file) => setData({ ...data, image: file })}
+        disabled={disabled}
+      />
+
+      {/* Nếu form bị disable (đã checkin) thì chỉ hiển thị thời gian xác nhận */}
+      {disabled ? (
+        <p className="confirmed-message">
+          Đã xác nhận lúc{" "}
+          {checkinTime
+            ? new Date(checkinTime).toLocaleTimeString("vi-VN")
+            : "Không xác định"}
         </p>
+      ) : (
+        <div className="km-action-group">
+          <h3 className="km-label">
+            {type === "checkin" ? "Check-in" : "Check-out"}
+          </h3>
+          <KmInput
+            value={data.km}
+            onChange={(val) => setData({ ...data, km: val })}
+            disabled={disabled}
+          />
+          {error && <p className="error-message">{error}</p>}
+
+          <button
+            disabled={!isReady || !!error}
+            className={`confirm-btn ${isReady && !error ? "ready" : "disabled"}`}
+            onClick={onConfirm}
+          >
+            Xác nhận
+          </button>
+        </div>
       )}
     </div>
   );
@@ -100,49 +128,97 @@ function CheckForm({ type, data, setData, onConfirm, checkinKm, lastTripKm, disa
 
 export default function Checkin() {
   const { id } = useParams();
+  const { userId } = useAuth();
   const navigate = useNavigate();
 
   const [vehicle, setVehicle] = useState(null);
   const [tripInfo, setTripInfo] = useState(null);
-  const [history, setHistory] = useState([]);
   const [phase, setPhase] = useState("checkin");
   const [checkinData, setCheckinData] = useState({ km: "", image: null });
   const [checkoutData, setCheckoutData] = useState({ km: "", image: null });
+  const [contractTotalKm, setContractTotalKm] = useState(0);
+  const [checkinTime, setCheckinTime] = useState(null);
 
   useEffect(() => {
-    const mockVehicle = {
-      id,
-      name: "Xe Honda City",
-      plate: "59D3 - 23456",
-      status: "Đang sử dụng",
+    const fetchData = async () => {
+      if (!userId) return;
+      try {
+        const [usageRes, checkinState, contractKmRes] = await Promise.all([
+          axios.get(`/api/check/usage-history?userId=${userId}&contractId=${id}`),
+          axios.get(`/api/check/is-checked-in?contractId=${id}`),
+          axios.get(`/api/check/contract-total-distance?contractId=${id}`),
+        ]);
+
+        const data = usageRes.data || {};
+        const trips = Array.isArray(data.trips)
+          ? data.trips.map((t) => ({
+            checkInTime: t.checkInTime,
+            checkOutTime: t.checkOutTime,
+            distance: t.distance || 0,
+          }))
+          : [];
+
+        setTripInfo({ distance: data.totalDistance || 0 });
+        setContractTotalKm(contractKmRes.data.totalDistance || 0);
+
+        const activeTrip = trips.find((t) => !t.checkOutTime);
+        if (activeTrip) {
+          setCheckinTime(activeTrip.checkInTime);
+          setPhase("checked");
+        }
+
+        const isCheckedIn = checkinState.data.isCheckedIn;
+        setVehicle({
+          id,
+          name: "Xe trong hợp đồng #" + id,
+          status: isCheckedIn ? "Đang sử dụng" : "Sẵn sàng",
+        });
+      } catch (err) {
+        console.error("Lỗi tải dữ liệu:", err);
+      }
     };
-    const mockTrip = { distance: 1234 };
-    const mockHistory = [
-      { endKm: 10200 },
-      { endKm: 10170 },
-      { endKm: 10150 },
-    ];
-    setVehicle(mockVehicle);
-    setTripInfo(mockTrip);
-    setHistory(mockHistory);
-  }, [id]);
 
-  const lastTripKm = history.length ? Math.max(...history.map((h) => h.endKm)) : 0;
+    fetchData();
+  }, [id, userId]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("checkinData");
-    if (saved) {
+  const handleCheckin = async () => {
+    try {
+      const kmValue = Number(checkinData.km.replace(/,/g, ""));
+      let base64Image = null;
+      if (checkinData.image) base64Image = await toBase64(checkinData.image);
+
+      await axios.post("/api/check/checkin", {
+        ContractId: Number(id),
+        UserId: userId,
+        Odometer: kmValue,
+        ProofImage: base64Image,
+      });
+
+      alert("Check-in thành công!");
       setPhase("checked");
-      setCheckinData(JSON.parse(saved));
+    } catch (err) {
+      alert("Lỗi khi check-in: " + (err.response?.data || err.message));
     }
-  }, []);
+  };
 
-  const reset = () => {
-    localStorage.removeItem("checkinData");
-    setPhase("checkin");
-    setCheckinData({ km: "", image: null });
-    setCheckoutData({ km: "", image: null });
-    navigate(`/vehicle/${id}/checkinHistory`);
+  const handleCheckout = async () => {
+    try {
+      const kmValue = Number(checkoutData.km.replace(/,/g, ""));
+      let base64Image = null;
+      if (checkoutData.image) base64Image = await toBase64(checkoutData.image);
+
+      await axios.post("/api/check/checkout", {
+        ContractId: Number(id),
+        UserId: userId,
+        Odometer: kmValue,
+        ProofImage: base64Image,
+      });
+
+      alert("Checkout thành công!");
+      navigate(`/vehicle/${id}/checkinHistory`);
+    } catch (err) {
+      alert("Lỗi khi checkout: " + (err.response?.data || err.message));
+    }
   };
 
   if (!vehicle) return <h2>Không tìm thấy phương tiện</h2>;
@@ -153,13 +229,17 @@ export default function Checkin() {
       <div className="main-content">
         <div className="main-content-layout">
           <VehicleInfo vehicle={vehicle} />
-          <div>
+
+          <div className="check-form-content">
             {tripInfo && (
               <>
-                <h3 className="mt-4 font-semibold text-lg">Hành trình của bạn</h3>
-                <p className="mb-2">
-                  <b>{tripInfo.distance} km</b>
+                <h3 className="check-form-title">Hành trình của bạn</h3>
+                <p className="trip-total-distance">
+                  <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
                 </p>
+                {/* <p className="checkin-distance">
+                  <b>{tripInfo.distance} Km</b>
+                </p> */}
               </>
             )}
 
@@ -168,26 +248,28 @@ export default function Checkin() {
                 type="checkin"
                 data={checkinData}
                 setData={setCheckinData}
-                lastTripKm={lastTripKm}
-                onConfirm={() => {
-                  localStorage.setItem("checkinData", JSON.stringify(checkinData));
-                  setPhase("checked");
-                }}
+                contractTotalKm={contractTotalKm}
+                onConfirm={handleCheckin}
               />
             )}
 
             {phase === "checked" && (
               <>
-                <CheckForm type="checkin" data={checkinData} setData={setCheckinData} lastTripKm={lastTripKm} disabled />
+                <CheckForm
+                  type="checkin"
+                  data={checkinData}
+                  setData={setCheckinData}
+                  disabled
+                  contractTotalKm={contractTotalKm}
+                  checkinTime={checkinTime}
+                />
                 <CheckForm
                   type="checkout"
                   data={checkoutData}
                   setData={setCheckoutData}
                   checkinKm={Number(checkinData.km.replace(/,/g, ""))}
-                  onConfirm={() => {
-                    alert("Đã hoàn tất check-out!");
-                    reset();
-                  }}
+                  contractTotalKm={contractTotalKm}
+                  onConfirm={handleCheckout}
                 />
               </>
             )}
@@ -196,4 +278,14 @@ export default function Checkin() {
       </div>
     </div>
   );
+}
+
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = (error) => reject(error);
+  });
 }

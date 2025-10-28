@@ -175,5 +175,32 @@ namespace BusinessLogicLayer.Services
 
             return expenses;
         }
+        public object GetPaymentDetails(int settlementId)
+        {
+            using var db = new EvcoOwnershipAndCostSharingSystemContext();
+
+            var settlement = db.Settlements
+                .Where(s => s.SettlementId == settlementId)
+                .Select(s => new
+                {
+                    s.SettlementId,
+                    s.AllocationId,
+                    s.PayerId,
+                    PayerName = s.Payer.FullName,
+                    s.ReceiverId,
+                    ReceiverName = s.Receiver.FullName,
+                    s.Amount,
+                    s.Method,
+                    s.Status,
+                    s.PaymentDate,
+                    s.ProofImageUrl,
+                    ExpenseDescription = s.Allocation.Expense.Description,
+                    ContractId = s.Allocation.Expense.ContractId
+                })
+                .FirstOrDefault();
+
+            return settlement;
+        }
+
     }
 }

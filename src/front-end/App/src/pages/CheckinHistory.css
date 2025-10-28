@@ -1,0 +1,153 @@
+/* ------------------------------------------------------------------ */
+/* --- PHẦN TRIP SECTION (PROFESSIONAL & INTERACTIVE) --- */
+/* ------------------------------------------------------------------ */
+
+.trip-section {
+    flex-basis: 45%;
+    background-color: transparent;
+    padding: 0;
+    box-shadow: none;
+
+    /* 1. Hiệu ứng khi tải trang */
+    animation: fadeInSlideUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    opacity: 0;
+    /* Bắt buộc phải có opacity: 0 ban đầu */
+}
+
+/* --- Tiêu đề & Tổng quãng đường --- */
+.trip-section h3 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 5px;
+}
+
+.trip-total-distance {
+    font-size: 24px;
+    font-weight: 300;
+    color: #ff6f00;
+    margin-top: 0;
+    margin-bottom: 40px;
+    transition: color 0.3s ease;
+    /* Hiệu ứng chuyển màu */
+}
+
+.trip-total-distance b {
+    font-weight: 800;
+    color: #ff6f00;
+}
+
+
+/* --- Lịch sử Hành trình --- */
+.history-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 18px;
+    padding-left: 0;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.history-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+
+    /* Thêm transition cho hover item */
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    border-radius: 4px;
+    /* Bo góc nhẹ cho khu vực hover */
+}
+
+/* Hiệu ứng tương tác cho từng item */
+.history-item:hover {
+    /* Nền hover rất nhẹ */
+    transform: translateX(4px);
+    /* Trượt nhẹ sang phải */
+}
+
+.history-item+.history-item {
+    padding-top: 25px;
+    margin-top: 0;
+}
+
+.history-time-range {
+    font-size: 15px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.history-distance {
+    font-size: 16px;
+    font-weight: 700;
+    color: #9c151a;
+    margin-left: 0;
+    /* Hiệu ứng chuyển màu (nếu cần đổi màu khi hover item) */
+    transition: color 0.3s ease;
+}
+
+/* --- Nút Bắt đầu Check-in/out (Đã có hiệu ứng gạch chân) --- */
+.trip-button-container {
+    margin-top: 45px;
+    text-align: left;
+}
+
+.start-checkin-btn {
+    font-size: 17px;
+    font-weight: 700;
+    color: #ff6f00;
+    position: relative;
+    padding-bottom: 3px;
+    transition: all 0.3s ease;
+    /* Đảm bảo màu chữ đổi mượt mà */
+}
+
+.start-checkin-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #ff6f00;
+    transform: scaleX(0);
+    transform-origin: bottom right;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.start-checkin-btn:hover {
+    color: #cc5a00;
+}
+
+.start-checkin-btn:hover::after {
+    transform: scaleX(1);
+    transform-origin: bottom left;
+}
+
+
+/* --- Keyframes (Hiệu ứng khi component load) --- */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.start-checkin-btn.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}

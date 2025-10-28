@@ -1,0 +1,291 @@
+/* =========================================
+1. Cấu hình cơ bản (Basic Configuration)
+=========================================
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+.user-profile-page {
+    /* Sử dụng font Inter cho vẻ ngoài hiện đại và dễ đọc */
+    font-family: 'Inter', sans-serif;
+    /* Giữ nền trang nhẹ nhàng để thẻ chính nổi bật */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* Giữ nội dung gần phía trên hơn */
+    padding: 40px 20px;
+    box-sizing: border-box;
+    /* BỔ SUNG: Dùng margin âm để bù trừ padding 30px từ body/cấu trúc ngoài */
+    margin: -30px;
+
+}
+
+/* =========================================
+2. Thẻ hồ sơ chính (Main Profile Card) - Cập nhật cho vẻ ngoài 'Sịn Sò'
+=========================================
+*/
+.user-profile-card {
+    background-color: #ffffff;
+    padding: 30px 40px;
+    border-radius: 16px;
+    /* Góc bo tròn mềm mại */
+    width: 100%;
+    max-width: 600px;
+    /* Giới hạn chiều rộng để dễ đọc trên desktop */
+    /* Bóng đổ nâng cấp: Mạnh mẽ hơn nhưng vẫn tinh tế */
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.12), 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    /* Transition mượt mà hơn */
+}
+
+.user-profile-card:hover {
+    transform: translateY(-5px);
+    /* Hiệu ứng nâng nhẹ khi hover */
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+}
+
+.user-profile-card h2 {
+    color: #1e3a8a;
+    /* Giữ màu xanh đậm cho tiêu đề chính để có độ tương phản cao */
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    border-bottom: none;
+    padding-bottom: 15px;
+    position: relative;
+}
+
+/* Thêm dải màu Gradient mới làm đường phân cách tiêu đề */
+.user-profile-card h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    /* Màu Gradient mới */
+    background: linear-gradient(to right, #8CC8E7, #C77DCE);
+    border-radius: 2px;
+}
+
+/* =========================================
+3. Các phần thông tin (Information Sections) - Thêm thanh chỉ thị
+=========================================
+*/
+.user-section {
+    margin-bottom: 30px;
+    /* Tăng khoảng cách */
+    /* Tạo box nổi bật với thanh màu bên trái */
+    background-color: #fcfcfc;
+    /* Thanh màu bên trái sử dụng màu Purple mới */
+    border-left: 5px solid #C77DCE;
+    padding: 15px 20px 15px 25px;
+    border-bottom: none;
+    /* Bỏ border ngang cũ */
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    transition: border-left-color 0.3s;
+}
+
+.user-section:last-child {
+    margin-bottom: 0;
+}
+
+.user-section h3 {
+    font-size: 1.25rem;
+    color: #2b0ebd;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.user-section p {
+    font-size: 1rem;
+    color: #374151;
+    line-height: 1.8;
+    margin: 5px 0;
+}
+
+.user-section b {
+    color: #111827;
+    font-weight: 600;
+    display: inline-block;
+    min-width: 120px;
+    /* Đảm bảo căn chỉnh cho nhãn */
+}
+
+
+/* =========================================
+4. Input & Buttons (Form Elements) - Nâng cấp hiệu ứng
+=========================================
+*/
+
+/* Inputs */
+.user-profile-card input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #374151;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box;
+}
+
+.user-profile-card input:focus {
+    /* Màu border khi focus sử dụng màu Light Blue mới */
+    border-color: #8CC8E7;
+    outline: none;
+    /* Shadow khi focus sử dụng màu Light Blue mới */
+    box-shadow: 0 0 0 3px rgba(140, 200, 231, 0.4);
+}
+
+/* Base Button Style */
+.user-profile-card button {
+    cursor: pointer;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease-in-out;
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* Default Section Button (Chỉnh sửa thông tin ngân hàng, Đổi mật khẩu) */
+.user-section button {
+    /* Áp dụng Gradient mới cho TẤT CẢ các nút */
+    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
+    color: white;
+    /* Đảm bảo chữ trắng để tương phản */
+    width: auto;
+    display: block;
+    max-width: 250px;
+    margin-top: 15px;
+    /* Shadow dựa trên màu tím */
+    box-shadow: 0 4px 10px rgba(199, 125, 206, 0.4);
+}
+
+.user-section button:hover {
+    /* Đảo gradient khi hover cho hiệu ứng sịn sò */
+    background: linear-gradient(135deg, #C77DCE 0%, #8CC8E7 100%);
+    transform: translateY(-2px);
+    /* Shadow mạnh hơn */
+    box-shadow: 0 6px 15px rgba(199, 125, 206, 0.5);
+}
+
+
+/* Save Button (For forms) - Thêm Gradient và Shadow mạnh hơn */
+.user-save-btn {
+    /* Áp dụng Gradient mới */
+    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
+    color: white;
+    box-shadow: 0 6px 20px rgba(199, 125, 206, 0.4);
+}
+
+.user-save-btn:hover {
+    /* Đảo gradient khi hover */
+    background: linear-gradient(135deg, #C77DCE 0%, #8CC8E7 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(199, 125, 206, 0.5);
+}
+
+/* Logout Button (For caution/exit) - Thêm Gradient và Shadow mạnh hơn */
+.user-logout-btn {
+    /* Áp dụng Gradient mới (thay thế màu đỏ) */
+    background: linear-gradient(135deg, #8CC8E7 0%, #C77DCE 100%);
+    color: white;
+    margin-top: 50px;
+    box-shadow: 0 6px 20px rgba(199, 125, 206, 0.4);
+}
+
+.user-logout-btn:hover {
+    /* Đảo gradient khi hover */
+    background: linear-gradient(135deg, #C77DCE 0%, #8CC8E7 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(199, 125, 206, 0.5);
+}
+
+/* Links (Quay lại) */
+.user-profile-card a {
+    display: inline-block;
+    /* Màu liên kết sử dụng màu Purple mới */
+    color: #C77DCE;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-top: 10px;
+    padding: 5px 0;
+    transition: color 0.2s;
+}
+
+.user-profile-card a:hover {
+    color: #b359c2;
+    /* Tối hơn một chút khi hover */
+    text-decoration: underline;
+}
+
+/* Spacing Utility for Forms */
+.space-y-2>*+* {
+    margin-top: 15px;
+}
+
+/* Message Display */
+.user-message {
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    background-color: #e6f4ff;
+    /* Nền nhẹ nhàng hơn */
+    color: #1e3a8a;
+    /* Chữ xanh đậm để tương phản */
+    border: 1px solid #8CC8E7;
+    /* Border theo màu mới */
+    text-align: center;
+}
+
+/* =========================================
+5. Responsive Design (Dành cho Mobile)
+=========================================
+*/
+@media (max-width: 640px) {
+    .user-profile-page {
+        padding: 20px 10px;
+        align-items: flex-start;
+        /* Giữ nguyên margin âm trên mobile để bù trừ */
+        margin: -30px;
+    }
+
+    .user-profile-card {
+        padding: 20px;
+        border-radius: 12px;
+    }
+
+    .user-profile-card h2 {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        padding-bottom: 12px;
+    }
+
+    .user-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .user-section b {
+        min-width: 100px;
+        display: block;
+    }
+
+    .user-section p {
+        margin-top: 2px;
+        margin-bottom: 10px;
+    }
+
+    .user-section button {
+        max-width: 100%;
+    }
+}

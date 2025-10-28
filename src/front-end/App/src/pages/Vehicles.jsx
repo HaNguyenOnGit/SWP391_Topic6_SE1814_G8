@@ -1,20 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../auth/AuthContext";
 
 export default function Vehicles() {
-    const vehicles = [
-        { id: 1, name: "Xe Honda City", status: "Đang sử dụng" },
-        { id: 2, name: "Xe Toyota Vios", status: "Đang trống" },
-        { id: 3, name: "Xe Ford Ranger", status: "Chưa kích hoạt hợp đồng" },
-    ];
+    const { userId } = useAuth();
+    const [vehicles, setVehicles] = useState([]);
 
-    // Hàm xác định class CSS cho trạng thái
+    useEffect(() => {
+        if (!userId) return;
+        axios
+            .get(`/api/contract/user-contracts/${userId}`)
+            .then((res) => setVehicles(res.data))
+            .catch((err) => console.error("Lỗi khi tải danh sách hợp đồng:", err));
+    }, [userId]);
+
     const getStatusClass = (status) => {
-        if (status === "Đang sử dụng") return "using";
-        if (status === "Đang trống") return "free";
-        if (status === "Chưa kích hoạt hợp đồng") return "inactive";
-        return "";
+        switch (status.toLowerCase()) {
+            case "active": return "using";
+            case "available": return "free";
+            case "pending": return "inactive";
+            default: return "";
+        }
+    };
+
+    const translateStatus = (status) => {
+        switch (status.toLowerCase()) {
+            case "active": return "Đang sử dụng";
+            case "available": return "Đang trống";
+            case "pending": return "Chờ kích hoạt";
+            default: return status;
+        }
     };
 
     return (
@@ -24,22 +41,27 @@ export default function Vehicles() {
                 <h1 className="vehicle-title">Phương tiện của bạn</h1>
                 <Link to="/newContract">Tạo hợp đồng →</Link>
 
-                {/* Danh sách phương tiện */}
                 <div className="vehicle-list">
-                    {vehicles.map((vehicle) => (
-                        <Link
-                            key={vehicle.id}
-                            to={`/vehicle/${vehicle.id}`}
-                            className="vehicle-card"
-                        >
-                            <h3>{vehicle.name}</h3>
-                            <div className={`status ${getStatusClass(vehicle.status)}`}>
-                                {vehicle.status}
-                            </div>
-                        </Link>
-                    ))}
+                    {vehicles.length > 0 ? (
+                        vehicles.map((v) => (
+                            <Link
+                                key={v.contractId}
+                                to={`/vehicle/${v.contractId}`}
+                                className="vehicle-card"
+                            >
+                                <h3>{v.vehicleName}</h3>
+                                <div className={`status ${getStatusClass(v.status)}`}>
+                                    {translateStatus(v.status)}
+                                </div>
+                            </Link>
+                        ))
+                    ) : (
+                        <p>Không có hợp đồng nào.</p>
+                    )}
                 </div>
             </div>
         </div>
     );
 }
+
+

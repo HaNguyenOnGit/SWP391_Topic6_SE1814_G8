@@ -252,5 +252,3 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     }
 }
 
-
-
