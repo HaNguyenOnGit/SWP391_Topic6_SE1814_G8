@@ -32,4 +32,7 @@ public partial class Expense
     public virtual ICollection<ExpenseAllocation> ExpenseAllocations { get; set; } = new List<ExpenseAllocation>();
 
     public virtual ExpenseProposal? Proposal { get; set; }
+
+    // Thêm property Status để fix lỗi truy cập trạng thái
+    public string Status { get; set; } = null!;
 }

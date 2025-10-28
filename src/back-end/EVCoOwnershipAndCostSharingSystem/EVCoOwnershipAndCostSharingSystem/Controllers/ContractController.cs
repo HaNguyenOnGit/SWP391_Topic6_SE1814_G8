@@ -19,6 +19,24 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest("Invalid status value");
             var result = _cms.UpdateMemberStatus(req.ContractId, req.UserId, req.Status);
             if (!result) return NotFound("Member not found in contract");
+
+            // Kiểm tra trạng thái phê duyệt của các đồng sở hữu
+            var contractRepo = new DataAccessLayer.Repositories.ContractRepository();
+            var contract = contractRepo.GetContractById(req.ContractId);
+            if (contract == null) return NotFound("Contract not found");
+            var memberStatuses = contract.ContractMembers.Select(m => m.Status).ToList();
+            if (memberStatuses.Any(s => s == "Rejected"))
+            {
+                contract.Status = "Cancelled";
+                contractRepo.UpdateContract(contract); // Update status
+                return Ok("Contract rejected by a member. Status updated to Cancelled.");
+            }
+            if (memberStatuses.All(s => s == "Confirmed"))
+            {
+                contract.Status = "Available";
+                contractRepo.UpdateContract(contract); // Update status
+                return Ok("All members confirmed. Contract status updated to Available.");
+            }
             return Ok("Status updated successfully");
         }
 

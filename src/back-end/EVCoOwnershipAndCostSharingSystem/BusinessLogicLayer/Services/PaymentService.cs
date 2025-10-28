@@ -103,20 +103,21 @@ namespace BusinessLogicLayer.Services
                 .Where(s => s.PayerId == userId)
                 .Select(s => new
                 {
-                    s.SettlementId,
-                    Expense = s.Allocation.Expense == null ? null : new
+                    settlementId = s.SettlementId,
+                    expense = s.Allocation.Expense == null ? null : new
                     {
-                        s.Allocation.Expense.ExpenseId,
-                        s.Allocation.Expense.Description,
-                        s.Allocation.Expense.Amount,
-                        //s.Allocation.Expense.Status,
-                        s.Allocation.Expense.ExpenseDate
+                        expenseId = s.Allocation.Expense.ExpenseId,
+                        description = s.Allocation.Expense.Description,
+                        amount = s.Allocation.Expense.Amount,
+                        status = s.Allocation.Expense.Status,
+                        expenseDate = s.Allocation.Expense.ExpenseDate
                     },
-                    s.Amount,
-                    s.Method,
-                    //s.Status,
-                    s.PaymentDate,
-                    //s.ProofImageUrl
+                    amount = s.Amount,
+                    method = s.Method,
+                    status = s.Status,
+                    paymentDate = s.PaymentDate,
+                    proofImageUrl = s.ProofImageUrl,
+                    receiverId = s.ReceiverId
                 }).ToList();
 
             return settlements;

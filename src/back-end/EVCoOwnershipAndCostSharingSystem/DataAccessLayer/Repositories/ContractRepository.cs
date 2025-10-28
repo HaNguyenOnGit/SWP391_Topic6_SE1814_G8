@@ -39,5 +39,11 @@ namespace DataAccessLayer.Repositories
                 .ThenInclude(cm => cm.User)
                 .FirstOrDefault();
         }
+
+        public void UpdateContract(Contract contract)
+        {
+            _context.Contracts.Update(contract);
+            _context.SaveChanges();
+        }
     }
 }
