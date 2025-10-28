@@ -134,7 +134,7 @@ export default function Proposal() {
       case "Góp quỹ":
         return "Equal";
       case "Tự chi trả":
-        return "Self";
+        return "SelfPaid";
       default:
         return "Custom";
     }
