@@ -3,6 +3,7 @@ using BusinessLogicLayer.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
+
 {
     [ApiController]
     [Route("api/check")]
@@ -12,6 +13,49 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         public UsageLogController()
         {
             _uls = new UsageLogService();
+        }
+        // API: Tỷ lệ sử dụng của các đồng sở hữu trong hợp đồng
+        [HttpGet("ratio/{contractId}")]
+        public IActionResult GetUsageRatio(int contractId)
+        {
+            var context = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            // Lấy danh sách thành viên hợp đồng
+            var members = context.ContractMembers
+                .Where(m => m.ContractId == contractId)
+                .Select(m => new { m.UserId, m.User.FullName })
+                .ToList();
+
+            // Lấy usage log 30 ngày gần nhất
+            var now = DateTime.Now;
+            var startDate = now.AddDays(-30);
+            var usageData = context.UsageLogs
+                .Where(u => u.ContractId == contractId && u.CheckOutTime >= startDate && u.CheckOutTime <= now && u.Distance != null)
+                .GroupBy(u => u.UserId)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    TotalDistance = g.Sum(x => x.Distance ?? 0)
+                })
+                .ToList();
+
+            var totalDistance = usageData.Sum(u => u.TotalDistance);
+            var result = new List<object>();
+            foreach (var member in members)
+            {
+                var usage = usageData.FirstOrDefault(u => u.UserId == member.UserId);
+                decimal percent = 0;
+                if (totalDistance > 0 && usage != null)
+                {
+                    percent = Math.Round((decimal)usage.TotalDistance / totalDistance * 100, 2);
+                }
+                result.Add(new
+                {
+                    userId = member.UserId,
+                    username = member.FullName,
+                    percent = percent
+                });
+            }
+            return Ok(result);
         }
         [HttpPost("usageLogRequest")]
         public IActionResult AddUsageLog([FromBody] UsageLogRequest usageLogRequest)

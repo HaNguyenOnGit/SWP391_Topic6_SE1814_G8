@@ -301,6 +301,18 @@ namespace BusinessLogicLayer.Services
                         Console.WriteLine($"🚗 User {usage.UserId}: {usage.TotalDistance} km ({percent:P2}) → {amount:N0} VND");
                     }
                 }
+                // ✅ 3️⃣ Nếu là SelfPaid: chỉ người đề xuất trả toàn bộ
+                else if (proposal.AllocationRule == "SelfPaid")
+                {
+                    allocations.Add(new ExpenseAllocation
+                    {
+                        ExpenseId = expense.ExpenseId,
+                        UserId = proposal.ProposedBy,
+                        Amount = expense.Amount,
+                        Status = "Unpaid"
+                    });
+                    Console.WriteLine($"💸 SelfPaid: User {proposal.ProposedBy} trả toàn bộ {expense.Amount:N0} VND");
+                }
                 else
                 {
                     Console.WriteLine($"⚠️ AllocationRule '{proposal.AllocationRule}' chưa được hỗ trợ.");
