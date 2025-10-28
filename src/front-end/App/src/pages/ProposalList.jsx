@@ -11,7 +11,6 @@ export default function ProposalList() {
     const { userId } = useAuth();
     const [contract, setContract] = useState(null);
     const [proposals, setProposals] = useState([]);
-    const [pendingIds, setPendingIds] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [selected, setSelected] = useState(null);
@@ -36,15 +35,7 @@ export default function ProposalList() {
                 const allProposals = Array.isArray(proposalRes.data) ? proposalRes.data : [];
                 setProposals(allProposals.sort((a, b) => b.proposalId - a.proposalId));
 
-                // ✅ Lấy danh sách pending (bắt riêng lỗi)
-                try {
-                    const pendingRes = await axios.get(`/api/proposal/contract/${id}/user/${uid}/pending`);
-                    const pendingData = Array.isArray(pendingRes.data) ? pendingRes.data : [];
-                    setPendingIds(pendingData.map(p => p.proposalId));
-                } catch (err) {
-                    console.warn("Không thể tải danh sách pending:", err);
-                    setPendingIds([]); // tránh crash
-                }
+                // Không cần lấy danh sách pending nữa
 
             } catch (err) {
                 console.error("Lỗi khi tải danh sách đề xuất:", err);
@@ -59,21 +50,19 @@ export default function ProposalList() {
 
     const handleVote = async (proposalId, decision) => {
         try {
-            await axios.post(
+            const res = await axios.post(
                 `/api/proposal/${proposalId}/user/${userId}/vote`,
                 { Decision: decision },
                 { headers: { "Content-Type": "application/json" } }
             );
-
-            setPendingIds((prev) => prev.filter((pid) => pid !== proposalId));
-
-            setProposals((prev) =>
-                prev.map((p) =>
-                    p.proposalId === proposalId
-                        ? { ...p, status: decision === "Accepted" ? "Approved" : "Rejected" }
-                        : p
-                )
-            );
+            if (res.status === 200) {
+                // Gọi lại API lấy danh sách đề xuất để cập nhật trạng thái mới nhất
+                const proposalRes = await axios.get(`/api/proposal/contract/${id}/user/${userId}`);
+                const allProposals = Array.isArray(proposalRes.data) ? proposalRes.data : [];
+                setProposals(allProposals.sort((a, b) => b.proposalId - a.proposalId));
+            } else {
+                alert("Gửi vote thất bại!");
+            }
         } catch {
             alert("Gửi vote thất bại!");
         }
@@ -123,56 +112,62 @@ export default function ProposalList() {
                                 {proposals.length === 0 ? (
                                     <p>Chưa có đề xuất nào.</p>
                                 ) : (
-                                    proposals.map((p) => (
-                                        <div
-                                            key={p.proposalId}
-                                            className="proposal-item"
-                                            onClick={() => setSelected(p)}
-                                        >
-                                            <div className="proposal-info">
-                                                <strong>{p.description ?? "Không có mô tả"}</strong>
-                                                <div className="proposal-meta">{p.allocationRule ?? p.AllocationRule}</div>
-                                                <div className="proposal-meta">{p.proposedBy ?? p.ProposedBy}</div>
-                                            </div>
-
-                                            <div>
-                                                {pendingIds.includes(p.proposalId) ? (
-                                                    <div className="action-buttons">
-                                                        <span>Chờ bạn xác nhận</span>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleVote(p.proposalId, "Rejected");
-                                                            }}
-                                                            className="btn btn-danger btn-sm"
+                                    proposals.map((p) => {
+                                        // Tìm vote của user hiện tại (ép kiểu để so sánh đúng)
+                                        const myVote = Array.isArray(p.votes)
+                                            ? p.votes.find(v => String(v.userId) === String(userId))
+                                            : null;
+                                        const showAction = myVote && myVote.vote === "Pending" && p.status !== "Rejected";
+                                        return (
+                                            <div
+                                                key={p.proposalId}
+                                                className="proposal-item"
+                                                onClick={() => setSelected(p)}
+                                            >
+                                                <div className="proposal-info">
+                                                    <strong>{p.description ?? "Không có mô tả"}</strong>
+                                                    <div className="proposal-meta">{p.allocationRule ?? p.AllocationRule}</div>
+                                                    <div className="proposal-meta">{p.proposedBy ?? p.ProposedBy}</div>
+                                                </div>
+                                                <div>
+                                                    {showAction ? (
+                                                        <div className="action-buttons">
+                                                            <span>Chờ bạn xác nhận</span>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleVote(p.proposalId, "Rejected");
+                                                                }}
+                                                                className="btn btn-danger btn-sm"
+                                                            >
+                                                                ❌
+                                                            </button>
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleVote(p.proposalId, "Accepted");
+                                                                }}
+                                                                className="btn btn-success btn-sm"
+                                                            >
+                                                                ✔️
+                                                            </button>
+                                                        </div>
+                                                    ) : (
+                                                        <span
+                                                            className={`status-text ${p.status === "Approved"
+                                                                ? "status-approved"
+                                                                : p.status === "Rejected"
+                                                                    ? "status-rejected"
+                                                                    : "status-pending"
+                                                                }`}
                                                         >
-                                                            ❌
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleVote(p.proposalId, "Accepted");
-                                                            }}
-                                                            className="btn btn-success btn-sm"
-                                                        >
-                                                            ✔️
-                                                        </button>
-                                                    </div>
-                                                ) : (
-                                                    <span
-                                                        className={`status-text ${p.status === "Approved"
-                                                            ? "status-approved"
-                                                            : p.status === "Rejected"
-                                                                ? "status-rejected"
-                                                                : "status-pending"
-                                                            }`}
-                                                    >
-                                                        {p.status === "Approved" ? "Hoàn thành" : p.status}
-                                                    </span>
-                                                )}
+                                                            {p.status === "Approved" ? "Hoàn thành" : p.status}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 )}
                             </div>
                         ) : (
@@ -216,7 +211,7 @@ export default function ProposalList() {
                                                 </thead>
                                                 <tbody>
                                                     {detail.allocations?.map((a, idx) => {
-                                                        const isCurrentUser = a.userId === userId;
+                                                        const isCurrentUser = String(a.userId) === String(userId);
                                                         return (
                                                             <tr key={idx}>
                                                                 <td>{a.fullName}</td>
@@ -226,22 +221,26 @@ export default function ProposalList() {
                                                                 <td>
                                                                     {isCurrentUser && a.vote === "Pending" ? (
                                                                         <>
-                                                                            <button
-                                                                                className="btn btn-danger btn-sm"
-                                                                                onClick={() =>
-                                                                                    handleVote(detail.proposal.proposalId, "Rejected")
-                                                                                }
-                                                                            >
-                                                                                ❌ Reject
-                                                                            </button>
-                                                                            <button
-                                                                                className="btn btn-success btn-sm"
-                                                                                onClick={() =>
-                                                                                    handleVote(detail.proposal.proposalId, "Accepted")
-                                                                                }
-                                                                            >
-                                                                                ✔️ Accept
-                                                                            </button>
+                                                                            {detail.proposal?.status !== "Rejected" && (
+                                                                                <>
+                                                                                    <button
+                                                                                        className="btn btn-danger btn-sm"
+                                                                                        onClick={() =>
+                                                                                            handleVote(detail.proposal.proposalId, "Rejected")
+                                                                                        }
+                                                                                    >
+                                                                                        ❌ Reject
+                                                                                    </button>
+                                                                                    <button
+                                                                                        className="btn btn-success btn-sm"
+                                                                                        onClick={() =>
+                                                                                            handleVote(detail.proposal.proposalId, "Accepted")
+                                                                                        }
+                                                                                    >
+                                                                                        ✔️ Accept
+                                                                                    </button>
+                                                                                </>
+                                                                            )}
                                                                         </>
                                                                     ) : null}
                                                                 </td>

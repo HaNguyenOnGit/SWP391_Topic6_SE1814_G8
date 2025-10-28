@@ -71,7 +71,7 @@ export default function Proposal() {
 
     if (value === "Theo lượng sử dụng") {
       try {
-        const res = await axios.get(`/api/usage/ratio/${id}`);
+        const res = await axios.get(`/api/check/ratio/${id}`);
         // backend trả dạng [{ userId, username, percent }] hoặc tương tự
         setContributions(res.data || []);
       } catch (err) {
