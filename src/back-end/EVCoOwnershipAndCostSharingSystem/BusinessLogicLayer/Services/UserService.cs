@@ -40,6 +40,11 @@ namespace BusinessLogicLayer.Services
             return _ur.GetUserByPhone(phoneNumber);
         }
 
+        public User? GetUserById(int userId)
+        {
+            return _ur.GetUserById(userId);
+        }
+
         public void AddUser(string fullName, string email, string citizenId, string drivingLicenseId,
                             string bankName, string bankAccount, string role,
                             string phoneNumber, string password, string frontIdImage, string backIdImage, string frontLicenseImage, string backLicenseImage)
@@ -58,6 +63,7 @@ namespace BusinessLogicLayer.Services
                 BankName = bankName,
                 BankAccount = bankAccount,
                 Role = role,
+                Status = "Disabled",
                 IsEmailConfirmed = false,
                 EmailConfirmationCode = null,
                 EmailConfirmationExpiry = null,
@@ -141,6 +147,15 @@ namespace BusinessLogicLayer.Services
             user.EmailConfirmationCode = null;
             user.EmailConfirmationExpiry = null;
 
+            _ur.UpdateUser(user);
+        }
+
+        public void EnableUserById(int userId)
+        {
+            var user = _ur.GetUserById(userId);
+            if (user == null)
+                throw new Exception("User not found");
+            user.Status = "Enabled";
             _ur.UpdateUser(user);
         }
         

@@ -11,31 +11,26 @@ public partial class UsageLog
 
     public int UserId { get; set; }
 
-    public int? ReservationId { get; set; }
 
     public int OdometerStart { get; set; }
 
     public int? OdometerEnd { get; set; }
 
-    public DateTime CheckOutTime { get; set; }
+    public DateTime? CheckOutTime { get; set; }
 
     public DateTime? CheckInTime { get; set; }
 
     public int? Distance { get; set; }
 
-    public string? Purpose { get; set; }
 
     public string? ProofImageStart { get; set; }
 
     public string? ProofImageEnd { get; set; }
 
-    public int? VerifiedBy { get; set; }
 
     public virtual Contract Contract { get; set; } = null!;
 
-    public virtual Reservation? Reservation { get; set; }
 
     public virtual User User { get; set; } = null!;
 
-    public virtual User? VerifiedByNavigation { get; set; }
 }

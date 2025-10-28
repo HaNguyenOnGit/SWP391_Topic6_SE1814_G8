@@ -32,4 +32,7 @@ public partial class Expense
     public virtual ICollection<ExpenseAllocation> ExpenseAllocations { get; set; } = new List<ExpenseAllocation>();
 
     public virtual ExpenseProposal? Proposal { get; set; }
+
+    // Add missing property for service usage
+    public string? Status { get; set; }
 }

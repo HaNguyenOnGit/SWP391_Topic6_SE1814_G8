@@ -46,5 +46,10 @@ namespace BusinessLogicLayer.Services
             };
             _cr.DeleteContract(contract);
         }
+
+        public Contract? GetContractById(int contractId)
+        {
+            return _cr.GetContractById(contractId);
+        }
     }
 }

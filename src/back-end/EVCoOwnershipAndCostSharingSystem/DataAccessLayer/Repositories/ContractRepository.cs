@@ -1,4 +1,5 @@
 ﻿using DataAccessLayer.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,15 @@ namespace DataAccessLayer.Repositories
         {
             _context.Contracts.Remove(contract);
             _context.SaveChanges();
+        }
+
+        public Contract? GetContractById(int contractId)
+        {
+            return _context.Contracts
+                .Where(c => c.ContractId == contractId)
+                .Include(c => c.ContractMembers)
+                .ThenInclude(cm => cm.User)
+                .FirstOrDefault();
         }
     }
 }
