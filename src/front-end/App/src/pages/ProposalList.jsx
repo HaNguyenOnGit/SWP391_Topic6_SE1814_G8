@@ -30,7 +30,7 @@ export default function ProposalList() {
 
                 const uid = userId ?? 0;
 
-                // ✅ Lấy tất cả đề xuất
+                // Lấy tất cả đề xuất
                 const proposalRes = await axios.get(`/api/proposal/contract/${id}/user/${uid}`);
                 const allProposals = Array.isArray(proposalRes.data) ? proposalRes.data : [];
                 setProposals(allProposals.sort((a, b) => b.proposalId - a.proposalId));

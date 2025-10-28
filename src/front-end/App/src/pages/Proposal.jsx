@@ -43,7 +43,7 @@ export default function Proposal() {
         setCoowners(members);
         setContributions(members);
       } catch (err) {
-        console.error("❌ Lỗi khi tải thông tin phương tiện:", err);
+        console.error("Lỗi khi tải thông tin phương tiện:", err);
         alert("Không thể tải dữ liệu phương tiện!");
       }
     };
@@ -75,7 +75,7 @@ export default function Proposal() {
         // backend trả dạng [{ userId, username, percent }] hoặc tương tự
         setContributions(res.data || []);
       } catch (err) {
-        console.error("❌ Lỗi khi lấy dữ liệu lượng sử dụng:", err);
+        console.error("Lỗi khi lấy dữ liệu lượng sử dụng:", err);
         alert("Không thể lấy dữ liệu lượng sử dụng!");
       }
     } else if (value === "Theo tỉ lệ sở hữu") {
@@ -112,11 +112,11 @@ export default function Proposal() {
       };
 
       const res = await axios.post("/api/proposal/create", payload);
-      console.log("✅ Proposal created:", res.data);
+      console.log("Proposal created:", res.data);
       setStage("success");
     } catch (err) {
       // show detailed error in console to debug
-      console.error("❌ Lỗi khi tạo đề xuất:", err.response?.data || err.message);
+      console.error("Lỗi khi tạo đề xuất:", err.response?.data || err.message);
       // user-facing message
       alert("Không thể tạo đề xuất, vui lòng thử lại!");
     } finally {
@@ -293,7 +293,7 @@ export default function Proposal() {
             {/* Thành công */}
             {stage === "success" && (
               <div>
-                <h3 style={{ color: "#4caf50" }}>✅ Đã tạo đề xuất thành công!</h3>
+                <h3 style={{ color: "#4caf50" }}>Đã tạo đề xuất thành công!</h3>
                 <Link to={`/vehicle/${id}/proposals`} style={{ color: "#ff9800", display: "block", marginTop: 12 }}>
                   Xem danh sách đề xuất
                 </Link>
