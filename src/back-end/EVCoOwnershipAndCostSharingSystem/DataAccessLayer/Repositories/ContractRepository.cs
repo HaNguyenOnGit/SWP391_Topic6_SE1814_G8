@@ -16,6 +16,13 @@ namespace DataAccessLayer.Repositories
         {
             _context = new EvcoOwnershipAndCostSharingSystemContext();
         }
+
+        public List<Contract> GetAllContracts()
+        {
+            var contracts = _context.Contracts.ToList();
+            return contracts;
+        }
+
         public void AddContract(Contract contract)
         {
             _context.Contracts.Add(contract);
@@ -25,8 +32,9 @@ namespace DataAccessLayer.Repositories
         {
             return _context.Contracts.FirstOrDefault(c => c.LicensePlate == licensePlate);
         }
-        public void DeleteContract(Contract contract)
+        public void DeleteContract(int contractId)
         {
+            var contract = _context.Contracts.FirstOrDefault(c => c.ContractId == contractId);
             _context.Contracts.Remove(contract);
             _context.SaveChanges();
         }
