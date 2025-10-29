@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Services;
 using DataAccessLayer.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
 {
@@ -161,6 +162,84 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 .OrderByDescending(s => s.paymentDate)
                 .ToList();
             return Ok(settlements);
+        }
+
+        // API: Lịch sử thanh toán đã hoàn thành của user trong hợp đồng
+        [HttpGet("contract/{contractId}/user/{userId}/settlement-history")]
+        public IActionResult GetUserSettlementHistory(int contractId, int userId)
+        {
+            var db = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            var settlements = db.Settlements
+                .Where(s => s.Allocation.Expense.ContractId == contractId && s.PayerId == userId && s.Status == "Paid")
+                .Select(s => new
+                {
+                    settlementId = s.SettlementId,
+                    expenseName = s.Allocation.Expense.Description,
+                    userPaidAmount = s.Amount,
+                    totalExpenseAmount = s.Allocation.Expense.Amount,
+                    receiverName = s.Receiver.FullName,
+                    paymentDate = s.PaymentDate
+                })
+                .OrderByDescending(s => s.paymentDate)
+                .ToList();
+            return Ok(settlements);
+        }
+        // API: Lấy danh sách expense của user trong hợp đồng
+        [HttpGet("contract/{contractId}/user/{userId}/user-expenses")]
+        public IActionResult GetUserExpenses(int contractId, int userId)
+        {
+            var db = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            var allocations = db.ExpenseAllocations
+                .Include(a => a.Expense)
+                .Where(a => a.Expense != null && a.Expense.ContractId == contractId && a.UserId == userId)
+                .ToList()
+                .Select(a =>
+                {
+                    var settlement = db.Settlements.FirstOrDefault(s => s.AllocationId == a.AllocationId && s.PayerId == userId);
+                    return new
+                    {
+                        expenseId = a.ExpenseId,
+                        expenseName = a.Expense != null ? a.Expense.Description : "",
+                        userAmount = a.Amount,
+                        status = settlement != null ? settlement.Status : "Unpaid"
+                    };
+                })
+                .ToList();
+            return Ok(allocations);
+        }
+
+        // API: Chi tiết expense cho user
+        [HttpGet("expense/{expenseId}/user/{userId}/detail")]
+        public IActionResult GetExpenseDetailForUser(int expenseId, int userId)
+        {
+            var db = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            var expense = db.Expenses
+                .Include(e => e.ExpenseAllocations)
+                .FirstOrDefault(e => e.ExpenseId == expenseId);
+            if (expense == null)
+                return NotFound("Expense not found");
+
+            var userAlloc = expense.ExpenseAllocations.FirstOrDefault(a => a.UserId == userId);
+            var userAmount = userAlloc != null ? userAlloc.Amount : 0;
+
+            var owners = expense.ExpenseAllocations
+                .Select(a => new
+                {
+                    userId = a.UserId,
+                    fullName = db.Users.FirstOrDefault(u => u.UserId == a.UserId)?.FullName ?? "",
+                    percent = expense.Amount > 0 ? Math.Round((decimal)a.Amount / expense.Amount * 100, 2) : 0,
+                    amount = a.Amount
+                })
+                .ToList();
+            var result = new
+            {
+                expenseName = expense.Description,
+                totalAmount = expense.Amount,
+                userAmount = userAmount,
+                allocationRule = expense.AllocationRule,
+                owners = owners
+            };
+            return Ok(result);
         }
 
     }

@@ -109,6 +109,7 @@ namespace BusinessLogicLayer.Services
                 expense.Description,
                 expense.Amount,
                 expense.AllocationRule,
+                expense.Status,
                 Allocations = allocations
             };
         }
@@ -131,8 +132,8 @@ namespace BusinessLogicLayer.Services
             settlement.Amount = amountPaid;
             settlement.Method = method ?? "Banking";
             settlement.PaymentDate = DateTime.Now;
-            //settlement.Status = "Paid";
-            //settlement.ProofImageUrl = proofImageUrl;
+            settlement.Status = "Paid";
+            settlement.ProofImageUrl = proofImageUrl;
 
             db.Settlements.Update(settlement);
             db.SaveChanges();
@@ -144,16 +145,16 @@ namespace BusinessLogicLayer.Services
                 .Where(s => s.Allocation.ExpenseId == expenseId)
                 .ToList();
 
-            //if (allSettlements.All(s => s.Status == "Paid"))
-            //{
-            //    var exp = db.Expenses.FirstOrDefault(e => e.ExpenseId == expenseId);
-            //    if (exp != null)
-            //    {
-            //        exp.Status = "Completed";
-            //        db.Expenses.Update(exp);
-            //        db.SaveChanges();
-            //    }
-            //}
+            if (allSettlements.All(s => s.Status == "Paid"))
+            {
+                var exp = db.Expenses.FirstOrDefault(e => e.ExpenseId == expenseId);
+                if (exp != null)
+                {
+                    exp.Status = "Completed";
+                    db.Expenses.Update(exp);
+                    db.SaveChanges();
+                }
+            }
         }
 
         // ✅ 3. Lấy danh sách khoản thanh toán user liên quan tới 1 contract
@@ -211,7 +212,7 @@ namespace BusinessLogicLayer.Services
                     e.Description,
                     e.ExpenseDate,
                     e.Amount,
-                    //e.Status,
+                    e.Status,
                     Allocations = e.ExpenseAllocations.Select(a => new
                     {
                         a.UserId,
@@ -230,7 +231,7 @@ namespace BusinessLogicLayer.Services
                     e.ExpenseId,
                     e.Description,
                     e.Amount,
-                    //e.Status,
+                    e.Status,
                     e.AllocationRule,
                     e.ExpenseDate
                 }).ToList();
