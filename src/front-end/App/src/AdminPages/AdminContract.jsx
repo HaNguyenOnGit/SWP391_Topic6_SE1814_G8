@@ -1,78 +1,71 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import axios from "axios";
 import AdminNavbar from "./ANavbar";
 import "./AdminContract.css";
 
 export default function AdminContracts() {
-    const users = [
-        { id: 1, fullName: "Nguyen Van A", phone: "0901234567" },
-        { id: 2, fullName: "Tran Thi B", phone: "0987654321" },
-        { id: 3, fullName: "Le Van C", phone: "0907654321" },
-        { id: 4, fullName: "Pham Thi D", phone: "0912345678" },
-        { id: 5, fullName: "Hoang Van E", phone: "0933333333" },
-    ];
-
-    const [contracts, setContracts] = useState([
-        {
-            id: 1,
-            vehicle: { name: "Honda City", license: "59A-12345", model: "2021" },
-            owners: [
-                { phone: "0901234567", ratio: 60 },
-                { phone: "0907654321", ratio: 40 },
-            ],
-            createDate: "2024-10-01",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 2,
-            vehicle: { name: "Toyota Vios", license: "51B-67890", model: "2020" },
-            owners: [
-                { phone: "0987654321", ratio: 100 },
-            ],
-            createDate: "2023-06-15",
-            status: "Đã kết thúc",
-        },
-        {
-            id: 3,
-            vehicle: { name: "Kia Morning", license: "60A-11223", model: "2019" },
-            owners: [
-                { phone: "0912345678", ratio: 50 },
-                { phone: "0933333333", ratio: 50 },
-            ],
-            createDate: "2024-02-10",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 4,
-            vehicle: { name: "Mazda 3", license: "43C-44556", model: "2022" },
-            owners: [
-                { phone: "0901234567", ratio: 70 },
-                { phone: "0987654321", ratio: 30 },
-            ],
-            createDate: "2024-08-20",
-            status: "Đang hoạt động",
-        },
-        {
-            id: 5,
-            vehicle: { name: "VinFast VF8", license: "30H-88888", model: "2023" },
-            owners: [
-                { phone: "0907654321", ratio: 100 },
-            ],
-            createDate: "2024-04-12",
-            status: "Đã kết thúc",
-        },
-        {
-            id: 6,
-            vehicle: { name: "Hyundai Accent", license: "65A-22222", model: "2021" },
-            owners: [
-                { phone: "0912345678", ratio: 60 },
-                { phone: "0987654321", ratio: 40 },
-            ],
-            createDate: "2025-01-05",
-            status: "Đang hoạt động",
-        },
-    ]);
-
+    const [contracts, setContracts] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [expandedId, setExpandedId] = useState(null);
+    const [detailLoading, setDetailLoading] = useState(false);
+    const [contractDetail, setContractDetail] = useState(null);
+    // Fix: Add missing search state
     const [search, setSearch] = useState("");
+
+    useEffect(() => {
+        const fetchContracts = async () => {
+            setLoading(true);
+            setError("");
+            try {
+                const res = await axios.get("/api/contract/contractListSummary");
+                const data = res.data;
+                setContracts(
+                    Array.isArray(data)
+                        ? data.map((c) => ({
+                            id: c.contractId,
+                            vehicle: {
+                                name: c.model,
+                                license: c.licensePlate,
+                                model: "", // If you want to show model year, add it to API
+                            },
+                            owners: c.memberSummaries.map((m) => ({
+                                fullName: m.fullName,
+                                phone: m.phoneNumber,
+                                ratio: m.sharePercent,
+                            })),
+                            createDate: c.startDate,
+                            status: c.status,
+                        }))
+                        : []
+                );
+            } catch (e) {
+                setError(e.message || "Đã có lỗi xảy ra");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchContracts();
+    }, []);
+
+    const handleExpand = async (id) => {
+        if (expandedId === id) {
+            setExpandedId(null);
+            setContractDetail(null);
+            return;
+        }
+        setExpandedId(id);
+        setDetailLoading(true);
+        setContractDetail(null);
+        try {
+            const res = await axios.get(`/api/contract/contract-detail/${id}`);
+            setContractDetail(res.data);
+        } catch (e) {
+            setContractDetail({ error: e.message || "Không tải được chi tiết hợp đồng" });
+        } finally {
+            setDetailLoading(false);
+        }
+    };
 
     // 🧠 Lọc hợp đồng theo từ khóa
     const filteredContracts = useMemo(() => {
@@ -85,22 +78,27 @@ export default function AdminContracts() {
                 c.vehicle.license.toLowerCase().includes(keyword);
 
             const ownerMatch = c.owners.some((o) => {
-                const user = users.find((u) => u.phone === o.phone);
                 return (
                     o.phone.includes(keyword) ||
-                    (user && user.fullName.toLowerCase().includes(keyword))
+                    (o.fullName && o.fullName.toLowerCase().includes(keyword))
                 );
             });
 
             return vehicleMatch || ownerMatch;
         });
-    }, [contracts, search, users]);
+    }, [contracts, search]);
 
-    const handleEndContract = (id) => {
-        if (window.confirm("Bạn có chắc muốn chấm dứt hợp đồng này?")) {
+    // Gọi API dừng hợp đồng
+    const handlePauseContract = async (id) => {
+        if (!window.confirm("Bạn có chắc muốn dừng hợp đồng này?")) return;
+        try {
+            await axios.patch(`/api/contract/pauseContract/${id}`);
             setContracts((prev) =>
                 prev.map((c) => (c.id === id ? { ...c, status: "Đã kết thúc" } : c))
             );
+            alert("Đã dừng hợp đồng thành công.");
+        } catch (e) {
+            alert(e.message || "Dừng hợp đồng thất bại");
         }
     };
 
@@ -127,17 +125,20 @@ export default function AdminContracts() {
             </div>
 
             {/* 📄 Danh sách hợp đồng */}
-            {filteredContracts.length > 0 ? (
+            {loading ? (
+                <p>Đang tải hợp đồng...</p>
+            ) : error ? (
+                <p className="error">{error}</p>
+            ) : filteredContracts.length > 0 ? (
                 filteredContracts.map((c) => (
-                    <div key={c.id} className="contract-card">
-                        <div className="contract-info">
+                    <div key={c.id} className={`contract-card${expandedId === c.id ? " expanded" : ""}`}>
+                        <div className="contract-info" onClick={() => handleExpand(c.id)} style={{ cursor: "pointer" }}>
                             <h2>Hợp đồng #{c.id}</h2>
                             <p>
                                 <strong>Xe:</strong> {c.vehicle.name} ({c.vehicle.license})
                             </p>
-                            <p>
-                                <strong>Năm SX:</strong> {c.vehicle.model}
-                            </p>
+                            {/* Nếu có model year, hiển thị ở đây */}
+                            {/* <p><strong>Năm SX:</strong> {c.vehicle.model}</p> */}
                             <p>
                                 <strong>Ngày tạo:</strong> {c.createDate}
                             </p>
@@ -147,15 +148,11 @@ export default function AdminContracts() {
                             <p>
                                 <strong>Người đồng sở hữu:</strong>
                             </p>
-                            {c.owners.map((o, i) => {
-                                const user = users.find((u) => u.phone === o.phone);
-                                return (
-                                    <p key={i}>
-                                        - {user ? `${user.fullName} (${o.phone})` : o.phone} (
-                                        {o.ratio}%)
-                                    </p>
-                                );
-                            })}
+                            {c.owners.map((o, i) => (
+                                <p key={i}>
+                                    - {o.fullName} ({o.phone}) ({o.ratio}%)
+                                </p>
+                            ))}
                         </div>
 
                         <p>
@@ -170,16 +167,13 @@ export default function AdminContracts() {
                         </p>
 
                         <div className="actions">
-                            {c.status === "Đang hoạt động" && (
-                                <button
-                                    onClick={() => handleEndContract(c.id)}
-                                    className="btn-stop"
-                                >
-                                    Ngừng hợp đồng
-                                </button>
-                            )}
+                            <button
+                                onClick={() => handlePauseContract(c.id)}
+                                className="btn-stop"
+                            >
+                                Dừng hợp đồng
+                            </button>
                             <button className="btn-export">Trích xuất chi tiêu</button>
-                            <button className="btn-edit">Chỉnh sửa thành viên</button>
                             <button
                                 onClick={() => handleDeleteContract(c.id)}
                                 className="btn-delete"
@@ -187,6 +181,36 @@ export default function AdminContracts() {
                                 Xóa
                             </button>
                         </div>
+
+                        {/* Chi tiết hợp đồng mở rộng */}
+                        {expandedId === c.id && (
+                            <div className="contract-detail">
+                                {detailLoading ? (
+                                    <p>Đang tải chi tiết hợp đồng...</p>
+                                ) : contractDetail && contractDetail.error ? (
+                                    <p className="error">{contractDetail.error}</p>
+                                ) : contractDetail ? (
+                                    <>
+                                        <h3>Chi tiết hợp đồng</h3>
+                                        <p><strong>Tên xe:</strong> {contractDetail.vehicleName}</p>
+                                        <p><strong>Model:</strong> {contractDetail.model}</p>
+                                        <p><strong>Biển số:</strong> {contractDetail.licensePlate}</p>
+                                        <p><strong>Ngày bắt đầu:</strong> {contractDetail.startDate}</p>
+                                        <p><strong>Trạng thái:</strong> {contractDetail.status}</p>
+                                        <h4>Thành viên</h4>
+                                        <ul>
+                                            {contractDetail.members.map((m) => (
+                                                <li key={m.userId}>
+                                                    {m.fullName} ({m.phoneNumber}) - {m.sharePercent}%
+                                                    <br />
+                                                    Trạng thái: {m.status} | Tham gia: {m.joinedAt}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                ) : null}
+                            </div>
+                        )}
                     </div>
                 ))
             ) : (
