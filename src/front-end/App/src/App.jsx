@@ -21,6 +21,7 @@ import UserManagement from "./AdminPages/UserManagement";
 import AdminContracts from "./AdminPages/AdminContract";
 import ProposalList from "./pages/ProposalList";
 import ContractVerification from "./pages/ContractVerification";
+import UsageHistory from "./pages/UsageHistory";
 
 export default function App() {
   return (
@@ -49,6 +50,8 @@ export default function App() {
 
         <Route path="/vehicle/:id/proposals" element={<ProposalList />} />
         <Route path="/contractVerify/:contractId" element={<ContractVerification />} />
+
+        <Route path="/usageHistory" element={<UsageHistory />} />
 
       </Routes>
     </BrowserRouter>
