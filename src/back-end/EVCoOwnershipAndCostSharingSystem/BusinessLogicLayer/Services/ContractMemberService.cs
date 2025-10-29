@@ -55,6 +55,11 @@ namespace BusinessLogicLayer.Services
             return _cmr.GetContractIdsByUserId(userId);
         }
 
+        public List<ContractMember> GetContractMembersByContractId(int contractId)
+        {
+            return _cmr.GetContractMembersByContractId(contractId);
+        }
+
         public async Task SendNotificationToMember(int memberId, int contractId)
         {
             var member = _us.GetUserById(memberId);

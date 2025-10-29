@@ -29,27 +29,25 @@ namespace BusinessLogicLayer.Services
             };
             _cr.AddContract(contract);
         }
+
+        public List<Contract> GetAllContracts()
+        {
+            return _cr.GetAllContracts();
+        }
+
         public Contract? GetContractByPlate(string licensePlate)
         {
             return _cr.GetContractByPlate(licensePlate);
-        }
-        public void DeleteContract(string vehicleName, string licensePlate, string model, DateOnly startDate,
-                                   string status)
-        {
-            Contract contract = new Contract
-            {
-                VehicleName = vehicleName,
-                LicensePlate = licensePlate,
-                Model = model,
-                StartDate = startDate,
-                Status = status
-            };
-            _cr.DeleteContract(contract);
         }
 
         public Contract? GetContractById(int contractId)
         {
             return _cr.GetContractById(contractId);
+        }
+
+        public void UpdateContract(Contract contract)
+        {
+            _cr.UpdateContract(contract);
         }
     }
 }

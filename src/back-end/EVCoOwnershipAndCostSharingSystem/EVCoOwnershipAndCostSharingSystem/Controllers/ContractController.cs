@@ -56,6 +56,45 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _cms = new ContractMemberService();
         }
 
+        //Hiển thị tóm tắt toàn bộ hợp đồng
+        //Dành cho admin
+        [HttpGet("contractListSummary")]
+        public IActionResult GetContractListSummary()
+        {
+            List<Contract> contracts = _cs.GetAllContracts();
+            List<ContractSummary> contractSummaries = new List<ContractSummary>();
+            foreach (var contract in contracts)
+            {
+                List<MemberSummary> memberSummaries = new List<MemberSummary>();
+                //Tim kiem toan bo dong so huu theo contractId
+                List<ContractMember> members = _cms.GetContractMembersByContractId(contract.ContractId);
+                //Add tung dong so huu vo danh sach cac dong so huu tuong ung voi ma hop dong
+                //Chi co FullName, PhoneNumber, SharePercent
+                //FullName va PhoneNumber nam o bang User
+                foreach (var member in members)
+                {
+                    var account = _us.GetUserById(member.UserId);
+                    MemberSummary ms = new MemberSummary(
+                        account.FullName,
+                        account.PhoneNumber,
+                        member.SharePercent
+                    );
+                    memberSummaries.Add(ms);
+                }
+                //Them tom tat hop dong vao danh sach hop dong da tom tat
+                ContractSummary contractSummary = new ContractSummary(
+                    contract.ContractId,
+                    contract.Model,
+                    contract.LicensePlate,
+                    contract.StartDate,
+                    memberSummaries,
+                    contract.Status
+                );
+                contractSummaries.Add(contractSummary);
+            }
+            return Ok(contractSummaries);
+        }
+
         [HttpGet("contract-detail/{contractId}")]
         public IActionResult GetContractDetail(int contractId)
         {
@@ -135,6 +174,23 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 await _cms.SendNotificationToMember(userId, contractId);
             }
             return Ok("Contract and members added successfully.");
+        }
+        //Ngưng hợp đồng
+        //Chuyển về pending
+        [HttpPatch("pauseContract/{contractId}")]
+        public IActionResult PauseContract([FromRoute] int contractId)
+        {
+            //Dau tien la ngung hop dong
+            var contract = _cs.GetContractById(contractId);
+            contract.Status = "Pending";
+            _cs.UpdateContract(contract);
+            //Sau do chuyen trang thai tat ca dong so huu ve pending
+            List<ContractMember> contractMembers = _cms.GetContractMembersByContractId(contractId);
+            foreach (var member in contractMembers)
+            {
+                _cms.UpdateMemberStatus(contractId, member.UserId, "Pending");
+            }
+            return Ok("Contract paused successfully.");
         }
     }
 }
