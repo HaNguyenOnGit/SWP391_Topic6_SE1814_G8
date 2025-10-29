@@ -25,21 +25,83 @@ namespace BusinessLogicLayer.Services
             var expense = _expenseRepo.GetExpenseWithAllocations(expenseId);
             if (expense == null) throw new Exception("Expense not found");
 
-            var allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
-                .Select(a => new
-                {
-                    a.AllocationId,
-                    a.UserId,
-                    a.Amount,
-                    a.Status,
-                    User = a.User == null ? null : new
+            List<object> allocations = new List<object>();
+            if (expense.AllocationRule == "ByShare")
+            {
+                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
+                    .Select(a => new
                     {
-                        a.User.UserId,
-                        a.User.FullName,
-                        a.User.BankName,
-                        a.User.BankAccount
-                    }
-                }).ToList();
+                        a.AllocationId,
+                        a.UserId,
+                        a.Amount,
+                        a.Status,
+                        User = a.User == null ? null : new
+                        {
+                            a.User.UserId,
+                            a.User.FullName,
+                            a.User.BankName,
+                            a.User.BankAccount
+                        },
+                        Type = "ByShare"
+                    }).ToList<object>();
+            }
+            else if (expense.AllocationRule == "SelfPaid")
+            {
+                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
+                    .Select(a => new
+                    {
+                        a.AllocationId,
+                        a.UserId,
+                        a.Amount,
+                        a.Status,
+                        User = a.User == null ? null : new
+                        {
+                            a.User.UserId,
+                            a.User.FullName,
+                            a.User.BankName,
+                            a.User.BankAccount
+                        },
+                        Type = "SelfPaid"
+                    }).ToList<object>();
+            }
+            else if (expense.AllocationRule == "ByUsage")
+            {
+                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
+                    .Select(a => new
+                    {
+                        a.AllocationId,
+                        a.UserId,
+                        a.Amount,
+                        a.Status,
+                        User = a.User == null ? null : new
+                        {
+                            a.User.UserId,
+                            a.User.FullName,
+                            a.User.BankName,
+                            a.User.BankAccount
+                        },
+                        Type = "ByUsage"
+                    }).ToList<object>();
+            }
+            else
+            {
+                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
+                    .Select(a => new
+                    {
+                        a.AllocationId,
+                        a.UserId,
+                        a.Amount,
+                        a.Status,
+                        User = a.User == null ? null : new
+                        {
+                            a.User.UserId,
+                            a.User.FullName,
+                            a.User.BankName,
+                            a.User.BankAccount
+                        },
+                        Type = expense.AllocationRule
+                    }).ToList<object>();
+            }
 
             return new
             {
@@ -47,7 +109,6 @@ namespace BusinessLogicLayer.Services
                 expense.Description,
                 expense.Amount,
                 expense.AllocationRule,
-                //expense.Status,
                 Allocations = allocations
             };
         }
