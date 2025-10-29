@@ -205,5 +205,27 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok(result);
         }
 
+        // API: Lấy tất cả settlement của user ở mọi hợp đồng
+        [HttpGet("user/{userId}/all-settlements")]
+        public IActionResult GetAllSettlementsForUser(int userId)
+        {
+            var db = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            var settlements = db.Settlements
+                .Where(s => s.PayerId == userId && s.Status == "Paid")
+                .Select(s => new
+                {
+                    settlementId = s.SettlementId,
+                    expenseName = s.Allocation.Expense.Description,
+                    userPaidAmount = s.Amount,
+                    totalExpenseAmount = s.Allocation.Expense.Amount,
+                    receiverName = s.Receiver.FullName,
+                    paymentDate = s.PaymentDate,
+                    contractName = s.Allocation.Expense.Contract.VehicleName
+                })
+                .OrderByDescending(s => s.paymentDate)
+                .ToList();
+            return Ok(settlements);
+        }
+
     }
 }
