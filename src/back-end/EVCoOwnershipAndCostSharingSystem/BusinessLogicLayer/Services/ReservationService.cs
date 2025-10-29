@@ -84,22 +84,26 @@ namespace BusinessLogicLayer.Services
                 .Where(r => r.StartTime <= now && r.EndTime > now && r.Status == "Approved")
                 .ToList();
 
-            // Đặt lại trạng thái cho tất cả hợp đồng
+            // Chỉ cập nhật trạng thái nếu đang là Active hoặc Available
             var contracts = db.Contracts.ToList();
             foreach (var contract in contracts)
             {
-                var currentRes = activeReservations.FirstOrDefault(r => r.ContractId == contract.ContractId);
-                if (currentRes != null)
+                if (contract.Status == "Active" || contract.Status == "Available")
                 {
-                    contract.Status = "Active";
-                    contract.UsingBy = currentRes.UserId;
+                    var currentRes = activeReservations.FirstOrDefault(r => r.ContractId == contract.ContractId);
+                    if (currentRes != null)
+                    {
+                        contract.Status = "Active";
+                        contract.UsingBy = currentRes.UserId;
+                    }
+                    else
+                    {
+                        contract.Status = "Available";
+                        contract.UsingBy = null;
+                    }
+                    db.Contracts.Update(contract);
                 }
-                else
-                {
-                    contract.Status = "Available";
-                    contract.UsingBy = null;
-                }
-                db.Contracts.Update(contract);
+                // Nếu trạng thái khác thì giữ nguyên, không đổi
             }
             db.SaveChanges();
         }
