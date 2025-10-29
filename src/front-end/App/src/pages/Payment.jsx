@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./Payment.css";
 
-export default function PaymentHistory() {
+export default function Payment() {
     const { id } = useParams(); // contractId
     const { userId } = useAuth();
     const [vehicle, setVehicle] = useState(null);
