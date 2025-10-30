@@ -537,7 +537,7 @@ export default function RegistrationForm() {
               </div>
 
               <div className="card-footer text-center small text-muted">
-                © Your Company
+                © EV Share
               </div>
             </div>
           </div>
