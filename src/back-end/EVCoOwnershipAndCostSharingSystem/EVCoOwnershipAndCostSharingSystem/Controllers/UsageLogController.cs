@@ -180,6 +180,19 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok("Checkout thành công!");
         }
 
+        // API: Tổng quãng đường của một contract (theo tất cả usage logs)
+        [HttpGet("contract-total-distance")]
+        public IActionResult GetContractTotalDistance([FromQuery] int contractId)
+        {
+            var context = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            // Sum distance, handle null and empty sets
+            var totalDistance = context.UsageLogs
+                .Where(u => u.ContractId == contractId)
+                .Sum(u => (int?)u.Distance) ?? 0;
+
+            return Ok(new { ContractId = contractId, TotalDistance = totalDistance });
+        }
+
         // DTO cho checkin/checkout
         public class CheckInOutRequest
         {
