@@ -29,22 +29,19 @@
 
 /* --- Cột đặt lịch (bên phải) --- */
 .booking-right {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    /* phân bố đều giữa list và bar */
-    align-items: stretch;
-    padding: 30px 32px;
+    justify-content: center;
+    align-items: center;
+    height: 610px;
+    width: min(100%, 420px);
+    align-self: stretch;
     border: 2px solid #000;
     border-radius: 16px;
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-    min-height: 600px;
-    max-width: 420px;
-    width: 100%;
+    padding: 30px 32px;
     box-sizing: border-box;
     margin-top: 2px;
-    /* căn cho thẳng hàng với calendar-section */
 }
 
 .booking-container {
