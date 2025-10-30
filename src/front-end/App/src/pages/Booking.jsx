@@ -11,9 +11,10 @@ export default function Booking() {
 
     const [vehicle, setVehicle] = useState(null);
     const [bookings, setBookings] = useState([]);
-    const [fromTime, setFromTime] = useState("");
-    const [toTime, setToTime] = useState("");
-    const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+    // Đặt lịch theo ngày
+    const [selectedStartDay, setSelectedStartDay] = useState(null);
+    const [selectedEndDay, setSelectedEndDay] = useState(null);
+    const [bookingError, setBookingError] = useState("");
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
@@ -27,8 +28,9 @@ export default function Booking() {
         }
     };
 
-    const getDateKey = () =>
-        `${selectedYear}-${String(selectedMonth).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`;
+    // Trả về chuỗi ngày yyyy-mm-dd
+    const getDateKey = (day) =>
+        `${selectedYear}-${String(selectedMonth).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
     // Lấy thông tin xe (từ contract)
     useEffect(() => {
@@ -50,18 +52,18 @@ export default function Booking() {
     }, [id]);
 
     // Lấy danh sách đặt lịch theo ngày
+    // Lấy danh sách đặt lịch cho cả tháng
     useEffect(() => {
         const fetchBookings = async () => {
             try {
-                const date = getDateKey();
-                const res = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
+                const res = await axios.get(`/api/reservation/contract/${id}/month?month=${selectedMonth}&year=${selectedYear}`);
                 setBookings(res.data || []);
             } catch (err) {
                 console.error("Lỗi khi tải danh sách đặt lịch:", err);
             }
         };
         fetchBookings();
-    }, [id, selectedDay, selectedMonth, selectedYear]);
+    }, [id, selectedMonth, selectedYear]);
 
     const parseTime = (str) => {
         const match = str.match(/(\d{1,2})h?(\d{0,2})p?/);
@@ -72,36 +74,30 @@ export default function Booking() {
     };
 
     const handleAddBooking = async () => {
-        if (!fromTime || !toTime) {
-            alert("Vui lòng nhập cả giờ bắt đầu và kết thúc!");
+        if (!selectedStartDay) {
+            alert("Vui lòng chọn ngày bắt đầu!");
             return;
         }
-
-        const from = parseTime(fromTime);
-        const to = parseTime(toTime);
-        if (isNaN(from) || isNaN(to) || from >= to) {
-            alert("Khoảng thời gian không hợp lệ!");
+        const startDay = selectedStartDay;
+        const endDay = selectedEndDay || selectedStartDay;
+        if (endDay < startDay) {
+            alert("Ngày kết thúc phải sau ngày bắt đầu!");
             return;
         }
-
         try {
-            const date = getDateKey();
-            const start = `${date}T${String(Math.floor(from / 60)).padStart(2, "0")}:${String(from % 60).padStart(2, "0")}:00`;
-            const end = `${date}T${String(Math.floor(to / 60)).padStart(2, "0")}:${String(to % 60).padStart(2, "0")}:00`;
-
+            const startDate = getDateKey(startDay) + "T00:00:00";
+            const endDate = getDateKey(endDay) + "T23:59:00";
             const res = await axios.post("/api/reservation", {
                 contractId: parseInt(id),
                 userId: parseInt(userId),
-                startTime: start,
-                endTime: end,
+                startTime: startDate,
+                endTime: endDate,
             });
-
             alert(res.data.message || "Đặt lịch thành công!");
-            setFromTime("");
-            setToTime("");
-
+            setSelectedStartDay(null);
+            setSelectedEndDay(null);
             // reload bookings
-            const bookingsRes = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
+            const bookingsRes = await axios.get(`/api/reservation/contract/${id}/month?month=${selectedMonth}&year=${selectedYear}`);
             setBookings(bookingsRes.data || []);
         } catch (err) {
             if (err.response?.status === 409)
@@ -119,7 +115,7 @@ export default function Booking() {
             await axios.delete(`/api/reservation/${bookingId}`);
             alert("Xóa lịch thành công!");
             const date = getDateKey();
-            const res = await axios.get(`/api/reservation/contract/${id}?date=${date}`);
+            const res = await axios.get(`/api/reservation/contract/${id}/month?month=${selectedMonth}&year=${selectedYear}`);
             setBookings(res.data || []);
         } catch (err) {
             alert("Lỗi khi xóa lịch!");
@@ -132,6 +128,20 @@ export default function Booking() {
         const firstDay = new Date(selectedYear, selectedMonth - 1, 1).getDay();
         return firstDay === 0 ? 6 : firstDay - 1;
     };
+    // Tạo mảng các ngày đã đặt
+    const bookedDays = (() => {
+        const arr = [];
+        bookings.forEach(b => {
+            const start = new Date(b.startTime);
+            const end = new Date(b.endTime);
+            if (start.getMonth() + 1 === selectedMonth && start.getFullYear() === selectedYear) {
+                for (let d = start.getDate(); d <= end.getDate(); d++) {
+                    if (d > 0 && d <= daysInMonth(selectedMonth, selectedYear)) arr.push(d);
+                }
+            }
+        });
+        return arr;
+    })();
 
     if (!vehicle) return <p>Đang tải thông tin xe...</p>;
 
@@ -191,15 +201,45 @@ export default function Booking() {
                                         {Array.from({ length: getStartOffset() }).map((_, i) => (
                                             <div key={`empty-${i}`} />
                                         ))}
-                                        {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => (
-                                            <div
-                                                key={i + 1}
-                                                className={`day ${selectedDay === i + 1 ? "active" : ""}`}
-                                                onClick={() => setSelectedDay(i + 1)}
-                                            >
-                                                {String(i + 1).padStart(2, "0")}
-                                            </div>
-                                        ))}
+                                        {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => {
+                                            const dayNum = i + 1;
+                                            const isBooked = bookedDays.includes(dayNum);
+                                            const isSelected = selectedStartDay && selectedEndDay
+                                                ? dayNum >= selectedStartDay && dayNum <= selectedEndDay
+                                                : selectedStartDay === dayNum;
+                                            return (
+                                                <div
+                                                    key={dayNum}
+                                                    className={`day${isSelected ? " active" : ""}${isBooked ? " booked" : ""}`}
+                                                    style={{ pointerEvents: isBooked ? "none" : "auto", opacity: isBooked ? 0.5 : 1 }}
+                                                    onClick={() => {
+                                                        if (isBooked) return;
+                                                        if (!selectedStartDay) {
+                                                            setSelectedStartDay(dayNum);
+                                                            setSelectedEndDay(null);
+                                                            setBookingError("");
+                                                        } else if (!selectedEndDay && dayNum > selectedStartDay) {
+                                                            // Kiểm tra có ngày đã đặt trong dải
+                                                            const hasBooked = bookedDays.some(d => d >= selectedStartDay && d <= dayNum);
+                                                            if (hasBooked) {
+                                                                setSelectedStartDay(null);
+                                                                setSelectedEndDay(null);
+                                                                setBookingError("Có ngày đã được đặt!");
+                                                                return;
+                                                            }
+                                                            setSelectedEndDay(dayNum);
+                                                            setBookingError("");
+                                                        } else {
+                                                            setSelectedStartDay(dayNum);
+                                                            setSelectedEndDay(null);
+                                                            setBookingError("");
+                                                        }
+                                                    }}
+                                                >
+                                                    {String(dayNum).padStart(2, "0")}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </>
@@ -212,12 +252,12 @@ export default function Booking() {
                             <div className="booking-right">
                                 <div className="booking-list">
                                     {bookings.length === 0 ? (
-                                        <div className="empty-booking">Chưa có lịch đặt trong ngày này.</div>
+                                        <div className="empty-booking">Chưa có lịch đặt trong tháng này.</div>
                                     ) : (
                                         bookings.map((b) => (
-                                            <div key={b.reservationId} className="booking-item">
+                                            <div style={{ height: "20px" }} key={b.reservationId} className="booking-item">
                                                 <span>
-                                                    <b>{b.userName}</b> {b.startTime.slice(11, 16)} - {b.endTime.slice(11, 16)}
+                                                    <b>{b.userName}</b> {new Date(b.startTime).getDate()} - {new Date(b.endTime).getDate()}/{selectedMonth}/{selectedYear}
                                                 </span>
                                                 {b.userId === parseInt(userId) && (
                                                     <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
@@ -227,36 +267,25 @@ export default function Booking() {
                                     )}
                                 </div>
 
-                                <div className="booking-bar">
+                                <div className="booking-bar" style={{ minWidth: 220 }}>
                                     <b>Đặt lịch cho bạn</b>
-                                    <div className="time-inputs">
-                                        <input
-                                            type="text"
-                                            placeholder="Từ (hh:mm)"
-                                            maxLength={5}
-                                            value={fromTime}
-                                            onChange={(e) => {
-                                                let val = e.target.value.replace(/\D/g, "");
-                                                if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
-                                                setFromTime(val);
-                                            }}
-                                        />
-                                        <b>→</b>
-                                        <input
-                                            type="text"
-                                            placeholder="Đến (hh:mm)"
-                                            maxLength={5}
-                                            value={toTime}
-                                            onChange={(e) => {
-                                                let val = e.target.value.replace(/\D/g, "");
-                                                if (val.length > 2) val = val.slice(0, 2) + ":" + val.slice(2, 4);
-                                                setToTime(val);
-                                            }}
-                                        />
-                                        <button className="addBtn" onClick={handleAddBooking}>
+                                    <div className="date-inputs" style={{ display: 'flex', alignItems: 'center' }}>
+                                        <span style={{ minWidth: 220, display: 'inline-block' }}>
+                                            {selectedStartDay
+                                                ? selectedEndDay
+                                                    ? `${String(selectedStartDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear} - ${String(selectedEndDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear}`
+                                                    : `${String(selectedStartDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear}`
+                                                : "Chọn ngày bắt đầu và kết thúc"}
+                                        </span>
+                                        <button className="addBtn" onClick={handleAddBooking} style={{ marginLeft: 12 }}>
                                             +
                                         </button>
                                     </div>
+                                    {bookingError && (
+                                        <div style={{ color: 'red', marginTop: 8, fontWeight: 500 }}>
+                                            {bookingError}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
