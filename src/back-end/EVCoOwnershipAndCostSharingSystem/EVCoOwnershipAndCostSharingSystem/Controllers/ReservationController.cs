@@ -68,54 +68,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         }
 
         // GET api/reservation/contract/{contractId}?date=yyyy-MM-dd
-        [HttpGet("contract/{contractId}")]
-        public IActionResult GetReservationsByContract(int contractId, [FromQuery] DateTime date)
-        {
-            try
-            {
-                    var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date.ToString("yyyy-MM-dd"));
-                var result = reservations.Select(r => new {
-                    r.ReservationId,
-                    r.ContractId,
-                    r.UserId,
-                    UserName = r.User?.FullName,
-                    r.StartTime,
-                    r.EndTime,
-                    r.Status,
-                    r.CreatedAt
-                });
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
-
-        // ✅ 2. Lấy danh sách lịch theo ngày
-        [HttpGet("{contractId}/{date}")]
-        public IActionResult GetReservationsByContract(int contractId, string date)
-        {
-            try
-            {
-                var reservations = _reservationService.GetReservationsByContractAndDate(contractId, date);
-                var result = reservations.Select(r => new
-                {
-                    r.ReservationId,
-                    r.ContractId,
-                    r.UserId,
-                    StartTime = r.StartTime.ToString("yyyy-MM-dd HH:mm"),
-                    EndTime = r.EndTime.ToString("yyyy-MM-dd HH:mm"),
-                    r.Status
-                });
-
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { Error = ex.Message });
-            }
-        }
 
         // ✅ 3. Xóa lịch
         [HttpDelete("{contractId}/{datetime}")]
@@ -139,6 +91,32 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             {
                 _reservationService.UpdateReservationStatus(reservationId, newStatus);
                 return Ok(new { Message = $"Cập nhật trạng thái đặt lịch {reservationId} thành công: {newStatus}" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Error = ex.Message });
+            }
+        }
+
+        // GET api/reservation/contract/{contractId}/month?month=MM&year=YYYY
+        [HttpGet("contract/{contractId}/month")]
+        public IActionResult GetReservationsByContractAndMonth(int contractId, [FromQuery] int month, [FromQuery] int year)
+        {
+            try
+            {
+                var reservations = _reservationService.GetReservationsByContractAndMonth(contractId, month, year);
+                var result = reservations.Select(r => new
+                {
+                    r.ReservationId,
+                    r.ContractId,
+                    r.UserId,
+                    UserName = r.User?.FullName,
+                    r.StartTime,
+                    r.EndTime,
+                    r.Status,
+                    r.CreatedAt
+                });
+                return Ok(result);
             }
             catch (Exception ex)
             {

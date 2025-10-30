@@ -44,13 +44,6 @@ namespace BusinessLogicLayer.Services
         }
 
         // ✅ Lấy danh sách lịch theo ngày (format linh hoạt)
-        public List<Reservation> GetReservationsByContractAndDate(int contractId, string dateString)
-        {
-            if (!DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-                throw new Exception("Định dạng ngày không hợp lệ.");
-
-            return _reservationRepo.GetReservationsByContractAndDate(contractId, date);
-        }
 
         // ✅ Xóa lịch (contractId + datetime)
         public void DeleteReservation(int contractId, string dateTimeString)
@@ -106,6 +99,11 @@ namespace BusinessLogicLayer.Services
                 // Nếu trạng thái khác thì giữ nguyên, không đổi
             }
             db.SaveChanges();
+        }
+        // Lấy danh sách lịch theo tháng
+        public List<Reservation> GetReservationsByContractAndMonth(int contractId, int month, int year)
+        {
+            return _reservationRepo.GetReservationsByContractAndMonth(contractId, month, year);
         }
     }
 }
