@@ -89,7 +89,7 @@ export default function Booking() {
             const start = `${date}T${String(Math.floor(from / 60)).padStart(2, "0")}:${String(from % 60).padStart(2, "0")}:00`;
             const end = `${date}T${String(Math.floor(to / 60)).padStart(2, "0")}:${String(to % 60).padStart(2, "0")}:00`;
 
-            const res = await axios.post("/api/reservation/reservationRequest", {
+            const res = await axios.post("/api/reservation", {
                 contractId: parseInt(id),
                 userId: parseInt(userId),
                 startTime: start,

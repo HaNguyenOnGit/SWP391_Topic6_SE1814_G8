@@ -189,7 +189,7 @@ export default function Checkin() {
 
       await axios.post("/api/check/checkin", {
         ContractId: Number(id),
-        UserId: userId,
+        UserId: Number(userId),
         Odometer: kmValue,
         ProofImage: base64Image,
       });
@@ -209,7 +209,7 @@ export default function Checkin() {
 
       await axios.post("/api/check/checkout", {
         ContractId: Number(id),
-        UserId: userId,
+        UserId: Number(userId),
         Odometer: kmValue,
         ProofImage: base64Image,
       });
