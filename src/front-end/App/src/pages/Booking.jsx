@@ -65,6 +65,13 @@ export default function Booking() {
         fetchBookings();
     }, [id, selectedMonth, selectedYear]);
 
+    // Ensure no date is pre-selected when the calendar first loads or when month/year changes
+    useEffect(() => {
+        setSelectedStartDay(null);
+        setSelectedEndDay(null);
+        setBookingError("");
+    }, [selectedMonth, selectedYear]);
+
     const parseTime = (str) => {
         const match = str.match(/(\d{1,2})h?(\d{0,2})p?/);
         if (!match) return NaN;
@@ -203,21 +210,40 @@ export default function Booking() {
                                         ))}
                                         {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => {
                                             const dayNum = i + 1;
+                                            const dateObj = new Date(selectedYear, selectedMonth - 1, dayNum);
+                                            const today = new Date();
+                                            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                                            const minAllowed = new Date(todayStart);
+                                            minAllowed.setDate(minAllowed.getDate() + 1); // must book at least 1 day before
+
+                                            const isPast = dateObj < todayStart; // past dates
+                                            const isTooSoon = dateObj < minAllowed; // today (or within 24h) not allowed
                                             const isBooked = bookedDays.includes(dayNum);
-                                            const isSelected = selectedStartDay && selectedEndDay
+                                            const isSelected = (selectedStartDay !== null && selectedEndDay !== null)
                                                 ? dayNum >= selectedStartDay && dayNum <= selectedEndDay
-                                                : selectedStartDay === dayNum;
+                                                : (selectedStartDay !== null && selectedStartDay === dayNum);
                                             return (
                                                 <div
                                                     key={dayNum}
-                                                    className={`day${isSelected ? " active" : ""}${isBooked ? " booked" : ""}`}
-                                                    style={{ pointerEvents: isBooked ? "none" : "auto", opacity: isBooked ? 0.5 : 1 }}
+                                                    className={`day${isSelected ? " active" : ""}${isBooked ? " booked" : ""}${isPast ? " past" : ""}`}
+                                                    style={{ pointerEvents: (isBooked || isPast) ? "none" : "auto", opacity: (isBooked || isPast) ? 0.5 : 1 }}
                                                     onClick={() => {
-                                                        if (isBooked) return;
+                                                        if (isBooked || isPast) return; // disallow clicking past or already booked
+
+                                                        // If the clicked date is too soon (must be at least next day), show error and cancel selection
+                                                        if (isTooSoon) {
+                                                            setSelectedStartDay(null);
+                                                            setSelectedEndDay(null);
+                                                            setBookingError("bạn phải đặt lịch trước 1 ngày");
+                                                            return;
+                                                        }
+
+                                                        // valid click, clear any previous error
+                                                        setBookingError("");
+
                                                         if (!selectedStartDay) {
                                                             setSelectedStartDay(dayNum);
                                                             setSelectedEndDay(null);
-                                                            setBookingError("");
                                                         } else if (!selectedEndDay && dayNum > selectedStartDay) {
                                                             // Kiểm tra có ngày đã đặt trong dải
                                                             const hasBooked = bookedDays.some(d => d >= selectedStartDay && d <= dayNum);
@@ -228,11 +254,9 @@ export default function Booking() {
                                                                 return;
                                                             }
                                                             setSelectedEndDay(dayNum);
-                                                            setBookingError("");
                                                         } else {
                                                             setSelectedStartDay(dayNum);
                                                             setSelectedEndDay(null);
-                                                            setBookingError("");
                                                         }
                                                     }}
                                                 >

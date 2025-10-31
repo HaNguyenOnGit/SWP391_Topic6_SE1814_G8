@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../NavBar";
 import "./newContract.css"
 import axios from "axios";
+import { useAuth } from "../auth/AuthContext";
 
 export default function NewContract() {
   const [step, setStep] = useState(1);
@@ -18,6 +19,21 @@ export default function NewContract() {
   const [owners, setOwners] = useState([]);
   const [ownerError, setOwnerError] = useState("");
   const [phone, setPhone] = useState("");
+  const { user } = useAuth();
+
+  // Ensure the current authenticated user is included as a co-owner by default
+  // and cannot be removed.
+  useEffect(() => {
+    if (!user) return;
+    const phoneNum = user.phoneNumber || user.PhoneNumber || user.phone || user.Phone || null;
+    if (!phoneNum) return;
+    setOwners((prev) => {
+      if (prev.some((o) => o.phone === phoneNum)) return prev;
+      const fullName = user.fullName || user.FullName || user.fullname || phoneNum;
+      // mark locked so UI won't show delete control for this owner
+      return [{ phone: phoneNum, fullName, ratio: 0, locked: true }, ...prev];
+    });
+  }, [user]);
 
   // form 3 state
   const terms = [
@@ -63,7 +79,7 @@ export default function NewContract() {
       const res = await axios.get(`/api/user/phone/${trimmedPhone}`);
       if (res.status === 200) {
         const fullName = res.data; // API trả về FullName (string)
-        setOwners([...owners, { phone: trimmedPhone, fullName, ratio: 0 }]);
+        setOwners(prev => [...prev, { phone: trimmedPhone, fullName, ratio: 0 }]);
         setPhone("");
         setOwnerError("");
       }
@@ -175,20 +191,25 @@ export default function NewContract() {
                   <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
                     <span className="pSlider-name" style={{ fontWeight: 500 }}>
                       {o.fullName}
+                      {o.locked && (
+                        <span style={{ fontSize: 12, color: '#666', marginLeft: 6 }}>(Bạn)</span>
+                      )}
                     </span>
-                    <span
-                      style={{
-                        cursor: "pointer",
-                        color: "red",
-                        fontWeight: "bold",
-                        fontSize: "16px",
-                        lineHeight: "1",
-                        marginTop: "-2px"
-                      }}
-                      onClick={() => setOwners(owners.filter((_, idx) => idx !== i))}
-                    >
-                      ✕
-                    </span>
+                    {!o.locked && (
+                      <span
+                        style={{
+                          cursor: "pointer",
+                          color: "red",
+                          fontWeight: "bold",
+                          fontSize: "16px",
+                          lineHeight: "1",
+                          marginTop: "-2px"
+                        }}
+                        onClick={() => setOwners(owners.filter((_, idx) => idx !== i))}
+                      >
+                        ✕
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
