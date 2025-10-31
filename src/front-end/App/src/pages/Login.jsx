@@ -85,8 +85,27 @@ export default function LoginPage({ apiUrl }) {
             setMessage("Đăng nhập thành công!");
             setPhone("");
             setPassword("");
-            // redirect to home or dashboard
-            navigate('/vehicles');
+
+            // Determine role: prefer value from returned user object, fallback to token payload if present
+            let roleValue = user?.role || user?.Role || user?.roleName || user?.RoleName || null;
+            if (!roleValue && token) {
+                try {
+                    const parts = token.split('.');
+                    if (parts.length === 3) {
+                        const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                        const json = atob(base64);
+                        const payload = JSON.parse(json);
+                        roleValue = payload.role || payload.Role || null;
+                    }
+                } catch { /* ignore */ }
+            }
+
+            const roleLower = roleValue ? String(roleValue).toLowerCase() : null;
+            if (roleLower === 'admin') {
+                navigate('/admin/users');
+            } else {
+                navigate('/vehicles');
+            }
         } catch (err) {
             setMessage(err.message);
         } finally {
