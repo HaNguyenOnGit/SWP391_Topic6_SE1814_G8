@@ -73,8 +73,10 @@ namespace BusinessLogicLayer.Services
         {
             var db = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
             var now = DateTime.Now;
+            // Consider any reservation whose time window contains 'now'.
+            // We ignore reservation.Status here so the contract is set based on time ranges only.
             var activeReservations = db.Reservations
-                .Where(r => r.StartTime <= now && r.EndTime > now && r.Status == "Approved")
+                .Where(r => r.StartTime <= now && r.EndTime > now)
                 .ToList();
 
             // Chỉ cập nhật trạng thái nếu đang là Active hoặc Available
