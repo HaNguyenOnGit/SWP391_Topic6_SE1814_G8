@@ -95,7 +95,7 @@ export default function ContractDetails() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
+            <div className="main-content" style={{ overflowY: "scroll" }}>
                 <h1>Chi tiết hợp đồng</h1>
 
                 {/* Vehicle info */}

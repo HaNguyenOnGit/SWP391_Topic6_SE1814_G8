@@ -26,6 +26,8 @@ export default function VehicleInfo() {
                 const members = data.members.map((m) => ({
                     username: m.fullName || m.phoneNumber,
                     share: m.sharePercent,
+                    // backend may call this field different names; try common ones, fallback to 'Confirmed'
+                    status: (m.status || m.invitationStatus || m.memberStatus || m.statusName || 'Confirmed')
                 }));
                 setCoowners(members);
             })
@@ -49,6 +51,18 @@ export default function VehicleInfo() {
     };
 
     if (!vehicle) return <p>Đang tải dữ liệu...</p>;
+
+    const getMemberNameColor = (status) => {
+        if (!status) return 'black';
+        const s = String(status).toLowerCase();
+        if (s === 'confirmed') return 'black';
+        if (s === 'pending') return 'goldenrod'; // vàng
+        if (s === 'rejected') return 'red';
+        // also handle vietnamese versions just in case
+        if (s.includes('chờ') || s.includes('pending')) return 'goldenrod';
+        if (s.includes('từ chối') || s.includes('rejected')) return 'red';
+        return 'black';
+    };
 
     return (
         <div className="vehicle-info">
@@ -94,7 +108,7 @@ export default function VehicleInfo() {
                                 margin: "10px 0",
                             }}
                         >
-                            <span style={{ color: "black", fontWeight: "bold" }}>
+                            <span style={{ color: getMemberNameColor(c.status), fontWeight: "bold" }}>
                                 {c.username}
                             </span>
                             <span style={{ color: "blue" }}>{c.share}%</span>
