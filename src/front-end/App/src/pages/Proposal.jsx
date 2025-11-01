@@ -214,7 +214,6 @@ export default function Proposal() {
                 <select className="txtInput" value={method} onChange={handleMethodChange}>
                   <option value="">-- Chọn cách thức --</option>
                   <option>Theo tỉ lệ sở hữu</option>
-                  <option>Góp quỹ</option>
                   <option>Tự chi trả</option>
                   <option>Theo lượng sử dụng</option>
                 </select><br /><br />
