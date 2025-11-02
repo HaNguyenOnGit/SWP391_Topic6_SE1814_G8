@@ -131,8 +131,6 @@ export default function Proposal() {
         return "ByShare";
       case "Theo lượng sử dụng":
         return "ByUsage";
-      case "Góp quỹ":
-        return "Equal";
       case "Tự chi trả":
         return "SelfPaid";
       default:
