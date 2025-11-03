@@ -25,83 +25,21 @@ namespace BusinessLogicLayer.Services
             var expense = _expenseRepo.GetExpenseWithAllocations(expenseId);
             if (expense == null) throw new Exception("Expense not found");
 
-            List<object> allocations = new List<object>();
-            if (expense.AllocationRule == "ByShare")
-            {
-                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
-                    .Select(a => new
+            var allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
+                .Select(a => new
+                {
+                    a.AllocationId,
+                    a.UserId,
+                    a.Amount,
+                    a.Status,
+                    User = a.User == null ? null : new
                     {
-                        a.AllocationId,
-                        a.UserId,
-                        a.Amount,
-                        a.Status,
-                        User = a.User == null ? null : new
-                        {
-                            a.User.UserId,
-                            a.User.FullName,
-                            a.User.BankName,
-                            a.User.BankAccount
-                        },
-                        Type = "ByShare"
-                    }).ToList<object>();
-            }
-            else if (expense.AllocationRule == "SelfPaid")
-            {
-                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
-                    .Select(a => new
-                    {
-                        a.AllocationId,
-                        a.UserId,
-                        a.Amount,
-                        a.Status,
-                        User = a.User == null ? null : new
-                        {
-                            a.User.UserId,
-                            a.User.FullName,
-                            a.User.BankName,
-                            a.User.BankAccount
-                        },
-                        Type = "SelfPaid"
-                    }).ToList<object>();
-            }
-            else if (expense.AllocationRule == "ByUsage")
-            {
-                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
-                    .Select(a => new
-                    {
-                        a.AllocationId,
-                        a.UserId,
-                        a.Amount,
-                        a.Status,
-                        User = a.User == null ? null : new
-                        {
-                            a.User.UserId,
-                            a.User.FullName,
-                            a.User.BankName,
-                            a.User.BankAccount
-                        },
-                        Type = "ByUsage"
-                    }).ToList<object>();
-            }
-            else
-            {
-                allocations = _expenseRepo.GetAllocationsByExpense(expenseId)
-                    .Select(a => new
-                    {
-                        a.AllocationId,
-                        a.UserId,
-                        a.Amount,
-                        a.Status,
-                        User = a.User == null ? null : new
-                        {
-                            a.User.UserId,
-                            a.User.FullName,
-                            a.User.BankName,
-                            a.User.BankAccount
-                        },
-                        Type = expense.AllocationRule
-                    }).ToList<object>();
-            }
+                        a.User.UserId,
+                        a.User.FullName,
+                        a.User.BankName,
+                        a.User.BankAccount
+                    }
+                }).ToList();
 
             return new
             {
@@ -109,7 +47,7 @@ namespace BusinessLogicLayer.Services
                 expense.Description,
                 expense.Amount,
                 expense.AllocationRule,
-                expense.Status,
+                //expense.Status,
                 Allocations = allocations
             };
         }
@@ -132,8 +70,8 @@ namespace BusinessLogicLayer.Services
             settlement.Amount = amountPaid;
             settlement.Method = method ?? "Banking";
             settlement.PaymentDate = DateTime.Now;
-            settlement.Status = "Paid";
-            settlement.ProofImageUrl = proofImageUrl;
+            //settlement.Status = "Paid";
+            //settlement.ProofImageUrl = proofImageUrl;
 
             db.Settlements.Update(settlement);
             db.SaveChanges();
@@ -145,16 +83,16 @@ namespace BusinessLogicLayer.Services
                 .Where(s => s.Allocation.ExpenseId == expenseId)
                 .ToList();
 
-            if (allSettlements.All(s => s.Status == "Paid"))
-            {
-                var exp = db.Expenses.FirstOrDefault(e => e.ExpenseId == expenseId);
-                if (exp != null)
-                {
-                    exp.Status = "Completed";
-                    db.Expenses.Update(exp);
-                    db.SaveChanges();
-                }
-            }
+            //if (allSettlements.All(s => s.Status == "Paid"))
+            //{
+            //    var exp = db.Expenses.FirstOrDefault(e => e.ExpenseId == expenseId);
+            //    if (exp != null)
+            //    {
+            //        exp.Status = "Completed";
+            //        db.Expenses.Update(exp);
+            //        db.SaveChanges();
+            //    }
+            //}
         }
 
         // ✅ 3. Lấy danh sách khoản thanh toán user liên quan tới 1 contract
@@ -212,7 +150,7 @@ namespace BusinessLogicLayer.Services
                     e.Description,
                     e.ExpenseDate,
                     e.Amount,
-                    e.Status,
+                    //e.Status,
                     Allocations = e.ExpenseAllocations.Select(a => new
                     {
                         a.UserId,
@@ -223,6 +161,12 @@ namespace BusinessLogicLayer.Services
 
             return history;
         }
+
+        public List<Expense> GetExpenseListByContractId(int contractId)
+        {
+            return _expenseRepo.GetExpenseListByContractId(contractId);
+        }
+
         public object GetExpensesByContract(int contractId)
         {
             var expenses = _expenseRepo.GetByContract(contractId)
@@ -231,7 +175,7 @@ namespace BusinessLogicLayer.Services
                     e.ExpenseId,
                     e.Description,
                     e.Amount,
-                    e.Status,
+                    //e.Status,
                     e.AllocationRule,
                     e.ExpenseDate
                 }).ToList();
@@ -265,5 +209,30 @@ namespace BusinessLogicLayer.Services
             return settlement;
         }
 
+        public List<ExpenseAllocation> GetAllocationListByExpenseId(int expenseId)
+        {
+            return _expenseRepo.GetAllocationListByExpenseId(expenseId);
+        }
+
+        public Settlement? GetSettlementByAllocationId(int allocationId)
+        {
+            return _settlementRepo.GetSettlementByAllocationId(allocationId);
+        }
+        public void DeleteSettlement(Settlement settlement)
+        {
+            _settlementRepo.DeleteSettlement(settlement);
+        }
+        public void DeleteAllocationList(List<ExpenseAllocation> expenseAllocations)
+        {
+            _expenseRepo.DeleteAllocationList(expenseAllocations);
+        }
+        public void DeleteExpenseList(List<Expense> expenses)
+        {
+            _expenseRepo.DeleteExpenseList(expenses);
+        }
+        public void DeleteExpenseProposalList(List<ExpenseProposal> proposals)
+        {
+            _expenseRepo.DeleteExpenseProposalList(proposals);
+        }
     }
 }

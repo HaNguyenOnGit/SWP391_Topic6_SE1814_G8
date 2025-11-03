@@ -103,7 +103,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             });
         }
 
-        // API: Check quyền checkin (chỉ trả true nếu UsingBy trùng với userId; nếu UsingBy == null trả về false)
+        // API: Check quyền checkin (userId phải trùng UsingBy hoặc UsingBy null)
         [HttpGet("can-checkin")]
         public IActionResult CanCheckin([FromQuery] int contractId, [FromQuery] int userId)
         {
@@ -111,12 +111,8 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             var contract = context.Contracts.FirstOrDefault(c => c.ContractId == contractId);
             if (contract == null)
                 return NotFound("Contract not found");
-
-            // Only allow checkin when UsingBy is explicitly set to the same userId.
-            // If UsingBy is null, return false as requested.
-            if (contract.UsingBy != null && contract.UsingBy == userId)
+            if (contract.UsingBy == null || contract.UsingBy == userId)
                 return Ok(new { CanCheckin = true });
-
             return Ok(new { CanCheckin = false });
         }
 
@@ -182,19 +178,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             contract.Status = "Available"; // Set status to Available on checkout
             context.SaveChanges();
             return Ok("Checkout thành công!");
-        }
-
-        // API: Tổng quãng đường của một contract (theo tất cả usage logs)
-        [HttpGet("contract-total-distance")]
-        public IActionResult GetContractTotalDistance([FromQuery] int contractId)
-        {
-            var context = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
-            // Sum distance, handle null and empty sets
-            var totalDistance = context.UsageLogs
-                .Where(u => u.ContractId == contractId)
-                .Sum(u => (int?)u.Distance) ?? 0;
-
-            return Ok(new { ContractId = contractId, TotalDistance = totalDistance });
         }
 
         // DTO cho checkin/checkout

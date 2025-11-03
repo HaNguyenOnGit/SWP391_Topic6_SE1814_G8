@@ -1,5 +1,4 @@
-﻿
-using DataAccessLayer.Entities;
+﻿using DataAccessLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,13 +7,6 @@ namespace DataAccessLayer.Repositories
 {
     public class ReservationRepository
     {
-        private readonly EvcoOwnershipAndCostSharingSystemContext _context;
-
-        public ReservationRepository()
-        {
-            _context = new EvcoOwnershipAndCostSharingSystemContext();
-        }
-
 
         public bool DeleteReservation(int reservationId)
         {
@@ -23,6 +15,12 @@ namespace DataAccessLayer.Repositories
             _context.Reservations.Remove(reservation);
             _context.SaveChanges();
             return true;
+        }
+        private readonly EvcoOwnershipAndCostSharingSystemContext _context;
+
+        public ReservationRepository()
+        {
+            _context = new EvcoOwnershipAndCostSharingSystemContext();
         }
 
         public void AddReservation(Reservation reservation)
@@ -51,6 +49,22 @@ namespace DataAccessLayer.Repositories
                  (startTime <= r.StartTime && endTime >= r.EndTime)));
         }
 
+        public List<Reservation> GetReservationsByContractAndDate(int contractId, DateTime date)
+        {
+            return _context.Reservations
+                .Where(r => r.ContractId == contractId && r.StartTime.Date == date.Date)
+                .Select(r => new Reservation {
+                    ReservationId = r.ReservationId,
+                    ContractId = r.ContractId,
+                    UserId = r.UserId,
+                    StartTime = r.StartTime,
+                    EndTime = r.EndTime,
+                    Status = r.Status,
+                    CreatedAt = r.CreatedAt,
+                    User = r.User
+                })
+                .ToList();
+        }
         public void DeleteReservation(int contractId, DateTime startTime)
         {
             var reservation = _context.Reservations
@@ -63,23 +77,13 @@ namespace DataAccessLayer.Repositories
             _context.SaveChanges();
         }
 
-        // Lấy danh sách lịch theo tháng
-        public List<Reservation> GetReservationsByContractAndMonth(int contractId, int month, int year)
+        public void DeleteReservationsByContractId(int contractId)
         {
-            return _context.Reservations
-                .Where(r => r.ContractId == contractId && r.StartTime.Month == month && r.StartTime.Year == year)
-                .Select(r => new Reservation
-                {
-                    ReservationId = r.ReservationId,
-                    ContractId = r.ContractId,
-                    UserId = r.UserId,
-                    StartTime = r.StartTime,
-                    EndTime = r.EndTime,
-                    Status = r.Status,
-                    CreatedAt = r.CreatedAt,
-                    User = r.User
-                })
+            var reservations = _context.Reservations
+                .Where(r => r.ContractId == contractId)
                 .ToList();
+            _context.Reservations.RemoveRange(reservations);
+            _context.SaveChanges();
         }
     }
 }

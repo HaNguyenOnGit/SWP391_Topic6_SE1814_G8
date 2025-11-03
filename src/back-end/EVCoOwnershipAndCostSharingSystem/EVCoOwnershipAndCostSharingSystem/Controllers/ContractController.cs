@@ -49,11 +49,78 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         private readonly ContractService _cs;
         private readonly UserService _us;
         private readonly ContractMemberService _cms;
+        private readonly UsageLogService _uls;
+        private readonly ReservationService _rs;
+        private readonly ProposalService _pss;
+        private readonly PaymentService _pms;
         public ContractController()
         {
             _cs = new ContractService();
             _us = new UserService();
             _cms = new ContractMemberService();
+            _uls = new UsageLogService();
+            _rs = new ReservationService();
+            _pss = new ProposalService();
+            _pms = new PaymentService();
+        }
+        //Chức năng quằn nhất từng làm
+        //Xóa hợp đồng kết hợp xóa các dữ liệu có liên quan tới hợp đồng
+        //Mà nó lại ràng buộc khóa ngoại với nhiều bảng khác
+        [HttpDelete("deleteContract/{contractId}")]
+        public IActionResult DeleteContract([FromRoute] int contractId)
+        {
+            //Xóa trước dữ liệu có liên quan tới hợp đồng đó trong bảng UsageLogs
+            _uls.DeleteUsageLogsByContractId(contractId);
+            //Xoá trước dữ liệu có liên quan tới hợp đồng đó trong bảng Reservations
+            _rs.DeleteReservationsByContractId(contractId);
+            //Lấy các khoản đề xuất chi tiêu liên quan tới hợp đồng đó trong bảng ExpenseProposals
+            List<ExpenseProposal> proposals = _pss.GetExpenseProposalsByContractId(contractId);
+            //Lấy các phiếu vote liên quan tới mã proposal (proposalId) trong bảng ProposalVotes
+            foreach (var proposal in proposals)
+            {
+                var proposalVoteList = _pss.GetProposalVotesByProposalId(proposal.ProposalId);
+                if (proposalVoteList == null)
+                {
+                    continue;
+                }
+                _pss.DeleteProposalVotesList(proposalVoteList);//1
+            }
+            //Khoan xóa các đề xuất chi tiêu liên quan tới hợp đồng đó trong bảng ExpenseProposals
+            //Giờ tới phần dữ liệu liên quan tới Expenses
+            //Đầu tiên lấy toàn bộ khoản chi tiêu tương ứng với contractId
+            List<Expense> expenses = _pms.GetExpenseListByContractId(contractId);
+            foreach (var expense in expenses)
+            {
+                //Chạy qua từng khoản chi tiêu để lấy toàn bộ các phân bổ chi tiêu tương ứng
+                var expenseAllocations = _pms.GetAllocationListByExpenseId(expense.ExpenseId);
+                //Rồi lại duyệt qua từng phân bổ chi tiêu để lấy khoản thanh toán tương ứng trong bảng Settlements
+                //Nếu không có phân bổ chi tiêu thì continue
+                //Nếu có thì xóa khoản thanh toán trong bảng Settlements
+                foreach (var allocation in expenseAllocations)
+                {
+                    var settlement = _pms.GetSettlementByAllocationId(allocation.AllocationId);
+                    if (settlement == null)
+                    {
+                        continue;
+                    }
+                    _pms.DeleteSettlement(settlement);//2
+                }
+                //Xóa toàn bộ phân bổ chi tiêu trong bảng ExpenseAllocations
+                _pms.DeleteAllocationList(expenseAllocations);//3
+            }
+            //Giờ là xóa toàn bộ khoản chi tiêu trong bảng Expenses
+            _pms.DeleteExpenseList(expenses);//4
+            //Xóa toàn bộ đề xuất chi tiêu trong bảng ExpenseProposals
+            _pms.DeleteExpenseProposalList(proposals);//5
+            //Xóa toàn bộ đồng sở hữu trong bảng ContractMembers
+            var contractMembers = _cms.GetContractMembersByContractId(contractId);
+            foreach (var member in contractMembers)
+            {
+                _cms.DeleteContractMember(contractId, member.UserId);//6
+            }
+            //Cuối cùng mới xóa hợp đồng trong bảng Contracts
+            _cs.DeleteContract(contractId);//7
+            return Ok("Contract and related data deleted successfully.");
         }
 
         //Hiển thị tóm tắt toàn bộ hợp đồng

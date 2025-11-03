@@ -111,7 +111,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                     user.FullName,
                     user.Role,
                     user.Status,
-                    user.PhoneNumber
                 }
             });
         }

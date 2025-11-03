@@ -79,5 +79,16 @@ namespace DataAccessLayer.Repositories
             _context.Settlements.Remove(s);
             _context.SaveChanges();
         }
+
+        public Settlement? GetSettlementByAllocationId(int allocationId)
+        {
+            return _context.Settlements.FirstOrDefault(s => s.AllocationId == allocationId);
+        }
+
+        public void DeleteSettlement(Settlement settlement)
+        {
+            _context.Settlements.Remove(settlement);
+            _context.SaveChanges();
+        }
     }
 }

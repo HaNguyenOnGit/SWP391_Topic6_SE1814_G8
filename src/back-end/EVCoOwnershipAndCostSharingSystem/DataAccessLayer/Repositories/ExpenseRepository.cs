@@ -15,11 +15,31 @@ namespace DataAccessLayer.Repositories
             _db = new EvcoOwnershipAndCostSharingSystemContext();
         }
 
+        public List<Expense> GetExpenseListByContractId(int contractId)
+        {
+            return _db.Expenses
+                       .Where(e => e.ContractId == contractId)
+                       .ToList();
+        }
+
+        public void DeleteExpenseList(List<Expense> expenses)
+        {
+            _db.Expenses.RemoveRange(expenses);
+            _db.SaveChanges();
+        }
+
         public IEnumerable<Expense> GetByContract(int contractId)
         {
             return _db.Expenses
                       .Where(e => e.ContractId == contractId)
                       .ToList();
+        }
+        
+        public List<ExpenseAllocation> GetAllocationListByExpenseId(int expenseId)
+        {
+            return _db.ExpenseAllocations
+                       .Where(a => a.ExpenseId == expenseId)
+                       .ToList();
         }
 
         public Expense GetExpenseWithAllocations(int expenseId)
@@ -67,5 +87,15 @@ namespace DataAccessLayer.Repositories
         }
 
         // add other helpers (create expense, allocations...) as needed
+        public void DeleteAllocationList(List<ExpenseAllocation> expenseAllocations)
+        {
+            _db.ExpenseAllocations.RemoveRange(expenseAllocations);
+            _db.SaveChanges();
+        }
+        public void DeleteExpenseProposalList(List<ExpenseProposal> proposals)
+        {
+            _db.ExpenseProposals.RemoveRange(proposals);
+            _db.SaveChanges();
+        }
     }
 }

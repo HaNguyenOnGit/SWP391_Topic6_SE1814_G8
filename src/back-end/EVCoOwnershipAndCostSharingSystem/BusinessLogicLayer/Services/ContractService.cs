@@ -49,5 +49,10 @@ namespace BusinessLogicLayer.Services
         {
             _cr.UpdateContract(contract);
         }
+
+        public void DeleteContract(int contractId)
+        {
+            _cr.DeleteContract(contractId);
+        }
     }
 }

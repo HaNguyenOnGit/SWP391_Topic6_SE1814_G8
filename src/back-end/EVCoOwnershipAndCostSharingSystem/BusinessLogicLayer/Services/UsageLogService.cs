@@ -33,5 +33,9 @@ namespace BusinessLogicLayer.Services
             };
             _ulr.AddUsageLog(usageLog);
         }
+        public void DeleteUsageLogsByContractId(int contractId)
+        {
+            _ulr.DeleteUsageLogsByContractId(contractId);
+        }
     }
 }

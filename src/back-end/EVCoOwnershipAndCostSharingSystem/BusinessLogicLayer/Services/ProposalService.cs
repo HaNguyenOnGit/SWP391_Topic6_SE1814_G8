@@ -33,6 +33,29 @@ namespace BusinessLogicLayer.Services
             );
         }
 
+        //Lấy các phiếu đề xuất (expense proposals) theo mã hợp đồng
+        public List<ExpenseProposal> GetExpenseProposalsByContractId(int contractId)
+        {
+            return _db.ExpenseProposals
+                .Where(p => p.ContractId == contractId)
+                .ToList();
+        }
+
+        //Lấy các vote liên quan tới proposalId
+        public List<ProposalVote> GetProposalVotesByProposalId(int proposalId)
+        {
+            return _db.ProposalVotes
+                .Where(v => v.ProposalId == proposalId)
+                .ToList();
+        }
+
+        //Xóa proposal vote theo proposalId
+        public void DeleteProposalVotesList(List<ProposalVote> proposalVoteList)
+        {
+            _db.RemoveRange(proposalVoteList);
+            _db.SaveChanges();
+        }
+
         // ✅ 1. Tạo đề xuất chi tiêu
         public async Task CreateProposal(CreateProposalRequest request)
         {
