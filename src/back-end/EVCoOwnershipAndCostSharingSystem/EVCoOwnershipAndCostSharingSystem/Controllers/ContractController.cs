@@ -9,6 +9,30 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/contract")]
     public class ContractController : ControllerBase
     {
+        public class UpdateMemberStatusRequest
+        {
+            public int ContractId { get; set; }
+            public int UserId { get; set; }
+            public string Status { get; set; }
+        }
+        private readonly ContractService _cs;
+        private readonly UserService _us;
+        private readonly ContractMemberService _cms;
+        private readonly UsageLogService _uls;
+        private readonly ReservationService _rs;
+        private readonly ProposalService _pss;
+        private readonly PaymentService _pms;
+
+        public ContractController()
+        {
+            _cs = new ContractService();
+            _us = new UserService();
+            _cms = new ContractMemberService();
+            _uls = new UsageLogService();
+            _rs = new ReservationService();
+            _pss = new ProposalService();
+            _pms = new PaymentService();
+        }
 
         [HttpPost("update-member-status")]
         public IActionResult UpdateMemberStatus([FromBody] UpdateMemberStatusRequest req)
@@ -38,31 +62,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return Ok("All members confirmed. Contract status updated to Available.");
             }
             return Ok("Status updated successfully");
-        }
-
-        public class UpdateMemberStatusRequest
-        {
-            public int ContractId { get; set; }
-            public int UserId { get; set; }
-            public string Status { get; set; }
-        }
-        private readonly ContractService _cs;
-        private readonly UserService _us;
-        private readonly ContractMemberService _cms;
-        private readonly UsageLogService _uls;
-        private readonly ReservationService _rs;
-        private readonly ProposalService _pss;
-        private readonly PaymentService _pms;
-        public ContractController()
-        {
-            _cs = new ContractService();
-            _us = new UserService();
-            _cms = new ContractMemberService();
-            _uls = new UsageLogService();
-            _rs = new ReservationService();
-            _pss = new ProposalService();
-            _pms = new PaymentService();
-        }
+        }     
         //Chức năng quằn nhất từng làm
         //Xóa hợp đồng kết hợp xóa các dữ liệu có liên quan tới hợp đồng
         //Mà nó lại ràng buộc khóa ngoại với nhiều bảng khác

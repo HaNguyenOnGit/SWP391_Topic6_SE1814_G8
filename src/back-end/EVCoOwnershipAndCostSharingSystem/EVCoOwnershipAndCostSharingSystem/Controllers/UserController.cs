@@ -5,6 +5,8 @@ using BusinessLogicLayer.Others;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using static System.IO.Directory;
+using static System.IO.File;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
 {
@@ -174,10 +176,39 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 user.FrontLicenseImage,
                 user.BackLicenseImage
             );
-
-            // Gửi mã xác nhận luôn
             var code = _us.GenerateEmailConfirmationCode(user.Email);
-
+            try
+            {
+                //Chuyen doi hinh anh tu base64 sang byte[]
+                byte[] frontIdImageByte = Convert.FromBase64String(user.FrontIdImage ?? "");
+                byte[] backIdImageByte = Convert.FromBase64String(user.BackIdImage ?? "");
+                byte[] frontLicenseImageByte = Convert.FromBase64String(user.FrontLicenseImage ?? "");
+                byte[] backLicenseImageByte = Convert.FromBase64String(user.BackLicenseImage ?? "");
+                //Tao 1 thu muc con de luu hinh anh nguoi dung
+                //Duoc luu trong o D theo duong dan la D:\\UserImages
+                string subfolderName = user.FullName + " - " + user.UserId;
+                string folderPath = "D:\\UserImages\\" + subfolderName;
+                CreateDirectory(folderPath);
+                //Tạo tên ảnh 
+                string frontIdImageName = "FrontIdImage_" + user.FullName + ".jpg";
+                string backIdImageName = "BackIdImage_" + user.FullName + ".jpg";
+                string frontLicenseImageName = "FrontLicenseImage_" + user.FullName + ".jpg";
+                string backLicenseImageName = "BackLicenseImage_" + user.FullName + ".jpg";
+                //Tạo đường dẫn đầy đủ cho từng ảnh
+                string frontIdImagePath = Path.Combine(folderPath, frontIdImageName);
+                string backIdImagePath = Path.Combine(folderPath, backIdImageName);
+                string frontLicenseImagePath = Path.Combine(folderPath, frontLicenseImageName);
+                string backLicenseImagePath = Path.Combine(folderPath, backLicenseImageName);
+                //Ghi byte[] vào file
+                WriteAllBytes(frontIdImagePath, frontIdImageByte);
+                WriteAllBytes(backIdImagePath, backIdImageByte);
+                WriteAllBytes(frontLicenseImagePath, frontLicenseImageByte);
+                WriteAllBytes(backLicenseImagePath, backLicenseImageByte);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest("Error saving images: " + ex.Message);
+            }
             return Ok("User added successfully. Please check your email to confirm.");
         }
 
