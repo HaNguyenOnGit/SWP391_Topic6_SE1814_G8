@@ -22,6 +22,8 @@ import AdminContracts from "./AdminPages/AdminContract";
 import ProposalList from "./pages/ProposalList";
 import ContractVerification from "./pages/ContractVerification";
 import UsageHistory from "./pages/UsageHistory";
+import Notification from "./pages/Notification";
+import AdminProfile from "./AdminPages/AdminProfile";
 
 export default function App() {
   return (
@@ -47,11 +49,13 @@ export default function App() {
         <Route path="/profile" element={<UserProfile />} />
         <Route path="/admin/users" element={<UserManagement />} />
         <Route path="/admin/contracts" element={<AdminContracts />} />
+        <Route path="/admin/profile" element={<AdminProfile />} />
 
         <Route path="/vehicle/:id/proposals" element={<ProposalList />} />
         <Route path="/contractVerify/:contractId" element={<ContractVerification />} />
 
         <Route path="/usageHistory" element={<UsageHistory />} />
+        <Route path="/notification" element={<Notification />} />
 
       </Routes>
     </BrowserRouter>
