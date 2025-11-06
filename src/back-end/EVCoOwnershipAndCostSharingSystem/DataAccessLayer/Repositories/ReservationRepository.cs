@@ -53,7 +53,8 @@ namespace DataAccessLayer.Repositories
         {
             return _context.Reservations
                 .Where(r => r.ContractId == contractId && r.StartTime.Date == date.Date)
-                .Select(r => new Reservation {
+                .Select(r => new Reservation
+                {
                     ReservationId = r.ReservationId,
                     ContractId = r.ContractId,
                     UserId = r.UserId,
@@ -84,6 +85,25 @@ namespace DataAccessLayer.Repositories
                 .ToList();
             _context.Reservations.RemoveRange(reservations);
             _context.SaveChanges();
+        }
+
+        // Lấy danh sách lịch theo tháng
+        public List<Reservation> GetReservationsByContractAndMonth(int contractId, int month, int year)
+        {
+            return _context.Reservations
+                .Where(r => r.ContractId == contractId && r.StartTime.Month == month && r.StartTime.Year == year)
+                .Select(r => new Reservation
+                {
+                    ReservationId = r.ReservationId,
+                    ContractId = r.ContractId,
+                    UserId = r.UserId,
+                    StartTime = r.StartTime,
+                    EndTime = r.EndTime,
+                    Status = r.Status,
+                    CreatedAt = r.CreatedAt,
+                    User = r.User
+                })
+                .ToList();
         }
     }
 }
