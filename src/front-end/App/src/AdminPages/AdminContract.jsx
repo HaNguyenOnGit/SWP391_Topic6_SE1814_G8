@@ -102,9 +102,16 @@ export default function AdminContracts() {
         }
     };
 
-    const handleDeleteContract = (id) => {
-        if (window.confirm("Bạn có chắc muốn xóa hợp đồng này?")) {
-            setContracts((prev) => prev.filter((c) => c.id !== id));
+    const handleDeleteContract = async (id) => {
+        if (!window.confirm("Bạn có chắc muốn xóa hợp đồng này?")) return;
+        try {
+            await axios.delete(`/api/contract/deleteContract/${id}`);
+            setContracts((prev) =>
+                prev.filter((c) => c.id !== id)
+            );
+            alert("Đã xóa hợp đồng thành công.");
+        } catch (e) {
+            alert(e.message || "Xóa hợp đồng thất bại");
         }
     };
 
