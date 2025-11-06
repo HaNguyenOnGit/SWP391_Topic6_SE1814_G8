@@ -167,6 +167,7 @@ export default function RegistrationForm() {
           role: "Co-owner",
           phoneNumber: formData.phone,
           password: formData.password,
+          status: "Pending",
           frontIdImage,
           backIdImage,
           frontLicenseImage,
