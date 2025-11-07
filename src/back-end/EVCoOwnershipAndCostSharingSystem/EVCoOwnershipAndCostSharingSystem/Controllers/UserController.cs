@@ -197,7 +197,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             //Lay nguoi dung de lay id
             var user = _us.GetUserByPhone(phoneNumber);
             //Den luc xu ly anh
-            string rootFolder = "D:\\SWP391_Topic6_SE1814_G8\\src\\back-end\\EVCoOwnershipAndCostSharingSystem\\EVCoOwnershipAndCostSharingSystem\\wwwroot\\UserImages";
+            string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserImages");
             string userFolder = fullName + "-" + user.UserId;
             string userPath = Path.Combine(rootFolder, userFolder);
             //Tao thu muc cho nguoi dung
@@ -225,7 +225,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             using (var stream = new FileStream(backLicenseImagePath, FileMode.Create))
             {
                 backLicenseImageFile.CopyTo(stream);
-            }           
+            }
             return Ok("User added successfully. Please check your email to confirm.");
         }
 

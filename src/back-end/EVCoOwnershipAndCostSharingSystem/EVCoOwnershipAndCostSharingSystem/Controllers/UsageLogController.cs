@@ -150,7 +150,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             };
             context.UsageLogs.Add(usageLog);
             contract.UsingBy = req.UserId;
-            contract.Status = "Active"; // Set status to Active on checkin
             context.SaveChanges();
             return Ok("Checkin thành công!");
         }
@@ -177,7 +176,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             usageLog.ProofImageEnd = req.ProofImage;
             usageLog.Distance = usageLog.OdometerEnd - usageLog.OdometerStart;
             contract.UsingBy = null;
-            contract.Status = "Available"; // Set status to Available on checkout
             context.SaveChanges();
             return Ok("Checkout thành công!");
         }
