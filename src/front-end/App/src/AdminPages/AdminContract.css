@@ -1,178 +1,268 @@
-/* ========== Tổng thể trang ========== */
-.contracts-container {
-    background: #f7f9fc;
+/* 🌟 AdminContract.css — giao diện admin hiện đại */
+
+.admin-container {
+    background: #f5f7fb;
     min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     font-family: "Inter", "Segoe UI", sans-serif;
-    color: #1f2937;
+    color: #111827;
 }
 
-.contracts-container h1 {
+/* --- Nội dung chính --- */
+.admin-content {
+    flex: 1;
+    padding: 32px 48px;
+}
+
+/* --- Tiêu đề trang --- */
+.page-header .title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     font-size: 26px;
     font-weight: 700;
-    color: #111827;
+    color: #1e293b;
+    margin-bottom: 28px;
+    letter-spacing: -0.5px;
+}
+
+.page-header .icon {
+    color: #4f46e5;
+    width: 28px;
+    height: 28px;
+}
+
+/* --- Bộ điều khiển (Search) --- */
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 24px;
-    border-bottom: 3px solid #4f46e5;
-    display: inline-block;
-    padding-bottom: 6px;
-    margin-left: 40px;
+    flex-wrap: wrap;
+    gap: 14px;
 }
 
-/* ========== Khung hợp đồng ========== */
-.contract-card {
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-    padding: 20px 28px;
-    margin-bottom: 24px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-left: 5px solid #4f46e5;
-    margin-left: 50px;
+.search-box {
+    position: relative;
+    flex: 1;
+    max-width: 420px;
 }
 
-.contract-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.15);
+.search-box .search-icon {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    width: 18px;
 }
 
-.contract-card h2 {
-    font-size: 20px;
-    color: #1e3a8a;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-/* ========== Chi tiết hợp đồng ========== */
-.contract-info p {
-    margin: 4px 0;
-    line-height: 1.6;
+.search-box input {
+    width: 100%;
+    padding: 10px 12px 10px 38px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
     font-size: 15px;
+    outline: none;
+    transition: 0.25s;
+    background-color: white;
 }
 
-.contract-info strong {
-    color: #111827;
+.search-box input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+}
+
+/* --- Lưới chính --- */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 32px;
+}
+
+@media (max-width: 900px) {
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Danh sách hợp đồng --- */
+.contract-list {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.contract-item {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f1f5f9;
+    transition: 0.2s;
+    cursor: pointer;
+}
+
+.contract-item:hover {
+    background: #f9fafb;
+}
+
+.contract-item.selected {
+    background: #eef2ff;
     font-weight: 600;
 }
 
-/* ========== Người đồng sở hữu ========== */
-.coowners {
-    background: #f3f4f6;
-    padding: 10px 16px;
-    border-radius: 8px;
-    margin-top: 8px;
+.contract-item h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #1e293b;
 }
 
-.coowners p {
-    margin: 2px 0;
-    color: #374151;
+.contract-item p {
+    margin: 4px 0;
     font-size: 14px;
+    color: #6b7280;
 }
 
-/* ========== Trạng thái hợp đồng ========== */
+/* --- Trạng thái hợp đồng --- */
 .status-active {
-    color: #059669;
+    color: #16a34a;
     font-weight: 600;
 }
 
 .status-ended {
-    color: #dc2626;
+    color: #ef4444;
     font-weight: 600;
 }
 
-/* ========== Các nút thao tác ========== */
-.actions {
-    margin-top: 14px;
+/* --- Chi tiết hợp đồng --- */
+.contract-detail {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    padding: 28px;
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    flex-direction: column;
 }
 
-.actions button {
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
+.detail-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1e293b;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.detail-title .icon {
+    width: 20px;
+    height: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.info-grid p {
+    margin: 0;
+}
+
+.info-grid strong {
+    color: #6b7280;
     font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+}
+
+.contract-detail h4 {
+    margin: 20px 0 10px 0;
+    font-size: 16px;
+    color: #1e293b;
+}
+
+.contract-detail ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.contract-detail li {
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
     font-size: 14px;
 }
 
+/* --- Nút hành động trong phần chi tiết --- */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.actions button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #e5e7eb;
+    transition: 0.25s;
+    font-weight: 500;
+}
+
 .actions button:hover {
-    transform: scale(1.05);
+    background: #d1d5db;
 }
 
-/* Màu nút */
-.btn-stop {
+.actions button:nth-child(1) {
     background: #f59e0b;
-    color: #fff;
+    color: white;
 }
 
-.btn-stop:hover {
+.actions button:nth-child(1):hover {
     background: #d97706;
 }
 
-.btn-export {
+.actions button:nth-child(2) {
     background: #3b82f6;
-    color: #fff;
+    color: white;
 }
 
-.btn-export:hover {
+.actions button:nth-child(2):hover {
     background: #2563eb;
 }
 
-.btn-edit {
-    background: #10b981;
-    color: #fff;
+.actions button:nth-child(3) {
+    background: #ef4444;
+    color: white;
 }
 
-.btn-edit:hover {
-    background: #059669;
+.actions button:nth-child(3):hover {
+    background: #dc2626;
 }
 
-.btn-delete {
-    background: #b91c1c;
-    color: #fff;
+.placeholder {
+    color: #9ca3af;
+    font-style: italic;
+    text-align: center;
+    margin-top: 60px;
+    font-size: 15px;
 }
 
-.btn-delete:hover {
-    background: #991b1b;
+.error {
+    color: #ef4444;
+    text-align: center;
+    padding: 20px;
 }
 
-/* ========== Responsive ========== */
-@media (max-width: 768px) {
-    .contracts-container {
-        padding: 16px;
-    }
-
-    .contract-card {
-        padding: 16px;
-    }
-
-    .actions {
-        flex-direction: column;
-    }
-
-    .actions button {
-        width: 100%;
-    }
-}
-
-.search-bar {
-    margin: 20px 0;
-    display: flex;
-    justify-content: center;
-}
-
-.search-bar input {
-    width: 60%;
-    padding: 10px 14px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 16px;
-    transition: all 0.2s;
-}
-
-.search-bar input:focus {
-    border-color: #4f46e5;
-    outline: none;
-    box-shadow: 0 0 4px rgba(79, 70, 229, 0.3);
+.no-result {
+    color: #9ca3af;
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
 }

@@ -1,0 +1,168 @@
+/* 🌟 AdminProfile.css — giao diện admin hiện đại */
+
+.admin-container {
+    background: #f5f7fb;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    color: #111827;
+}
+
+/* --- Nội dung chính --- */
+.admin-content {
+    flex: 1;
+    padding: 32px 48px;
+}
+
+/* --- Tiêu đề trang --- */
+.page-header .title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 26px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 28px;
+    letter-spacing: -0.5px;
+}
+
+.page-header .icon {
+    color: #4f46e5;
+    width: 28px;
+    height: 28px;
+}
+
+/* --- Chi tiết hồ sơ --- */
+.profile-detail {
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #1e293b;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.detail-title .icon {
+    width: 20px;
+    height: 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.info-grid p {
+    margin: 0;
+}
+
+.info-grid strong {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.form-grid div {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-grid label {
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.form-grid input {
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+.form-grid input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+/* --- Nút hành động --- */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.actions button {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: #e5e7eb;
+    transition: 0.25s;
+    font-weight: 500;
+}
+
+.actions button:hover {
+    background: #d1d5db;
+}
+
+.actions .save-btn {
+    background: #10b981;
+    color: white;
+}
+
+.actions .save-btn:hover {
+    background: #059669;
+}
+
+.actions .logout-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.actions .logout-btn:hover {
+    background: #dc2626;
+}
+
+.message {
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+.message:contains("thành công") {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.message:not(:contains("thành công")) {
+    background: #fee2e2;
+    color: #991b1b;
+}
