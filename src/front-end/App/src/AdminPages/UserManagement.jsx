@@ -258,16 +258,16 @@ export default function UserManagement() {
                                 {/* Ảnh giấy tờ */}
                                 <div className="image-grid">
                                     {selectedUser.cccdFront && (
-                                        <img src={selectedUser.cccdFront} alt="CCCD Trước" />
+                                        <img style={{ width: "160px", height: "90px", objectFit: "cover" }} src={`http://localhost:5170/${selectedUser.cccdFront}`} alt="CCCD Trước" />
                                     )}
                                     {selectedUser.cccdBack && (
-                                        <img src={selectedUser.cccdBack} alt="CCCD Sau" />
+                                        <img style={{ width: "160px", height: "90px", objectFit: "cover" }} src={`http://localhost:5170/${selectedUser.cccdBack}`} alt="CCCD Sau" />
                                     )}
                                     {selectedUser.licenseFront && (
-                                        <img src={selectedUser.licenseFront} alt="Bằng lái Trước" />
+                                        <img style={{ width: "160px", height: "90px", objectFit: "cover" }} src={`http://localhost:5170/${selectedUser.licenseFront}`} alt="Bằng lái Trước" />
                                     )}
                                     {selectedUser.licenseBack && (
-                                        <img src={selectedUser.licenseBack} alt="Bằng lái Sau" />
+                                        <img style={{ width: "160px", height: "90px", objectFit: "cover" }} src={`http://localhost:5170/${selectedUser.licenseBack}`} alt="Bằng lái Sau" />
                                     )}
                                 </div>
 
