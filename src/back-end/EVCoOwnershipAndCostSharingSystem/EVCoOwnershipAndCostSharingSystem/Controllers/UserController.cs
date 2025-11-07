@@ -7,6 +7,7 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using static System.IO.Directory;
 using static System.IO.File;
+using Microsoft.Identity.Client;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
 {
@@ -113,7 +114,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                     user.FullName,
                     user.Role,
                     user.Status,
-                    user.PhoneNumber
                 }
             });
         }
@@ -160,56 +160,72 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddUser([FromBody] User user)
+        public IActionResult AddUser([FromForm] RegisterRequest registerRequest)
         {
+            //Chuoi
+            string fullName = registerRequest.FullName ?? "";
+            string email = registerRequest.Email ?? "";
+            string citizenId = registerRequest.CitizenId ?? "";
+            string driverLicenseId = registerRequest.DriverLicenseId ?? "";
+            string bankName = registerRequest.BankName ?? "";
+            string bankAccount = registerRequest.BankAccount ?? "";
+            string role = registerRequest.Role ?? "";
+            string phoneNumber = registerRequest.PhoneNumber ?? "";
+            string password = registerRequest.Password ?? "";
+            //4 file anh
+            var frontIdImageFile = registerRequest.FrontIdImageFile;
+            var backIdImageFile = registerRequest.BackIdImageFile;
+            var frontLicenseImageFile = registerRequest.FrontLicenseImageFile;
+            var backLicenseImageFile = registerRequest.BackLicenseImageFile;
+            //Them nguoi dung
             _us.AddUser(
-                user.FullName,
-                user.Email,
-                user.CitizenId,
-                user.DriverLicenseId,
-                user.BankName,
-                user.BankAccount,
-                user.Role,
-                user.PhoneNumber,
-                user.Password,
-                user.FrontIdImage,
-                user.BackIdImage,
-                user.FrontLicenseImage,
-                user.BackLicenseImage
+                fullName,
+                email,
+                citizenId,
+                driverLicenseId,
+                bankName,
+                bankAccount,
+                role,
+                phoneNumber,
+                password,
+                frontIdImageFile.FileName,
+                backIdImageFile.FileName,
+                frontLicenseImageFile.FileName,
+                backLicenseImageFile.FileName
             );
-            var code = _us.GenerateEmailConfirmationCode(user.Email);
-            try
+            var code = _us.GenerateEmailConfirmationCode(email);
+            //Lay nguoi dung de lay id
+            var user = _us.GetUserByPhone(phoneNumber);
+            //Den luc xu ly anh
+            string rootFolder = "D:\\SWP391_Topic6_SE1814_G8\\src\\back-end\\EVCoOwnershipAndCostSharingSystem\\EVCoOwnershipAndCostSharingSystem\\wwwroot\\UserImages";
+            string userFolder = fullName + "-" + user.UserId;
+            string userPath = Path.Combine(rootFolder, userFolder);
+            //Tao thu muc cho nguoi dung
+            if (!Directory.Exists(userPath))
             {
-                //Chuyen doi hinh anh tu base64 sang byte[]
-                byte[] frontIdImageByte = Convert.FromBase64String(user.FrontIdImage ?? "");
-                byte[] backIdImageByte = Convert.FromBase64String(user.BackIdImage ?? "");
-                byte[] frontLicenseImageByte = Convert.FromBase64String(user.FrontLicenseImage ?? "");
-                byte[] backLicenseImageByte = Convert.FromBase64String(user.BackLicenseImage ?? "");
-                //Tao 1 thu muc con de luu hinh anh nguoi dung
-                //Duoc luu trong o D theo duong dan la D:\\UserImages
-                string subfolderName = user.FullName + " - " + user.UserId;
-                string folderPath = "D:\\UserImages\\" + subfolderName;
-                CreateDirectory(folderPath);
-                //Tạo tên ảnh 
-                string frontIdImageName = "FrontIdImage_" + user.FullName + ".jpg";
-                string backIdImageName = "BackIdImage_" + user.FullName + ".jpg";
-                string frontLicenseImageName = "FrontLicenseImage_" + user.FullName + ".jpg";
-                string backLicenseImageName = "BackLicenseImage_" + user.FullName + ".jpg";
-                //Tạo đường dẫn đầy đủ cho từng ảnh
-                string frontIdImagePath = Path.Combine(folderPath, frontIdImageName);
-                string backIdImagePath = Path.Combine(folderPath, backIdImageName);
-                string frontLicenseImagePath = Path.Combine(folderPath, frontLicenseImageName);
-                string backLicenseImagePath = Path.Combine(folderPath, backLicenseImageName);
-                //Ghi byte[] vào file
-                WriteAllBytes(frontIdImagePath, frontIdImageByte);
-                WriteAllBytes(backIdImagePath, backIdImageByte);
-                WriteAllBytes(frontLicenseImagePath, frontLicenseImageByte);
-                WriteAllBytes(backLicenseImagePath, backLicenseImageByte);
+                CreateDirectory(userPath);
             }
-            catch (Exception ex)
+            //Luu anh vao thu muc nguoi dung
+            var frontIdImagePath = Path.Combine(userPath, frontIdImageFile.FileName);
+            using (var stream = new FileStream(frontIdImagePath, FileMode.Create))
             {
-                return BadRequest("Error saving images: " + ex.Message);
+                frontIdImageFile.CopyTo(stream);
             }
+            var backIdImagePath = Path.Combine(userPath, backIdImageFile.FileName);
+            using (var stream = new FileStream(backIdImagePath, FileMode.Create))
+            {
+                backIdImageFile.CopyTo(stream);
+            }
+            var frontLicenseImagePath = Path.Combine(userPath, frontLicenseImageFile.FileName);
+            using (var stream = new FileStream(frontLicenseImagePath, FileMode.Create))
+            {
+                frontLicenseImageFile.CopyTo(stream);
+            }
+            var backLicenseImagePath = Path.Combine(userPath, backLicenseImageFile.FileName);
+            using (var stream = new FileStream(backLicenseImagePath, FileMode.Create))
+            {
+                backLicenseImageFile.CopyTo(stream);
+            }           
             return Ok("User added successfully. Please check your email to confirm.");
         }
 
@@ -283,4 +299,3 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         }
     }
 }
-
