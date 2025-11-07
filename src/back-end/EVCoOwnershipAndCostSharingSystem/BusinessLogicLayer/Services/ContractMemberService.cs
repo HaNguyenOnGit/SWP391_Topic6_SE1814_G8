@@ -74,7 +74,7 @@ namespace BusinessLogicLayer.Services
                             <p>Hãy sẵn sàng sử dụng số tiền đang có để cống hiến cho người mua xe</p>
                             <p>Xài ké mà đòi chủ xe phải trả hết à</p>
                             <p>Trân trọng,<br><b>EVCO System</b></p>
-                            <p><a href =""https://localhost:5173/contractVerify/{contractId}"">Bấm vào đây để verify</a></p>";
+                            <p><a href =""http://localhost:5173/contractVerify/{contractId}"">Bấm vào đây để verify</a></p>";
             try
             {
                 await _es.SendEmailAsync(member.Email, subject, body);
