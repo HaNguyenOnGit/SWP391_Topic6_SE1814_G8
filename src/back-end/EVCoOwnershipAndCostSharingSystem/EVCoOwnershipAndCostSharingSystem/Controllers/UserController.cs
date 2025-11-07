@@ -188,14 +188,18 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 role,
                 phoneNumber,
                 password,
-                frontIdImageFile.FileName,
-                backIdImageFile.FileName,
-                frontLicenseImageFile.FileName,
-                backLicenseImageFile.FileName
+                "", // tạm thời để trống, sẽ update sau
+                "",
+                "",
+                ""
             );
             var code = _us.GenerateEmailConfirmationCode(email);
             //Lay nguoi dung de lay id
             var user = _us.GetUserByPhone(phoneNumber);
+            if (user == null)
+            {
+                return BadRequest("User not found after registration.");
+            }
             //Den luc xu ly anh
             string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserImages");
             string userFolder = fullName + "-" + user.UserId;
@@ -205,27 +209,48 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             {
                 CreateDirectory(userPath);
             }
-            //Luu anh vao thu muc nguoi dung
-            var frontIdImagePath = Path.Combine(userPath, frontIdImageFile.FileName);
-            using (var stream = new FileStream(frontIdImagePath, FileMode.Create))
+            //Luu anh vao thu muc nguoi dung và cập nhật đường dẫn
+            string relativeBase = "UserImages/" + userFolder + "/";
+            if (frontIdImageFile != null)
             {
-                frontIdImageFile.CopyTo(stream);
+                var frontIdImagePath = Path.Combine(userPath, frontIdImageFile.FileName);
+                using (var stream = new FileStream(frontIdImagePath, FileMode.Create))
+                {
+                    frontIdImageFile.CopyTo(stream);
+                }
+                user.FrontIdImage = relativeBase + frontIdImageFile.FileName;
             }
-            var backIdImagePath = Path.Combine(userPath, backIdImageFile.FileName);
-            using (var stream = new FileStream(backIdImagePath, FileMode.Create))
+            if (backIdImageFile != null)
             {
-                backIdImageFile.CopyTo(stream);
+                var backIdImagePath = Path.Combine(userPath, backIdImageFile.FileName);
+                using (var stream = new FileStream(backIdImagePath, FileMode.Create))
+                {
+                    backIdImageFile.CopyTo(stream);
+                }
+                user.BackIdImage = relativeBase + backIdImageFile.FileName;
             }
-            var frontLicenseImagePath = Path.Combine(userPath, frontLicenseImageFile.FileName);
-            using (var stream = new FileStream(frontLicenseImagePath, FileMode.Create))
+            if (frontLicenseImageFile != null)
             {
-                frontLicenseImageFile.CopyTo(stream);
+                var frontLicenseImagePath = Path.Combine(userPath, frontLicenseImageFile.FileName);
+                using (var stream = new FileStream(frontLicenseImagePath, FileMode.Create))
+                {
+                    frontLicenseImageFile.CopyTo(stream);
+                }
+                user.FrontLicenseImage = relativeBase + frontLicenseImageFile.FileName;
             }
-            var backLicenseImagePath = Path.Combine(userPath, backLicenseImageFile.FileName);
-            using (var stream = new FileStream(backLicenseImagePath, FileMode.Create))
+            if (backLicenseImageFile != null)
             {
-                backLicenseImageFile.CopyTo(stream);
+                var backLicenseImagePath = Path.Combine(userPath, backLicenseImageFile.FileName);
+                using (var stream = new FileStream(backLicenseImagePath, FileMode.Create))
+                {
+                    backLicenseImageFile.CopyTo(stream);
+                }
+                user.BackLicenseImage = relativeBase + backLicenseImageFile.FileName;
             }
+            // Lưu thay đổi vào DB
+            var context = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            context.Users.Update(user);
+            context.SaveChanges();
             return Ok("User added successfully. Please check your email to confirm.");
         }
 

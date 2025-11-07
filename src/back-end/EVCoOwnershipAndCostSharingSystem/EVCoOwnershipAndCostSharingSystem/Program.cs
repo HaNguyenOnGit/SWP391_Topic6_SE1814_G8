@@ -69,6 +69,8 @@ namespace EVCoOwnershipAndCostSharingSystem
 
             app.UseHttpsRedirection();
 
+            app.UseStaticFiles();
+
             app.UseAuthentication();
             app.UseAuthorization();
 
