@@ -107,7 +107,7 @@ export default function LoginPage({ apiUrl }) {
                 navigate('/vehicles');
             }
         } catch (err) {
-            setMessage(err.message);
+            setMessage("Số điện thoại hoặc mật khẩu không đúng!");
         } finally {
             setLoading(false);
         }
@@ -117,7 +117,6 @@ export default function LoginPage({ apiUrl }) {
         <div className="login-page">
             <form onSubmit={handleSubmit} noValidate>
                 <h2>Đăng Nhập</h2>
-                {message && <p>{message}</p>}
 
                 <div style={{ marginBottom: "10px" }}>
                     <label>Số điện thoại</label>
@@ -158,6 +157,8 @@ export default function LoginPage({ apiUrl }) {
                         <p style={{ color: "red", fontSize: "12px" }}>{errors.password}</p>
                     )}
                 </div>
+
+                {message && <p style={{ color: "red", marginBottom: "10px" }}>{message}</p>}
 
                 <button
                     type="submit"

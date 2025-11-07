@@ -143,38 +143,25 @@ export default function RegistrationForm() {
       }
 
       try {
-        const toBase64 = (file) =>
-          new Promise((resolve, reject) => {
-            if (!file) return resolve("");
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(",")[1]);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
+        const data = new FormData();
+        data.append('FullName', formData.fullName);
+        data.append('Email', formData.email);
+        data.append('CitizenId', formData.cccd);
+        data.append('DriverLicenseId', formData.license);
+        data.append('BankName', formData.bankName);
+        data.append('BankAccount', formData.bankNumber);
+        data.append('Role', 'Co-owner');
+        data.append('PhoneNumber', formData.phone);
+        data.append('Password', formData.password);
 
-        const frontIdImage = await toBase64(formData.cccdFront);
-        const backIdImage = await toBase64(formData.cccdBack);
-        const frontLicenseImage = await toBase64(formData.licenseFront);
-        const backLicenseImage = await toBase64(formData.licenseBack);
+        if (formData.cccdFront) data.append('FrontIdImageFile', formData.cccdFront);
+        if (formData.cccdBack) data.append('BackIdImageFile', formData.cccdBack);
+        if (formData.licenseFront) data.append('FrontLicenseImageFile', formData.licenseFront);
+        if (formData.licenseBack) data.append('BackLicenseImageFile', formData.licenseBack);
 
-        const payload = {
-          fullName: formData.fullName,
-          email: formData.email,
-          citizenId: formData.cccd,
-          driverLicenseId: formData.license,
-          bankName: formData.bankName,
-          bankAccount: formData.bankNumber,
-          role: "Co-owner",
-          phoneNumber: formData.phone,
-          password: formData.password,
-          status: "Pending",
-          frontIdImage,
-          backIdImage,
-          frontLicenseImage,
-          backLicenseImage,
-        };
-
-        const res = await axios.post("/api/user/add", payload);
+        const res = await axios.post("/api/user/add", data, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
 
         console.log("Register response:", res.data);
         setShowOTP(true);
