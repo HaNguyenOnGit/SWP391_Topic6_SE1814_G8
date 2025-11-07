@@ -1,5 +1,3 @@
-@import "tailwindcss";
-
 * {
     font-family: "Inter", sans-serif;
     margin: 0;
@@ -14,9 +12,9 @@ html {
 }
 
 body {
-    background-color: #D9D9D9;
     padding: 30px;
     height: 100%;
+    background-color: #D9D9D9;
 }
 
 a {
@@ -40,16 +38,17 @@ a {
 
 .navigate a.active {
     font-weight: 700;
-    border: 1px solid #000;
+    border: none;
 }
 
 .navigate a:hover {
-    border-color: #000;
+    color: #0F6CAE;
+    border: none;
 }
 
 /* Giúp active luôn rõ ràng, không bị hover đè lên */
 .navigate a.active:hover {
-    border-color: #000;
+    border: none;
 }
 
 .username {
@@ -79,30 +78,89 @@ a {
     margin: 15px;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .navigate a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.18s ease, transform 0.18s ease;
+    white-space: nowrap;
+    box-sizing: border-box;
     padding: 10px 5px 10px 5px;
     font-size: 18pt;
-    border: 1px solid transparent;
+    border: none;
     transition: border-color 0.2s ease, color 0.2s ease;
+    position: relative;
+    z-index: 10;
+    /* used only for the animated underline - does not change size */
 }
 
-.navigate a:hover {
-    border-color: #000000;
+/* Animated underline that appears on hover/active/focus */
+.navigate a::after {
+    content: "";
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 6px;
+    height: 3px;
+    width: 0;
+    background: linear-gradient(90deg, #0F6CAE, #8CC8E7);
+    border-radius: 3px;
+    transition: width 0.22s cubic-bezier(.2, .8, .2, 1), opacity 0.18s ease;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.navigate a:hover::after,
+.navigate a:focus-visible::after,
+.navigate a.active::after {
+    width: calc(100% - 16px);
+    opacity: 1;
+}
+
+.nav-icon {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #2c035e;
+    transition: transform 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+    opacity: 0.95;
+    line-height: 1;
+    will-change: transform, opacity;
+}
+
+.navigate a:hover .nav-icon,
+.navigate a:focus-visible .nav-icon {
+    transform: translateX(-6px) scale(1.06);
+    filter: drop-shadow(0 2px 4px rgba(15, 108, 174, 0.18));
+    opacity: 1;
+}
+
+.navigate a:hover,
+.navigate a:focus-visible {
+    color: #0F6CAE;
 }
 
 .navigate a.active {
     font-weight: 700;
-    border: 1px solid #000;
+    color: #0F6CAE;
+    border: none;
 }
 
-.navigate a:hover {
-    border-color: #000;
+.navigate a.active .nav-icon {
+    transform: scale(1.06);
+    filter: drop-shadow(0 2px 6px rgba(15, 108, 174, 0.22));
+    color: #0F6CAE;
 }
 
-.navigate a.active:hover {
-    border-color: #000;
+.menu-btn svg {
+    width: 22px;
+    height: 22px;
 }
 
 .color-box {
@@ -406,6 +464,32 @@ a {
     margin-top: 40px;
 }
 
+/* Icon visuals and subtle interactions (keeps overall navbar size unchanged) */
+.nav-icon svg,
+.nav-icon img {
+    width: 18px;
+    height: 18px;
+    display: block;
+    flex: 0 0 18px;
+    transition: transform 0.18s ease, filter 0.18s ease, opacity 0.18s ease;
+}
+
+/* Small label movement to emphasize hover without changing element size */
+.navigate a .nav-label {
+    transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.navigate a:hover .nav-label {
+    transform: translateX(2px);
+}
+
+@media (max-width: 1048px) {
+    .navigate a::after {
+        bottom: 4px;
+        left: 6px;
+        right: 6px;
+    }
+}
 
 @media (max-width: 1048px) {
 
@@ -525,6 +609,11 @@ a {
     }
 
     .nvbr-overlay a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        transition: transform 0.18s ease, color 0.18s ease;
+        white-space: nowrap;
         font-size: 18px;
         color: black;
     }
@@ -567,5 +656,108 @@ a {
     .vehicle-info span {
         font-size: 12pt;
         margin-bottom: 10px;
+    }
+}
+
+/* Vehicles page: card hover, chevron animation, icon sizing/colors */
+.vehicle-card {
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    will-change: transform, box-shadow;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.vehicle-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 6px 10px 24px rgba(32, 41, 61, 0.12);
+    border-color: rgba(15, 108, 174, 0.12);
+}
+
+.vehicle-card:active {
+    transform: translateY(-2px) scale(1.01);
+}
+
+.vehicle-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-bottom: 8px;
+}
+
+.vehicle-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.vehicle-card-title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #1b0033;
+}
+
+/* Chevron animation and styling */
+.chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(0, 0, 0, 0.45);
+    transition: transform 0.18s cubic-bezier(.2, .8, .2, 1), color 0.18s ease;
+}
+
+.vehicle-card:hover .chevron {
+    transform: translateX(8px) rotate(18deg);
+    color: rgba(15, 108, 174, 0.95);
+}
+
+.vehicle-card:focus-within .chevron {
+    transform: translateX(6px);
+}
+
+/* Icon sizing and color tweaks */
+.vehicle-card .nav-icon svg,
+.nav-icon.title-icon svg,
+.nav-icon.create-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.nav-icon.title-icon svg {
+    width: 22px;
+    height: 22px;
+    color: #0F6CAE;
+}
+
+.nav-icon.create-icon svg {
+    width: 20px;
+    height: 20px;
+    color: #2e7d32;
+    /* green-ish for create */
+}
+
+.vehicle-card .nav-icon svg {
+    color: #2c035e;
+    /* default vehicle icon color */
+}
+
+/* Ensure link focus is visible and card remains same size */
+.vehicle-card:focus,
+.vehicle-card a:focus,
+.vehicle-card:focus-within {
+    outline: 3px solid rgba(15, 108, 174, 0.12);
+    outline-offset: 2px;
+}
+
+/* Small responsive tweak to keep chevron visible */
+@media (max-width: 520px) {
+    .vehicle-card-title {
+        font-size: 18px;
+    }
+
+    .chevron {
+        transform: none;
     }
 }

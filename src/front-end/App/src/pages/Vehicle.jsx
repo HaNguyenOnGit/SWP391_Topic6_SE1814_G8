@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../NavBar";
 import { useParams, Link } from "react-router-dom";
+import { FaCalendarAlt, FaDoorOpen, FaFileInvoiceDollar, FaExclamationCircle, FaMoneyBillWave, FaHistory, FaChevronLeft } from "react-icons/fa";
 import VehicleInfo from "../VehicleInfo";
 import "./Vehicle.css";
 import axios from "axios";
@@ -75,12 +76,12 @@ export default function Vehicle() {
     if (!vehicle) return <h2>Đang tải dữ liệu...</h2>;
 
     const actions = [
-        { name: "Đặt lịch", path: `/vehicle/${id}/schedule` },
-        { name: "Check-in/out", path: `/vehicle/${id}/checkinHistory` },
-        { name: "Thông tin chi phí", path: `/vehicle/${id}/costs` },
-        { name: "Đề xuất khoản chi", path: `/vehicle/${id}/proposal` },
-        { name: "Thanh toán", path: `/vehicle/${id}/payment` },
-        { name: "Lịch sử", path: `/vehicle/${id}/history` },
+        { name: "Đặt lịch", path: `/vehicle/${id}/schedule`, icon: FaCalendarAlt },
+        { name: "Check-in/out", path: `/vehicle/${id}/checkinHistory`, icon: FaDoorOpen },
+        { name: "Thông tin chi phí", path: `/vehicle/${id}/costs`, icon: FaFileInvoiceDollar },
+        { name: "Đề xuất khoản chi", path: `/vehicle/${id}/proposal`, icon: FaExclamationCircle },
+        { name: "Thanh toán", path: `/vehicle/${id}/payment`, icon: FaMoneyBillWave },
+        { name: "Lịch sử", path: `/vehicle/${id}/history`, icon: FaHistory },
     ];
 
     // Nếu hợp đồng bị chờ kích hoạt hoặc hủy → chỉ hiển thị thông báo
@@ -104,11 +105,17 @@ export default function Vehicle() {
                         </div>
                     ) : (
                         <div className="action-menu">
-                            {actions.map((action, idx) => (
-                                <div key={idx} className="action-item">
-                                    <Link to={action.path}>{action.name}</Link>
-                                </div>
-                            ))}
+                            {actions.map((action, idx) => {
+                                const Icon = action.icon;
+                                return (
+                                    <div key={idx} className="action-item">
+                                        <Link to={action.path} className="action-link">
+                                            <span className="nav-icon"><Icon /></span>
+                                            <span className="action-label">{action.name}</span>
+                                        </Link>
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
                 </div>

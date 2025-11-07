@@ -74,3 +74,25 @@
         width: 300px;
     }
 }
+
+/* ========================= */
+/*        ICON TRONG MENU    */
+/* ========================= */
+.nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-size: 22px;
+    /* kích thước dễ nhìn, không phá layout */
+    color: #0f6cae;
+    /* màu nhấn đồng bộ với theme */
+    transition: transform 0.2s ease, color 0.2s ease;
+    vertical-align: middle;
+}
+
+/* Hiệu ứng nhẹ khi hover vào toàn bộ link */
+.action-link:hover .nav-icon {
+    color: #3498db;
+    transform: scale(1.1);
+}
