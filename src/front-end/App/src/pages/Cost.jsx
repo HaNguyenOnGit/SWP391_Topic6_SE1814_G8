@@ -17,6 +17,25 @@ export default function CostDetail() {
     const [error, setError] = useState("");
     const [isAnimating, setIsAnimating] = useState(false);
 
+    const translateAllocationRule = (rule) => {
+        if (!rule) return "";
+        const r = String(rule).toLowerCase();
+        switch (r) {
+            case "byshare":
+            case "byshare":
+                return "Theo tỉ lệ sở hữu";
+            case "selfpaid":
+            case "self_paid":
+            case "selfpaid":
+                return "Tự trả";
+            case "byshareplus":
+            case "byshare_plus":
+                return "Theo tỉ lệ + cố định";
+            default:
+                return rule;
+        }
+    };
+
     const reloadExpenses = async () => {
         try {
             const res = await axios.get(`/api/payment/contract/${id}/user/${userId}/user-expenses`);
@@ -130,7 +149,7 @@ export default function CostDetail() {
                                     {selectedExpense.detail.expenseName}
                                 </h4>
                                 <p className="cost-detail-desc">
-                                    {selectedExpense.detail.allocationRule}
+                                    {translateAllocationRule(selectedExpense.detail.allocationRule)}
                                 </p>
 
                                 <div className="cost-total">

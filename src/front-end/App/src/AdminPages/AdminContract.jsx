@@ -20,6 +20,7 @@ export default function AdminContracts() {
             try {
                 const res = await axios.get("/api/contract/contractListSummary");
                 const data = res.data;
+                data.reverse(); // Đảo ngược để hiển thị contract mới trước
                 setContracts(
                     Array.isArray(data)
                         ? data.map((c) => ({

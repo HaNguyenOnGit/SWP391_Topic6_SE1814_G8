@@ -16,6 +16,50 @@ export default function ProposalList() {
     const [selected, setSelected] = useState(null);
     const [detail, setDetail] = useState(null);
 
+    // Mapping helper (display-only)
+    const translateAllocationRule = (rule) => {
+        if (!rule) return "";
+        const r = String(rule).toLowerCase();
+        switch (r) {
+            case "byshare":
+            case "byshare":
+            case "byshare":
+                return "Theo tỉ lệ sở hữu";
+            case "selfpaid":
+            case "self_paid":
+            case "selfpaid":
+                return "Tự trả";
+            case "byshareplus":
+            case "byshare_plus":
+                return "Theo tỉ lệ + cố định";
+            default:
+                // Accept already-localized strings as passthrough
+                return rule;
+        }
+    };
+
+    const translateProposalStatus = (s) => {
+        if (!s) return "";
+        const st = String(s).toLowerCase();
+        switch (st) {
+            case "approved": return "Hoàn thành";
+            case "rejected": return "Đã bị từ chối";
+            case "pending": return "Đang chờ";
+            default: return s;
+        }
+    };
+
+    const translateVote = (v) => {
+        if (!v) return "";
+        const vt = String(v).toLowerCase();
+        switch (vt) {
+            case "pending": return "Đang chờ";
+            case "accepted": return "Đã chấp thuận";
+            case "rejected": return "Đã từ chối";
+            default: return v;
+        }
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -126,7 +170,7 @@ export default function ProposalList() {
                                             >
                                                 <div className="proposal-info">
                                                     <strong>{p.description ?? "Không có mô tả"}</strong>
-                                                    <div className="proposal-meta">{p.allocationRule ?? p.AllocationRule}</div>
+                                                    <div className="proposal-meta">{translateAllocationRule(p.allocationRule ?? p.AllocationRule)}</div>
                                                     <div className="proposal-meta">{p.proposedBy ?? p.ProposedBy}</div>
                                                 </div>
                                                 <div>
@@ -161,7 +205,7 @@ export default function ProposalList() {
                                                                     : "status-pending"
                                                                 }`}
                                                         >
-                                                            {p.status === "Approved" ? "Hoàn thành" : p.status}
+                                                            {translateProposalStatus(p.status)}
                                                         </span>
                                                     )}
                                                 </div>
@@ -186,7 +230,7 @@ export default function ProposalList() {
                                             {detail.proposal?.expectedAmount?.toLocaleString("vi-VN") ?? "-"} ₫
                                         </div>
                                         <div>
-                                            <strong>Cách chia:</strong> {detail.proposal?.allocationRule ?? "-"}
+                                            <strong>Cách chia:</strong> {translateAllocationRule(detail.proposal?.allocationRule ?? "-")}
                                         </div>
                                         <div>
                                             <strong>Mô tả:</strong> {detail.proposal?.description ?? "-"}
@@ -195,7 +239,7 @@ export default function ProposalList() {
                                             <strong>Người đề xuất:</strong> {detail.proposal?.proposedBy ?? "-"}
                                         </div>
                                         <div>
-                                            <strong>Trạng thái:</strong> {detail.proposal?.status ?? "-"}
+                                            <strong>Trạng thái:</strong> {translateProposalStatus(detail.proposal?.status ?? "-")}
                                         </div>
                                         <div>
                                             <strong>Danh sách thành viên & chi tiết chi phí:</strong>
@@ -217,7 +261,7 @@ export default function ProposalList() {
                                                                 <td>{a.fullName}</td>
                                                                 <td>{a.payPercent}</td>
                                                                 <td>{a.amount?.toLocaleString("vi-VN")}</td>
-                                                                <td>{a.vote}</td>
+                                                                <td>{translateVote(a.vote)}</td>
                                                                 <td>
                                                                     {isCurrentUser && a.vote === "Pending" ? (
                                                                         <>

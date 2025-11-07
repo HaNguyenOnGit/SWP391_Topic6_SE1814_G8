@@ -20,6 +20,7 @@ export default function UsageHistory() {
             try {
                 const res = await axios.get(`/api/payment/user/${userId}/all-settlements`);
                 const data = res.data || [];
+                data.reverse(); // Đảo ngược để hiển thị mới trước
 
                 // ✅ Nhóm các thanh toán theo contractName
                 const grouped = data.reduce((acc, item) => {

@@ -21,7 +21,9 @@ export default function Notification() {
         const fetchContracts = async () => {
             try {
                 const res = await axios.get(`/api/contract/user-contracts/${userId}`);
-                setContracts(res.data || []);
+                const data = res.data || [];
+                data.reverse(); // Đảo ngược để hiển thị contract mới trước
+                setContracts(data);
             } catch (err) {
                 console.error("Lỗi khi tải hợp đồng:", err);
                 setError("Không thể tải thông tin hợp đồng.");

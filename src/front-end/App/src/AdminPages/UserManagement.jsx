@@ -67,6 +67,7 @@ export default function UserManagement() {
                 const res = await fetch(`${API_BASE}/api/user/all`);
                 if (!res.ok) throw new Error(await res.text());
                 const data = await res.json();
+                data.reverse(); // Đảo ngược để hiển thị user mới trước
                 setUsers(Array.isArray(data) ? data.map(mapUserFromApi) : []);
             } catch (e) {
                 setError(e.message || "Đã có lỗi xảy ra");
