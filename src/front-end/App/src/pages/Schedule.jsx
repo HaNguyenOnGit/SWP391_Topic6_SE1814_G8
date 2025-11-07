@@ -3,7 +3,7 @@ import Navbar from "../NavBar";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
-import "../index.css";
+import { FaCar, FaChevronRight, FaPlusCircle } from "react-icons/fa";
 
 export default function Schedule() {
     const { userId } = useAuth();
@@ -18,7 +18,7 @@ export default function Schedule() {
     }, [userId]);
 
     const getStatusClass = (status) => {
-        switch (status?.toLowerCase()) {
+        switch (status.toLowerCase()) {
             case "active": return "using";
             case "available": return "free";
             case "pending": return "inactive";
@@ -27,11 +27,11 @@ export default function Schedule() {
     };
 
     const translateStatus = (status) => {
-        switch (status?.toLowerCase()) {
+        switch (status.toLowerCase()) {
             case "active": return "Đang sử dụng";
             case "available": return "Đang trống";
             case "pending": return "Chờ kích hoạt";
-            default: return status || "";
+            default: return status;
         }
     };
 
@@ -39,18 +39,25 @@ export default function Schedule() {
         <div className="main-container">
             <Navbar username="Username" />
             <div className="main-content">
-                <h1 className="vehicle-title">Phương tiện của bạn</h1>
-                <Link to="/newContract">Tạo hợp đồng →</Link>
+                <h1 className="vehicle-title"><span className="nav-icon title-icon"><FaCar /></span> Phương tiện của bạn</h1>
+                <Link to="/newContract"><span className="nav-icon create-icon"><FaPlusCircle /></span> Tạo hợp đồng</Link>
 
                 <div className="vehicle-list">
                     {vehicles.length > 0 ? (
                         vehicles.map((v) => (
                             <Link
                                 key={v.contractId}
-                                to={`/vehicle/${v.contractId}/schedule`}
+                                to={`/vehicle/${v.contractId}`}
                                 className="vehicle-card"
                             >
-                                <h3>{v.vehicleName}</h3>
+                                <div className="vehicle-card-header">
+                                    <div className="vehicle-card-left">
+                                        <span className="nav-icon"><FaCar /></span>
+                                        <h3 className="vehicle-card-title">{v.vehicleName}</h3>
+                                    </div>
+                                    <span className="chevron"><FaChevronRight /></span>
+                                </div>
+
                                 <div className={`status ${getStatusClass(v.status)}`}>
                                     {translateStatus(v.status)}
                                 </div>

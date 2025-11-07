@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import axios from "axios";
+import { FileText, Search } from "lucide-react";
 import AdminNavbar from "./ANavbar";
 import "./AdminContract.css";
 
@@ -7,10 +8,7 @@ export default function AdminContracts() {
     const [contracts, setContracts] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [expandedId, setExpandedId] = useState(null);
-    const [detailLoading, setDetailLoading] = useState(false);
-    const [contractDetail, setContractDetail] = useState(null);
-    // Fix: Add missing search state
+    const [selectedContract, setSelectedContract] = useState(null);
     const [search, setSearch] = useState("");
 
     useEffect(() => {
@@ -28,7 +26,7 @@ export default function AdminContracts() {
                             vehicle: {
                                 name: c.model,
                                 license: c.licensePlate,
-                                model: "", // If you want to show model year, add it to API
+                                model: "",
                             },
                             owners: c.memberSummaries.map((m) => ({
                                 fullName: m.fullName,
@@ -49,26 +47,6 @@ export default function AdminContracts() {
         fetchContracts();
     }, []);
 
-    const handleExpand = async (id) => {
-        if (expandedId === id) {
-            setExpandedId(null);
-            setContractDetail(null);
-            return;
-        }
-        setExpandedId(id);
-        setDetailLoading(true);
-        setContractDetail(null);
-        try {
-            const res = await axios.get(`/api/contract/contract-detail/${id}`);
-            setContractDetail(res.data);
-        } catch (e) {
-            setContractDetail({ error: e.message || "Không tải được chi tiết hợp đồng" });
-        } finally {
-            setDetailLoading(false);
-        }
-    };
-
-    // 🧠 Lọc hợp đồng theo từ khóa
     const filteredContracts = useMemo(() => {
         const keyword = search.trim().toLowerCase();
         if (!keyword) return contracts;
@@ -89,7 +67,6 @@ export default function AdminContracts() {
         });
     }, [contracts, search]);
 
-    // Gọi API dừng hợp đồng
     const handlePauseContract = async (id) => {
         if (!window.confirm("Bạn có chắc muốn dừng hợp đồng này?")) return;
         try {
@@ -117,113 +94,111 @@ export default function AdminContracts() {
     };
 
     return (
-        <div className="contracts-container">
+        <div className="admin-container">
             <AdminNavbar adminName="Admin" />
 
-            <h1>Quản lý hợp đồng</h1>
+            <main className="admin-content">
+                <header className="page-header">
+                    <h1 className="title">
+                        <FileText className="icon" /> Quản lý hợp đồng
+                    </h1>
+                </header>
 
-            {/* 🔍 Ô tìm kiếm */}
-            <div className="search-bar">
-                <input
-                    type="text"
-                    placeholder="Tìm theo tên xe, biển số hoặc người sở hữu..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-            </div>
+                <section className="controls">
+                    <div className="search-box">
+                        <Search className="search-icon" />
+                        <input
+                            type="text"
+                            placeholder="Tìm theo tên xe, biển số hoặc người sở hữu..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                        />
+                    </div>
+                </section>
 
-            {/* 📄 Danh sách hợp đồng */}
-            {loading ? (
-                <p>Đang tải hợp đồng...</p>
-            ) : error ? (
-                <p className="error">{error}</p>
-            ) : filteredContracts.length > 0 ? (
-                filteredContracts.map((c) => (
-                    <div key={c.id} className={`contract-card${expandedId === c.id ? " expanded" : ""}`}>
-                        <div className="contract-info" onClick={() => handleExpand(c.id)} style={{ cursor: "pointer" }}>
-                            <h2>Hợp đồng #{c.id}</h2>
-                            <p>
-                                <strong>Xe:</strong> {c.vehicle.name} ({c.vehicle.license})
-                            </p>
-                            {/* Nếu có model year, hiển thị ở đây */}
-                            {/* <p><strong>Năm SX:</strong> {c.vehicle.model}</p> */}
-                            <p>
-                                <strong>Ngày tạo:</strong> {c.createDate}
-                            </p>
-                        </div>
-
-                        <div className="coowners">
-                            <p>
-                                <strong>Người đồng sở hữu:</strong>
-                            </p>
-                            {c.owners.map((o, i) => (
-                                <p key={i}>
-                                    - {o.fullName} ({o.phone}) ({o.ratio}%)
-                                </p>
-                            ))}
-                        </div>
-
-                        <p>
-                            <strong>Trạng thái:</strong>{" "}
-                            <span
-                                className={
-                                    c.status === "Đã kết thúc" ? "status-ended" : "status-active"
-                                }
-                            >
-                                {c.status}
-                            </span>
-                        </p>
-
-                        <div className="actions">
-                            <button
-                                onClick={() => handlePauseContract(c.id)}
-                                className="btn-stop"
-                            >
-                                Dừng hợp đồng
-                            </button>
-                            <button className="btn-export">Trích xuất chi tiêu</button>
-                            <button
-                                onClick={() => handleDeleteContract(c.id)}
-                                className="btn-delete"
-                            >
-                                Xóa
-                            </button>
-                        </div>
-
-                        {/* Chi tiết hợp đồng mở rộng */}
-                        {expandedId === c.id && (
-                            <div className="contract-detail">
-                                {detailLoading ? (
-                                    <p>Đang tải chi tiết hợp đồng...</p>
-                                ) : contractDetail && contractDetail.error ? (
-                                    <p className="error">{contractDetail.error}</p>
-                                ) : contractDetail ? (
-                                    <>
-                                        <h3>Chi tiết hợp đồng</h3>
-                                        <p><strong>Tên xe:</strong> {contractDetail.vehicleName}</p>
-                                        <p><strong>Model:</strong> {contractDetail.model}</p>
-                                        <p><strong>Biển số:</strong> {contractDetail.licensePlate}</p>
-                                        <p><strong>Ngày bắt đầu:</strong> {contractDetail.startDate}</p>
-                                        <p><strong>Trạng thái:</strong> {contractDetail.status}</p>
-                                        <h4>Thành viên</h4>
-                                        <ul>
-                                            {contractDetail.members.map((m) => (
-                                                <li key={m.userId}>
-                                                    {m.fullName} ({m.phoneNumber}) - {m.sharePercent}%
-                                                    <br />
-                                                    Trạng thái: {m.status} | Tham gia: {m.joinedAt}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </>
-                                ) : null}
-                            </div>
+                <section className="main-grid">
+                    <div className="contract-list">
+                        {loading ? (
+                            <p>Đang tải hợp đồng...</p>
+                        ) : error ? (
+                            <p className="error">{error}</p>
+                        ) : filteredContracts.length > 0 ? (
+                            filteredContracts.map((c) => (
+                                <div
+                                    key={c.id}
+                                    className={`contract-item ${selectedContract?.id === c.id ? "selected" : ""}`}
+                                    onClick={() => setSelectedContract(c)}
+                                >
+                                    <h3>Hợp đồng #{c.id}</h3>
+                                    <p>Xe: {c.vehicle.name} ({c.vehicle.license})</p>
+                                    <p>Ngày tạo: {c.createDate}</p>
+                                    <p>
+                                        Trạng thái:{" "}
+                                        <span
+                                            className={
+                                                c.status === "Đã kết thúc" ? "status-ended" : "status-active"
+                                            }
+                                        >
+                                            {c.status}
+                                        </span>
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="no-result">Không tìm thấy hợp đồng phù hợp.</p>
                         )}
                     </div>
-                ))
-            ) : (
-                <p className="no-result">Không tìm thấy hợp đồng phù hợp.</p>
-            )}
+
+                    <div className="contract-detail">
+                        {selectedContract ? (
+                            <>
+                                <h2 className="detail-title">
+                                    <FileText className="icon" /> Chi tiết hợp đồng
+                                </h2>
+
+                                <div className="info-grid">
+                                    <p><strong>ID:</strong> {selectedContract.id}</p>
+                                    <p><strong>Xe:</strong> {selectedContract.vehicle.name} ({selectedContract.vehicle.license})</p>
+                                    <p><strong>Ngày tạo:</strong> {selectedContract.createDate}</p>
+                                    <p>
+                                        <strong>Trạng thái:</strong>{" "}
+                                        <span
+                                            className={
+                                                selectedContract.status === "Đã kết thúc" ? "status-ended" : "status-active"
+                                            }
+                                        >
+                                            {selectedContract.status}
+                                        </span>
+                                    </p>
+                                </div>
+
+                                <h4>Thành viên</h4>
+                                <ul>
+                                    {selectedContract.owners.map((o, i) => (
+                                        <li key={i}>
+                                            {o.fullName} ({o.phone}) - {o.ratio}%
+                                        </li>
+                                    ))}
+                                </ul>
+
+                                <div className="actions">
+                                    <button onClick={() => handlePauseContract(selectedContract.id)}>
+                                        Dừng hợp đồng
+                                    </button>
+                                    <button>Trích xuất chi tiêu</button>
+                                    <button onClick={() => handleDeleteContract(selectedContract.id)}>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="placeholder">
+                                Chọn hợp đồng để xem chi tiết
+                            </p>
+                        )}
+                    </div>
+                </section>
+            </main>
         </div>
     );
 }

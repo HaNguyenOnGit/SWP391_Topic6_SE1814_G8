@@ -73,6 +73,19 @@
     box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
 }
 
+.avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #10b981;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
 /* Icon admin luôn trắng */
 .admin-box svg {
     color: #ffffff !important;

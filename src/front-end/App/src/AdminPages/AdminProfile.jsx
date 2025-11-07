@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "./ANavbar";
 import { useNavigate } from "react-router-dom";
+import { User } from "lucide-react";
+import "./AdminProfile.css";
 
 
 export default function AdminProfile() {
@@ -95,44 +97,59 @@ export default function AdminProfile() {
             <AdminNavbar adminName={user.fullName || "Admin"} />
 
             <main className="admin-content">
+                <header className="page-header">
+                    <h1 className="title">
+                        <User className="icon" /> Hồ sơ Admin
+                    </h1>
+                </header>
+
                 {section === "password" ? (
-                    <div className="admin-profile-card">
-                        <h2>Đổi mật khẩu</h2>
-                        <div className="space-y-2">
-                            <input type="password" name="currentPwd" placeholder="Mật khẩu hiện tại" onChange={handleChange} />
-                            <input type="password" name="newPwd" placeholder="Mật khẩu mới" onChange={handleChange} />
-                            <input type="password" name="confirmPwd" placeholder="Xác nhận mật khẩu mới" onChange={handleChange} />
-                            <button className="admin-save-btn" onClick={() => handleSubmit("password")}>Cập nhật mật khẩu</button>
-                            <a href="#" onClick={() => handleSectionChange("")}>Quay lại</a>
+                    <div className="profile-detail">
+                        <h2 className="detail-title">Đổi mật khẩu</h2>
+                        <div className="form-grid">
+                            <div>
+                                <label>Mật khẩu hiện tại</label>
+                                <input type="password" name="currentPwd" placeholder="Mật khẩu hiện tại" onChange={handleChange} />
+                            </div>
+                            <div>
+                                <label>Mật khẩu mới</label>
+                                <input type="password" name="newPwd" placeholder="Mật khẩu mới" onChange={handleChange} />
+                            </div>
+                            <div>
+                                <label>Xác nhận mật khẩu mới</label>
+                                <input type="password" name="confirmPwd" placeholder="Xác nhận mật khẩu mới" onChange={handleChange} />
+                            </div>
                         </div>
+                        <div className="actions">
+                            <button className="save-btn" onClick={() => handleSubmit("password")}>Cập nhật mật khẩu</button>
+                            <button onClick={() => handleSectionChange("")}>Quay lại</button>
+                        </div>
+                        {message && <p className="message">{message}</p>}
                     </div>
                 ) : (
-                    <div className="admin-profile-card">
-                        <h2>Hồ sơ Admin</h2>
-
-                        <div className="admin-section">
-                            <h3>Thông tin cá nhân</h3>
-                            <p><b>Họ tên:</b> {user.fullName}</p>
-                            <p><b>Số điện thoại:</b> {user.phone}</p>
-                            <p><b>Email:</b> {user.email}</p>
+                    <div className="profile-detail">
+                        <h2 className="detail-title">Thông tin cá nhân</h2>
+                        <div className="info-grid">
+                            <p><strong>Họ tên:</strong> {user.fullName}</p>
+                            <p><strong>Số điện thoại:</strong> {user.phone}</p>
+                            <p><strong>Email:</strong> {user.email}</p>
                         </div>
 
-                        <div className="admin-section">
-                            <h3>Đổi mật khẩu</h3>
+                        <div className="actions">
                             <button onClick={() => handleSectionChange("password")}>Đổi mật khẩu</button>
+                            <button
+                                className="logout-btn"
+                                onClick={() => {
+                                    localStorage.removeItem("auth_token");
+                                    localStorage.removeItem("auth_user");
+                                    navigate("/login");
+                                }}
+                            >
+                                Đăng xuất
+                            </button>
                         </div>
 
-                        {message && <p className="admin-message">{message}</p>}
-                        <button
-                            className="admin-logout-btn"
-                            onClick={() => {
-                                localStorage.removeItem("auth_token");
-                                localStorage.removeItem("auth_user");
-                                navigate("/login");
-                            }}
-                        >
-                            Đăng xuất
-                        </button>
+                        {message && <p className="message">{message}</p>}
                     </div>
                 )}
             </main>

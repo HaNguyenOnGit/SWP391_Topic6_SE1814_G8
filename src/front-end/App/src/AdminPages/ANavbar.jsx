@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaUserShield, FaUsers, FaFileContract, FaChartPie } from "react-icons/fa";
+import { FaUsers, FaFileContract, FaChartPie } from "react-icons/fa";
 import { useAuth } from "../auth/AuthContext";
 import "./ANavbar.css";
 
@@ -8,6 +8,13 @@ export default function AdminNavbar({ adminName }) {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, user } = useAuth();
+
+    const getInitials = (name) => {
+        if (!name) return "A";
+        const parts = name.trim().split(" ");
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    };
 
     const handleProfileClick = () => {
         navigate("/admin/profile");
@@ -45,7 +52,7 @@ export default function AdminNavbar({ adminName }) {
             </div>
 
             <div className="admin-box" onClick={handleProfileClick}>
-                <FaUserShield className="nav-icon" size={20} />
+                <div className="avatar">{getInitials(adminName)}</div>
                 <span>{adminName}</span>
             </div>
         </nav>
