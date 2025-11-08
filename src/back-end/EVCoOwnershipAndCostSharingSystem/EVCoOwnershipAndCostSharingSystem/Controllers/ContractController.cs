@@ -62,7 +62,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return Ok("All members confirmed. Contract status updated to Available.");
             }
             return Ok("Status updated successfully");
-        }     
+        }
         //Chức năng quằn nhất từng làm
         //Xóa hợp đồng kết hợp xóa các dữ liệu có liên quan tới hợp đồng
         //Mà nó lại ràng buộc khóa ngoại với nhiều bảng khác
@@ -188,6 +188,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 contract.Model,
                 contract.StartDate,
                 contract.Status,
+                contract.UsingBy,
                 Members = members
             };
             return Ok(result);
