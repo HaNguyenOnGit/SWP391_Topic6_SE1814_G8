@@ -16,6 +16,7 @@ export default function CheckinHistory() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [canCheckin, setCanCheckin] = useState(false);
+  const [hasOngoingTrip, setHasOngoingTrip] = useState(false);
 
   // --- Gọi API usage-history ---
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function CheckinHistory() {
         ]);
 
         const data = usageRes.data || {};
-        setCanCheckin(checkinRes.data?.canCheckin ?? false);
+        const canCheckinFromApi = checkinRes.data?.canCheckin ?? false;
 
         const trips = Array.isArray(data.trips)
           ? data.trips.map((t) => {
@@ -58,8 +59,8 @@ export default function CheckinHistory() {
               date,
               time: timeRange,
               distance: t.distance || 0,
-              checkOutTime: checkOut, // Thêm để sort
-              checkInTime: checkIn, // Thêm để sort
+              checkOutTime: checkOut, // Để check ongoing và sort
+              checkInTime: checkIn, // Để sort
               isOngoing: !checkOut, // Checkin chưa checkout
             };
           }).sort((a, b) => {
@@ -74,6 +75,11 @@ export default function CheckinHistory() {
             return b.checkInTime - a.checkInTime;
           })
           : [];
+
+        // Mở rộng điều kiện: Cho phép vào checkin nếu có trip đang ongoing (chưa checkout)
+        const hasOngoingTrip = trips.some(t => !t.checkOutTime);
+        setCanCheckin(canCheckinFromApi || hasOngoingTrip);
+        setHasOngoingTrip(hasOngoingTrip);
 
         setHistory(trips);
         setTripInfo({ distance: data.totalDistance || 0 });
@@ -138,7 +144,7 @@ export default function CheckinHistory() {
                   if (!canCheckin) e.preventDefault();
                 }}
               >
-                Bắt đầu check-in/out
+                {hasOngoingTrip ? "Tiếp tục checkout" : "Bắt đầu check-in"}
               </Link>
             </div>
           </div>
