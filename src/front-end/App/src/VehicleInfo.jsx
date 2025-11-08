@@ -6,6 +6,7 @@ export default function VehicleInfo() {
     const { id } = useParams(); // id lấy từ URL /vehicle/:id
     const [vehicle, setVehicle] = useState(null);
     const [coowners, setCoowners] = useState([]);
+    const [usingBy, setUsingBy] = useState(null);
 
     useEffect(() => {
         if (!id) return;
@@ -23,7 +24,10 @@ export default function VehicleInfo() {
                     status: translateStatus(data.status),
                 });
 
+                setUsingBy(data.usingBy);
+
                 const members = data.members.map((m) => ({
+                    userId: m.userId,
                     username: m.fullName || m.phoneNumber,
                     share: m.sharePercent,
                     // backend may call this field different names; try common ones, fallback to 'Confirmed'
@@ -52,7 +56,9 @@ export default function VehicleInfo() {
 
     if (!vehicle) return <p>Đang tải dữ liệu...</p>;
 
-    const getMemberNameColor = (status) => {
+    const getMemberNameColor = (member) => {
+        if (usingBy && member.userId === usingBy) return 'green'; // Màu lá cho người đang dùng
+        const status = member.status;
         if (!status) return 'black';
         const s = String(status).toLowerCase();
         if (s === 'confirmed') return 'black';
@@ -108,7 +114,7 @@ export default function VehicleInfo() {
                                 margin: "10px 0",
                             }}
                         >
-                            <span style={{ color: getMemberNameColor(c.status), fontWeight: "bold" }}>
+                            <span style={{ color: getMemberNameColor(c), fontWeight: "bold" }}>
                                 {c.username}
                             </span>
                             <span style={{ color: "blue" }}>{c.share}%</span>
