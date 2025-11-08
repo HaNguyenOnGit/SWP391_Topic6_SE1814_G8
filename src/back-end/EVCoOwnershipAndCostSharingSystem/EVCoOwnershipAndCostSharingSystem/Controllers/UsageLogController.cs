@@ -203,8 +203,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             var contract = context.Contracts.FirstOrDefault(c => c.ContractId == req.ContractId);
             if (contract == null)
                 return NotFound("Contract not found");
-            if (contract.UsingBy != req.UserId)
-                return BadRequest("Bạn không phải người đang sử dụng xe!");
+            // Không check UsingBy nữa, chỉ dựa vào UsageLog
             // Tìm usage log gần nhất chưa có checkout
             var usageLog = context.UsageLogs
                 .Where(u => u.ContractId == req.ContractId && u.UserId == req.UserId && u.CheckOutTime == null)
@@ -237,7 +236,14 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             usageLog.CheckOutTime = DateTime.Now;
             usageLog.Distance = usageLog.OdometerEnd - usageLog.OdometerStart;
             context.SaveChanges();
-            return Ok("Checkout thành công!");
+
+            // Cảnh báo nếu UsingBy không match
+            string message = "Checkout thành công!";
+            if (contract.UsingBy == null || contract.UsingBy != req.UserId)
+            {
+                message += " Lưu ý: Bạn nên checkout đúng giờ so với lịch hẹn để tránh xung đột.";
+            }
+            return Ok(message);
         }
 
         // API: Tổng quãng đường của một contract (theo tất cả usage logs)
