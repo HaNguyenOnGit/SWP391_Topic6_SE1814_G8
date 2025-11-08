@@ -144,36 +144,54 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest("Xe đang được sử dụng bởi user khác!");
             // Lưu usage log mới (chỉ lưu checkin, checkout sẽ update sau)
             var proofImageInFile = req.ProofImageInFile;
-            var usageLog = new DataAccessLayer.Entities.UsageLog
+            if (proofImageInFile != null)
             {
-                ContractId = req.ContractId,
-                UserId = req.UserId,
-                OdometerStart = req.Odometer,
-                CheckInTime = DateTime.Now,
-                ProofImageStart = proofImageInFile.FileName
-            };
-            context.UsageLogs.Add(usageLog);
-            context.SaveChanges();
-            //Xu ly anh va folder
-            var savedLog = context.UsageLogs
-                .FirstOrDefault(u => u.ContractId == req.ContractId && u.UserId == req.UserId && u.Distance == null);
-            string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CheckInOutImages");
-            string checkInOutSubfolder = savedLog.UsageId + "-" + savedLog.ContractId + "-" + savedLog.UserId;
-            string checkInOutPath = Path.Combine(rootFolder, checkInOutSubfolder);
-            if (!Directory.Exists(checkInOutPath))
-            {
-                CreateDirectory(checkInOutPath);
+                var usageLog = new DataAccessLayer.Entities.UsageLog
+                {
+                    ContractId = req.ContractId,
+                    UserId = req.UserId,
+                    OdometerStart = req.Odometer,
+                    CheckInTime = DateTime.Now,
+                    ProofImageStart = proofImageInFile.FileName
+                };
+                context.UsageLogs.Add(usageLog);
+                context.SaveChanges();
+                //Xu ly anh va folder
+                var savedLog = context.UsageLogs
+                    .FirstOrDefault(u => u.ContractId == req.ContractId && u.UserId == req.UserId && u.Distance == null);
+                if (savedLog != null)
+                {
+                    string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CheckInOutImages");
+                    string checkInOutSubfolder = savedLog.UsageId + "-" + savedLog.ContractId + "-" + savedLog.UserId;
+                    string checkInOutPath = Path.Combine(rootFolder, checkInOutSubfolder);
+                    if (!Directory.Exists(checkInOutPath))
+                    {
+                        CreateDirectory(checkInOutPath);
+                    }
+                    string proofImageInPath = Path.Combine(checkInOutPath, proofImageInFile.FileName);
+                    using (var stream = new FileStream(proofImageInPath, FileMode.Create))
+                    {
+                        proofImageInFile.CopyTo(stream);
+                    }
+                    //Luu duong dan anh vao db
+                    string relativePathImageIn = "/CheckInOutImages/" + checkInOutSubfolder + "/" + proofImageInFile.FileName;
+                    savedLog.ProofImageStart = relativePathImageIn;
+                    context.SaveChanges();
+                }
             }
-            string proofImageInPath = Path.Combine(checkInOutPath, proofImageInFile.FileName);
-            using (var stream = new FileStream(proofImageInPath, FileMode.Create))
+            else
             {
-                proofImageInFile.CopyTo(stream);
+                var usageLog = new DataAccessLayer.Entities.UsageLog
+                {
+                    ContractId = req.ContractId,
+                    UserId = req.UserId,
+                    OdometerStart = req.Odometer,
+                    CheckInTime = DateTime.Now,
+                    ProofImageStart = null
+                };
+                context.UsageLogs.Add(usageLog);
+                context.SaveChanges();
             }
-            //Luu duong dan anh vao db
-            string relativePathImageIn = "/CheckInOutImages/" + checkInOutSubfolder + "/" + proofImageInFile.FileName;
-            savedLog.ProofImageStart = relativePathImageIn;
-            contract.UsingBy = req.UserId;
-            context.SaveChanges();
             return Ok("Checkin thành công!");
         }
 
@@ -197,25 +215,27 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             // Cập nhật thông tin checkout
             // Có vẻ chưa xử lý ảnh checkout
             var proofImageOutFile = req.ProofImageOutFile;
-            string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CheckInOutImages");
-            string checkInOutSubfolder = usageLog.UsageId + "-" + usageLog.ContractId + "-" + usageLog.UserId;
-            string checkInOutPath = Path.Combine(rootFolder, checkInOutSubfolder);
-            if (!Directory.Exists(checkInOutPath))
+            if (proofImageOutFile != null)
             {
-                CreateDirectory(checkInOutPath);
+                string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "CheckInOutImages");
+                string checkInOutSubfolder = usageLog.UsageId + "-" + usageLog.ContractId + "-" + usageLog.UserId;
+                string checkInOutPath = Path.Combine(rootFolder, checkInOutSubfolder);
+                if (!Directory.Exists(checkInOutPath))
+                {
+                    CreateDirectory(checkInOutPath);
+                }
+                string proofImageOutPath = Path.Combine(checkInOutPath, proofImageOutFile.FileName);
+                using (var stream = new FileStream(proofImageOutPath, FileMode.Create))
+                {
+                    proofImageOutFile.CopyTo(stream);
+                }
+                //Luu duong dan anh vao db
+                string relativePathImageOut = "/CheckInOutImages/" + checkInOutSubfolder + "/" + proofImageOutFile.FileName;
+                usageLog.ProofImageEnd = relativePathImageOut;
             }
-            string proofImageOutPath = Path.Combine(checkInOutPath, proofImageOutFile.FileName);
-            using (var stream = new FileStream(proofImageOutPath, FileMode.Create))
-            {
-                proofImageOutFile.CopyTo(stream);
-            }
-            //Luu duong dan anh vao db
-            string relativePathImageOut = "/CheckInOutImages/" + checkInOutSubfolder + "/" + proofImageOutFile.FileName;
             usageLog.OdometerEnd = req.Odometer;
             usageLog.CheckOutTime = DateTime.Now;
-            usageLog.ProofImageEnd = relativePathImageOut;
             usageLog.Distance = usageLog.OdometerEnd - usageLog.OdometerStart;
-            contract.UsingBy = null;
             context.SaveChanges();
             return Ok("Checkout thành công!");
         }
@@ -239,7 +259,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             public int ContractId { get; set; }
             public int UserId { get; set; }
             public int Odometer { get; set; }
-            public IFormFile ProofImageInFile { get; set; }
+            public IFormFile? ProofImageInFile { get; set; }
         }
         // DTO cho checkout
         public class CheckOutRequest
@@ -247,7 +267,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             public int ContractId { get; set; }
             public int UserId { get; set; }
             public int Odometer { get; set; }
-            public IFormFile ProofImageOutFile { get; set; }
+            public IFormFile? ProofImageOutFile { get; set; }
         }
     }
 }
