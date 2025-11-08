@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./Checkin.css";
 
-function OdoUpload({ value, onChange, disabled }) {
+function OdoUpload({ value, onChange, disabled, inputId = "odoInput" }) {
   const [preview, setPreview] = useState(value || null);
 
   const handleFile = (e) => {
@@ -21,22 +21,23 @@ function OdoUpload({ value, onChange, disabled }) {
   return (
     <div
       className={`camera-box ${disabled ? "disabled" : ""}`}
-      onClick={() => !disabled && document.getElementById("odoInput").click()}
+      onClick={() => !disabled && document.getElementById(inputId).click()}
     >
       {preview ? (
         <img src={preview} alt="Odo" className="odo-image" />
       ) : (
         <div className="upload-text">
           <span>📸</span>
-          <span>Upload ảnh ô-đô (tùy chọn)</span>
+          <span>Upload ảnh ô-đô (bắt buộc)</span>
         </div>
       )}
       <input
-        id="odoInput"
+        id={inputId}
         type="file"
         accept="image/*"
         onChange={handleFile}
         className="hidden-input"
+        required
       />
       {!disabled && preview && <span className="change-photo-btn">Thay đổi ảnh</span>}
     </div>
@@ -75,15 +76,16 @@ function CheckForm({
   disabled = false,
   checkinTime = null,
 }) {
-  const isReady = data.km;
+  const isReady = data.km && data.image;
   const kmValue = Number(data.km.replace(/,/g, ""));
   let error = "";
 
   // RÀNG BUỘC
-  if (type === "checkin" && kmValue < contractTotalKm)
-    error = `Số km check-in phải ≥ tổng số km hợp đồng (${contractTotalKm.toLocaleString()} km)`;
-  if (type === "checkout" && kmValue < checkinKm)
-    error = "Số km check-out phải ≥ check-in";
+  if ((type === "checkin" && kmValue < contractTotalKm) || (type === "checkout" && kmValue < contractTotalKm))
+    error += "Số km không phù hợp! ";
+  if (!data.image)
+    error += "Hãy upload ảnh!";
+  error = error.trim();
 
   return (
     <div className="checkin-main-group">
@@ -91,6 +93,7 @@ function CheckForm({
         value={data.image}
         onChange={(file) => setData({ ...data, image: file })}
         disabled={disabled}
+        inputId={`${type}OdoInput`}
       />
 
       {/* Nếu form bị disable (đã checkin) thì chỉ hiển thị thời gian xác nhận */}
@@ -158,7 +161,7 @@ export default function Checkin() {
           }))
           : [];
 
-        setTripInfo({ distance: data.totalDistance || 0 });
+        setTripInfo({ distance: contractKmRes.data.totalDistance || 0 });
         setContractTotalKm(contractKmRes.data.totalDistance || 0);
 
         const activeTrip = trips.find((t) => !t.checkOutTime);
@@ -184,14 +187,18 @@ export default function Checkin() {
   const handleCheckin = async () => {
     try {
       const kmValue = Number(checkinData.km.replace(/,/g, ""));
-      let base64Image = null;
-      if (checkinData.image) base64Image = await toBase64(checkinData.image);
+      const formData = new FormData();
+      formData.append("ContractId", Number(id));
+      formData.append("UserId", Number(userId));
+      formData.append("Odometer", kmValue);
+      if (checkinData.image) {
+        formData.append("ProofImageInFile", checkinData.image);
+      }
 
-      await axios.post("/api/check/checkin", {
-        ContractId: Number(id),
-        UserId: Number(userId),
-        Odometer: kmValue,
-        ProofImage: base64Image,
+      await axios.post("/api/check/checkin", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       alert("Check-in thành công!");
@@ -204,14 +211,18 @@ export default function Checkin() {
   const handleCheckout = async () => {
     try {
       const kmValue = Number(checkoutData.km.replace(/,/g, ""));
-      let base64Image = null;
-      if (checkoutData.image) base64Image = await toBase64(checkoutData.image);
+      const formData = new FormData();
+      formData.append("ContractId", Number(id));
+      formData.append("UserId", Number(userId));
+      formData.append("Odometer", kmValue);
+      if (checkoutData.image) {
+        formData.append("ProofImageOutFile", checkoutData.image);
+      }
 
-      await axios.post("/api/check/checkout", {
-        ContractId: Number(id),
-        UserId: Number(userId),
-        Odometer: kmValue,
-        ProofImage: base64Image,
+      await axios.post("/api/check/checkout", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       alert("Checkout thành công!");
@@ -233,7 +244,7 @@ export default function Checkin() {
           <div className="check-form-content">
             {tripInfo && (
               <>
-                <h3 className="check-form-title">Hành trình của bạn</h3>
+                <h3 className="check-form-title">Hành trình của xe</h3>
                 <p className="trip-total-distance">
                   <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
                 </p>
@@ -278,14 +289,4 @@ export default function Checkin() {
       </div>
     </div>
   );
-}
-
-function toBase64(file) {
-  return new Promise((resolve, reject) => {
-    if (!file) return resolve(null);
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = (error) => reject(error);
-  });
 }

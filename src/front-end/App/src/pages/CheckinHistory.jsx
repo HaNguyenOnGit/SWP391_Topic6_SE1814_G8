@@ -58,7 +58,20 @@ export default function CheckinHistory() {
               date,
               time: timeRange,
               distance: t.distance || 0,
+              checkOutTime: checkOut, // Thêm để sort
+              checkInTime: checkIn, // Thêm để sort
+              isOngoing: !checkOut, // Checkin chưa checkout
             };
+          }).sort((a, b) => {
+            // Ưu tiên checkin chưa checkout ở đầu
+            if (a.isOngoing && !b.isOngoing) return -1;
+            if (!a.isOngoing && b.isOngoing) return 1;
+            // Nếu cả hai đã checkout, sort theo checkOutTime descending (mới nhất trước)
+            if (!a.isOngoing && !b.isOngoing) {
+              return b.checkOutTime - a.checkOutTime;
+            }
+            // Nếu cả hai chưa checkout (hiếm), sort theo checkInTime descending
+            return b.checkInTime - a.checkInTime;
           })
           : [];
 
