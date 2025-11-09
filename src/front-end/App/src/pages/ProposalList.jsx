@@ -22,16 +22,11 @@ export default function ProposalList() {
         const r = String(rule).toLowerCase();
         switch (r) {
             case "byshare":
-            case "byshare":
-            case "byshare":
                 return "Theo tỉ lệ sở hữu";
             case "selfpaid":
-            case "self_paid":
-            case "selfpaid":
                 return "Tự trả";
-            case "byshareplus":
-            case "byshare_plus":
-                return "Theo tỉ lệ + cố định";
+            case "byusage":
+                return "Theo mức sử dụng";
             default:
                 // Accept already-localized strings as passthrough
                 return rule;

@@ -22,15 +22,11 @@ export default function CostDetail() {
         const r = String(rule).toLowerCase();
         switch (r) {
             case "byshare":
-            case "byshare":
                 return "Theo tỉ lệ sở hữu";
             case "selfpaid":
-            case "self_paid":
-            case "selfpaid":
                 return "Tự trả";
-            case "byshareplus":
-            case "byshare_plus":
-                return "Theo tỉ lệ + cố định";
+            case "byusage":
+                return "Theo mức sử dụng";
             default:
                 return rule;
         }
@@ -39,7 +35,8 @@ export default function CostDetail() {
     const reloadExpenses = async () => {
         try {
             const res = await axios.get(`/api/payment/contract/${id}/user/${userId}/user-expenses`);
-            setExpenses(Array.isArray(res.data) ? res.data : []);
+            const data = Array.isArray(res.data) ? res.data : [];
+            setExpenses(data.reverse());
         } catch (err) {
             console.error("Lỗi khi tải danh sách chi phí:", err);
             setExpenses([]);
