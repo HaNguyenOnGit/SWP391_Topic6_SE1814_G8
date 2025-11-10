@@ -33,6 +33,29 @@ namespace BusinessLogicLayer.Services
             );
         }
 
+        //Lấy các phiếu đề xuất (expense proposals) theo mã hợp đồng
+        public List<ExpenseProposal> GetExpenseProposalsByContractId(int contractId)
+        {
+            return _db.ExpenseProposals
+                .Where(p => p.ContractId == contractId)
+                .ToList();
+        }
+
+        //Lấy các vote liên quan tới proposalId
+        public List<ProposalVote> GetProposalVotesByProposalId(int proposalId)
+        {
+            return _db.ProposalVotes
+                .Where(v => v.ProposalId == proposalId)
+                .ToList();
+        }
+
+        //Xóa proposal vote theo proposalId
+        public void DeleteProposalVotesList(List<ProposalVote> proposalVoteList)
+        {
+            _db.RemoveRange(proposalVoteList);
+            _db.SaveChanges();
+        }
+
         // ✅ 1. Tạo đề xuất chi tiêu
         public async Task CreateProposal(CreateProposalRequest request)
         {
@@ -234,38 +257,150 @@ namespace BusinessLogicLayer.Services
                     .Where(m => m.ContractId == proposal.ContractId)
                     .ToList();
 
-                var allocations = new List<ExpenseAllocation>();
-                foreach (var m in members)
+                if (!members.Any())
                 {
-                    var amount = (expense.Amount * m.SharePercent) / 100;
+                    Console.WriteLine("⚠️ Không có thành viên trong hợp đồng!");
+                    return;
+                }
+
+                var allocations = new List<ExpenseAllocation>();
+
+                // ✅ 1️⃣ Nếu chia theo phần trăm
+                if (proposal.AllocationRule == "ByShare")
+                {
+                    foreach (var m in members)
+                    {
+                        var amount = (expense.Amount * m.SharePercent) / 100;
+                        allocations.Add(new ExpenseAllocation
+                        {
+                            ExpenseId = expense.ExpenseId,
+                            UserId = m.UserId,
+                            Amount = amount,
+                            Status = "Unpaid"
+                        });
+                    }
+                }
+                // ✅ 2️⃣ Nếu chia theo mức sử dụng (ByUsage)
+                else if (proposal.AllocationRule == "ByUsage")
+                {
+                    var now = DateTime.Now;
+                    var startDate = now.AddDays(-30);
+
+                    // Lấy tổng km từng user trong 30 ngày gần nhất
+                    var usageData = _db.UsageLogs
+                        .Where(u => u.ContractId == proposal.ContractId
+                                 && u.CheckOutTime >= startDate
+                                 && u.CheckOutTime <= now
+                                 && u.Distance != null)
+                        .GroupBy(u => u.UserId)
+                        .Select(g => new
+                        {
+                            UserId = g.Key,
+                            TotalDistance = g.Sum(x => x.Distance ?? 0)
+                        })
+                        .ToList();
+
+                    var totalDistance = usageData.Sum(u => u.TotalDistance);
+
+                    if (totalDistance == 0)
+                    {
+                        Console.WriteLine("⚠️ Không có dữ liệu sử dụng trong 30 ngày qua → Không thể tính ByUsage.");
+                        return;
+                    }
+
+                    foreach (var usage in usageData)
+                    {
+                        var percent = (decimal)usage.TotalDistance / totalDistance;
+                        var amount = Math.Round(expense.Amount * percent, 2);
+
+                        allocations.Add(new ExpenseAllocation
+                        {
+                            ExpenseId = expense.ExpenseId,
+                            UserId = usage.UserId,
+                            Amount = amount,
+                            Status = "Unpaid"
+                        });
+
+                        Console.WriteLine($"🚗 User {usage.UserId}: {usage.TotalDistance} km ({percent:P2}) → {amount:N0} VND");
+                    }
+                }
+                // ✅ 3️⃣ Nếu là SelfPaid: chỉ người đề xuất trả toàn bộ
+                else if (proposal.AllocationRule == "SelfPaid")
+                {
                     allocations.Add(new ExpenseAllocation
                     {
                         ExpenseId = expense.ExpenseId,
-                        UserId = m.UserId,
-                        Amount = amount,
+                        UserId = proposal.ProposedBy,
+                        Amount = expense.Amount,
                         Status = "Unpaid"
                     });
+                    Console.WriteLine($"💸 SelfPaid: User {proposal.ProposedBy} trả toàn bộ {expense.Amount:N0} VND");
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ AllocationRule '{proposal.AllocationRule}' chưa được hỗ trợ.");
+                    return;
                 }
 
                 _db.ExpenseAllocations.AddRange(allocations);
                 _db.SaveChanges();
 
+                // ✅ 3️⃣ Tạo settlement tương ứng
                 var settlements = new List<Settlement>();
+
                 foreach (var alloc in allocations)
                 {
-                    settlements.Add(new Settlement
+                    bool isProposer = alloc.UserId == proposal.ProposedBy;
+
+                    var settlement = new Settlement
                     {
                         AllocationId = alloc.AllocationId,
                         PayerId = alloc.UserId,
                         ReceiverId = proposal.ProposedBy,
                         Amount = alloc.Amount,
-                        Status = "Pending",
                         Method = "Banking"
-                    });
+                    };
+
+                    // 🟢 Nếu là người tạo đề xuất → coi như đã thanh toán
+                    if (isProposer)
+                    {
+                        settlement.Status = "Paid";
+                        settlement.PaymentDate = DateTime.Now;
+                        settlement.ProofImageUrl = "/system/auto-approved"; // có thể đổi chuỗi này nếu muốn
+                        Console.WriteLine($"💰 Người tạo đề xuất (User {alloc.UserId}) được đánh dấu đã thanh toán tự động.");
+                    }
+                    else
+                    {
+                        settlement.Status = "Pending";
+                    }
+
+                    settlements.Add(settlement);
+                }
+
+                // 🟣 Trường hợp SelfPaid (chỉ 1 người duy nhất)
+                if (proposal.AllocationRule == "SelfPaid")
+                {
+                    var selfAlloc = allocations.First();
+                    var selfSettle = new Settlement
+                    {
+                        AllocationId = selfAlloc.AllocationId,
+                        PayerId = proposal.ProposedBy,
+                        ReceiverId = proposal.ProposedBy,
+                        Amount = selfAlloc.Amount,
+                        Method = "Banking",
+                        Status = "Paid",
+                        PaymentDate = DateTime.Now,
+                        ProofImageUrl = "/system/selfpaid"
+                    };
+
+                    settlements.Clear();
+                    settlements.Add(selfSettle);
+                    Console.WriteLine($"💸 SelfPaid: User {proposal.ProposedBy} được đánh dấu đã thanh toán toàn bộ.");
                 }
 
                 _db.Settlements.AddRange(settlements);
                 _db.SaveChanges();
+
 
                 expense.Status = "AwaitingPayment";
                 _db.Expenses.Update(expense);
@@ -280,5 +415,6 @@ namespace BusinessLogicLayer.Services
                     Console.WriteLine($"🔍 Inner: {ex.InnerException.Message}");
             }
         }
+
     }
 }

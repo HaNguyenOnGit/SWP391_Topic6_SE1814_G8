@@ -43,14 +43,7 @@ namespace BusinessLogicLayer.Services
             return reservation;
         }
 
-        // ✅ Lấy danh sách lịch theo ngày (format linh hoạt)
-        public List<Reservation> GetReservationsByContractAndDate(int contractId, string dateString)
-        {
-            if (!DateTime.TryParse(dateString, CultureInfo.InvariantCulture, DateTimeStyles.None, out var date))
-                throw new Exception("Định dạng ngày không hợp lệ.");
 
-            return _reservationRepo.GetReservationsByContractAndDate(contractId, date);
-        }
 
         // ✅ Xóa lịch (contractId + datetime)
         public void DeleteReservation(int contractId, string dateTimeString)
@@ -73,6 +66,52 @@ namespace BusinessLogicLayer.Services
 
             reservation.Status = newStatus;
             _reservationRepo.UpdateReservation(reservation);
+        }
+
+        // Đơn giản: cập nhật trạng thái hợp đồng theo lịch đặt hiện tại
+        public void UpdateContractStatusByReservation()
+        {
+            var db = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            var now = DateTime.Now;
+            // Consider any reservation whose time window contains 'now'.
+            // We ignore reservation.Status here so the contract is set based on time ranges only.
+            var activeReservations = db.Reservations
+                .Where(r => r.StartTime <= now && r.EndTime > now)
+                .ToList();
+
+            // Chỉ cập nhật trạng thái nếu đang là Active hoặc Available
+            var contracts = db.Contracts.ToList();
+            foreach (var contract in contracts)
+            {
+                if (contract.Status == "Active" || contract.Status == "Available")
+                {
+                    var currentRes = activeReservations.FirstOrDefault(r => r.ContractId == contract.ContractId);
+                    if (currentRes != null)
+                    {
+                        contract.Status = "Active";
+                        contract.UsingBy = currentRes.UserId;
+                    }
+                    else
+                    {
+                        contract.Status = "Available";
+                        contract.UsingBy = null;
+                    }
+                    db.Contracts.Update(contract);
+                }
+                // Nếu trạng thái khác thì giữ nguyên, không đổi
+            }
+            db.SaveChanges();
+        }
+
+        // Lấy danh sách lịch theo tháng
+        public List<Reservation> GetReservationsByContractAndMonth(int contractId, int month, int year)
+        {
+            return _reservationRepo.GetReservationsByContractAndMonth(contractId, month, year);
+        }
+
+        public void DeleteReservationsByContractId(int contractId)
+        {
+            _reservationRepo.DeleteReservationsByContractId(contractId);
         }
     }
 }

@@ -21,13 +21,15 @@ public partial class Settlement
 
     public string? Reference { get; set; }
 
+    // Thêm property lưu đường dẫn ảnh xác nhận thanh toán
+    public string? ProofImageUrl { get; set; }
+
+    // Thêm property Status để fix lỗi truy cập trạng thái
+    public string Status { get; set; } = null!;
+
     public virtual ExpenseAllocation Allocation { get; set; } = null!;
 
     public virtual User Payer { get; set; } = null!;
 
     public virtual User Receiver { get; set; } = null!;
-
-    // Add missing properties for repository usage
-    public string? Status { get; set; }
-    public string? ProofImageUrl { get; set; }
 }

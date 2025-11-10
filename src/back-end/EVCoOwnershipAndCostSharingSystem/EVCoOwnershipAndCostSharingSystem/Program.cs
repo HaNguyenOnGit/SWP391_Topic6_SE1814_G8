@@ -32,6 +32,9 @@ namespace EVCoOwnershipAndCostSharingSystem
             builder.Services.AddSingleton<AuthService>();
             builder.Services.AddScoped<UserRepository>();
 
+            // Đăng ký background service tự động cập nhật trạng thái hợp đồng
+            builder.Services.AddHostedService<EVCoOwnershipAndCostSharingSystem.Services.ContractStatusBackgroundService>();
+
             // Configure JWT authentication
             var jwtSection = builder.Configuration.GetSection("JwtSettings");
             var jwtKey = jwtSection["Key"] ?? throw new Exception("JwtSettings:Key not configured");
@@ -65,6 +68,8 @@ namespace EVCoOwnershipAndCostSharingSystem
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseAuthentication();
             app.UseAuthorization();

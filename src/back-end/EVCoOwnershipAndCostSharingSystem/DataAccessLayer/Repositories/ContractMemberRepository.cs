@@ -30,6 +30,23 @@ namespace DataAccessLayer.Repositories
             _context.SaveChanges();
         }
 
+        public void DeleteContractMember(int contractId, int userId)
+        {
+            var member = _context.ContractMembers.FirstOrDefault(cm => cm.ContractId == contractId && cm.UserId == userId);
+            if (member != null)
+            {
+                _context.ContractMembers.Remove(member);
+                _context.SaveChanges();
+            }
+        }
+
+        public List<ContractMember> GetContractMembersByContractId(int contractId)
+        {
+            return _context.ContractMembers
+                .Where(cm => cm.ContractId == contractId)
+                .ToList();
+        }
+
         public List<int> GetContractIdsByUserId(int userId)
         {
             return _context.ContractMembers

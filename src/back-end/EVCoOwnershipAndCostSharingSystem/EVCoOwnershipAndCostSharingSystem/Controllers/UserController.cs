@@ -5,6 +5,9 @@ using BusinessLogicLayer.Others;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
+using static System.IO.Directory;
+using static System.IO.File;
+using Microsoft.Identity.Client;
 
 namespace EVCoOwnershipAndCostSharingSystem.Controllers
 {
@@ -111,6 +114,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                     user.FullName,
                     user.Role,
                     user.Status,
+                    user.PhoneNumber
                 }
             });
         }
@@ -157,27 +161,97 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         }
 
         [HttpPost("add")]
-        public IActionResult AddUser([FromBody] User user)
+        public IActionResult AddUser([FromForm] RegisterRequest registerRequest)
         {
+            //Chuoi
+            string fullName = registerRequest.FullName ?? "";
+            string email = registerRequest.Email ?? "";
+            string citizenId = registerRequest.CitizenId ?? "";
+            string driverLicenseId = registerRequest.DriverLicenseId ?? "";
+            string bankName = registerRequest.BankName ?? "";
+            string bankAccount = registerRequest.BankAccount ?? "";
+            string role = registerRequest.Role ?? "";
+            string phoneNumber = registerRequest.PhoneNumber ?? "";
+            string password = registerRequest.Password ?? "";
+            //4 file anh
+            var frontIdImageFile = registerRequest.FrontIdImageFile;
+            var backIdImageFile = registerRequest.BackIdImageFile;
+            var frontLicenseImageFile = registerRequest.FrontLicenseImageFile;
+            var backLicenseImageFile = registerRequest.BackLicenseImageFile;
+            //Them nguoi dung
             _us.AddUser(
-                user.FullName,
-                user.Email,
-                user.CitizenId,
-                user.DriverLicenseId,
-                user.BankName,
-                user.BankAccount,
-                user.Role,
-                user.PhoneNumber,
-                user.Password,
-                user.FrontIdImage,
-                user.BackIdImage,
-                user.FrontLicenseImage,
-                user.BackLicenseImage
+                fullName,
+                email,
+                citizenId,
+                driverLicenseId,
+                bankName,
+                bankAccount,
+                role,
+                phoneNumber,
+                password,
+                "", // tạm thời để trống, sẽ update sau
+                "",
+                "",
+                ""
             );
-
-            // Gửi mã xác nhận luôn
-            var code = _us.GenerateEmailConfirmationCode(user.Email);
-
+            var code = _us.GenerateEmailConfirmationCode(email);
+            //Lay nguoi dung de lay id
+            var user = _us.GetUserByPhone(phoneNumber);
+            if (user == null)
+            {
+                return BadRequest("User not found after registration.");
+            }
+            //Den luc xu ly anh
+            string rootFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "UserImages");
+            string userFolder = fullName + "-" + user.UserId;
+            string userPath = Path.Combine(rootFolder, userFolder);
+            //Tao thu muc cho nguoi dung
+            if (!Directory.Exists(userPath))
+            {
+                CreateDirectory(userPath);
+            }
+            //Luu anh vao thu muc nguoi dung và cập nhật đường dẫn
+            string relativeBase = "UserImages/" + userFolder + "/";
+            if (frontIdImageFile != null)
+            {
+                var frontIdImagePath = Path.Combine(userPath, frontIdImageFile.FileName);
+                using (var stream = new FileStream(frontIdImagePath, FileMode.Create))
+                {
+                    frontIdImageFile.CopyTo(stream);
+                }
+                user.FrontIdImage = relativeBase + frontIdImageFile.FileName;
+            }
+            if (backIdImageFile != null)
+            {
+                var backIdImagePath = Path.Combine(userPath, backIdImageFile.FileName);
+                using (var stream = new FileStream(backIdImagePath, FileMode.Create))
+                {
+                    backIdImageFile.CopyTo(stream);
+                }
+                user.BackIdImage = relativeBase + backIdImageFile.FileName;
+            }
+            if (frontLicenseImageFile != null)
+            {
+                var frontLicenseImagePath = Path.Combine(userPath, frontLicenseImageFile.FileName);
+                using (var stream = new FileStream(frontLicenseImagePath, FileMode.Create))
+                {
+                    frontLicenseImageFile.CopyTo(stream);
+                }
+                user.FrontLicenseImage = relativeBase + frontLicenseImageFile.FileName;
+            }
+            if (backLicenseImageFile != null)
+            {
+                var backLicenseImagePath = Path.Combine(userPath, backLicenseImageFile.FileName);
+                using (var stream = new FileStream(backLicenseImagePath, FileMode.Create))
+                {
+                    backLicenseImageFile.CopyTo(stream);
+                }
+                user.BackLicenseImage = relativeBase + backLicenseImageFile.FileName;
+            }
+            // Lưu thay đổi vào DB
+            var context = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
+            context.Users.Update(user);
+            context.SaveChanges();
             return Ok("User added successfully. Please check your email to confirm.");
         }
 
@@ -251,4 +325,3 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         }
     }
 }
-

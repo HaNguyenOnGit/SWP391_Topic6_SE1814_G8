@@ -15,7 +15,6 @@ public partial class Contract
 
     public string Status { get; set; } = null!;
 
-
     public string? VehicleName { get; set; }
 
     // UserId của người đang sử dụng xe (null nếu xe đang rảnh)

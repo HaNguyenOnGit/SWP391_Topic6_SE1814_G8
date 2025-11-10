@@ -19,5 +19,11 @@ namespace DataAccessLayer.Repositories
             _context.UsageLogs.Add(usageLog);
             _context.SaveChanges();
         }
+        public void DeleteUsageLogsByContractId(int contractId)
+        {
+            var logs = _context.UsageLogs.Where(c => c.ContractId ==contractId).ToList();
+            _context.UsageLogs.RemoveRange(logs);
+            _context.SaveChanges();
+        }
     }
 }

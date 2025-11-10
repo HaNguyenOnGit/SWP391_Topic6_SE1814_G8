@@ -33,6 +33,6 @@ public partial class Expense
 
     public virtual ExpenseProposal? Proposal { get; set; }
 
-    // Add missing property for service usage
-    public string? Status { get; set; }
+    // Thêm property Status để fix lỗi truy cập trạng thái
+    public string Status { get; set; } = null!;
 }

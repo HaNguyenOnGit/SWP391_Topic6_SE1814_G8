@@ -116,10 +116,66 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                         m.FullName,
                         PayPercent = m.SharePercent,
                         Amount = (proposal.ExpectedAmount * m.SharePercent) / 100,
-                        Vote = m.Vote
+                        Vote = m.Vote,
+                        Type = "ByShare"
                     }).ToList();
                 }
-
+                else if (proposal.AllocationRule == "SelfPaid")
+                {
+                    // Chỉ người đề xuất trả toàn bộ
+                    int proposerId = 0;
+                    if (proposal.ProposedBy != null && int.TryParse(proposal.ProposedBy.ToString(), out proposerId))
+                    {
+                        var proposer = members.FirstOrDefault(m => m.UserId == proposerId);
+                        if (proposer != null)
+                        {
+                            allocations.Add(new
+                            {
+                                proposer.UserId,
+                                proposer.FullName,
+                                PayPercent = 100,
+                                Amount = proposal.ExpectedAmount,
+                                Vote = proposer.Vote,
+                                Type = "SelfPaid"
+                            });
+                        }
+                    }
+                }
+                else if (proposal.AllocationRule == "ByUsage")
+                {
+                    // Tính theo usage log 30 ngày gần nhất
+                    var now = DateTime.Now;
+                    var startDate = now.AddDays(-30);
+                    var usageData = db.UsageLogs
+                        .Where(u => u.ContractId == proposal.ContractId && u.CheckOutTime >= startDate && u.CheckOutTime <= now && u.Distance != null)
+                        .GroupBy(u => u.UserId)
+                        .Select(g => new
+                        {
+                            UserId = g.Key,
+                            TotalDistance = g.Sum(x => x.Distance ?? 0)
+                        })
+                        .ToList();
+                    var totalDistance = usageData.Sum(u => u.TotalDistance);
+                    foreach (var m in members)
+                    {
+                        var usage = usageData.FirstOrDefault(u => u.UserId == m.UserId);
+                        decimal percent = 0;
+                        if (totalDistance > 0 && usage != null)
+                        {
+                            percent = Math.Round((decimal)usage.TotalDistance / totalDistance * 100, 2);
+                        }
+                        var amount = totalDistance > 0 && usage != null ? Math.Round(proposal.ExpectedAmount * percent / 100, 2) : 0;
+                        allocations.Add(new
+                        {
+                            m.UserId,
+                            m.FullName,
+                            PayPercent = percent,
+                            Amount = amount,
+                            Vote = m.Vote,
+                            Type = "ByUsage"
+                        });
+                    }
+                }
                 return Ok(new
                 {
                     Proposal = proposal,
@@ -141,31 +197,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             {
                 _ps.VoteProposal(proposalId, userId, req.Decision);
                 return Ok("Vote submitted successfully");
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        // ✅ 5. Lấy danh sách đề xuất user chưa xác nhận
-        [HttpGet("contract/{contractId}/user/{userId}/pending")]
-        public IActionResult GetPendingProposals(int contractId, int userId)
-        {
-            try
-            {
-                var proposals = _ps.GetProposalsForContract(contractId, userId) as IEnumerable<dynamic>;
-                if (proposals == null) return BadRequest("Không lấy được danh sách đề xuất.");
-                var pending = proposals
-                    .Where(p =>
-                    {
-                        var votes = p.Votes as IEnumerable<dynamic>;
-                        if (votes == null) return true;
-                        var userVote = votes.FirstOrDefault(v => v.UserId == userId);
-                        return userVote == null || (userVote.Vote == "Pending");
-                    })
-                    .ToList();
-                return Ok(pending);
             }
             catch (Exception ex)
             {
