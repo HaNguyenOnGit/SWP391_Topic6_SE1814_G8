@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Navbar from "../NavBar";
+import Navbar from "../Navbar";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
 import "./Booking.css";

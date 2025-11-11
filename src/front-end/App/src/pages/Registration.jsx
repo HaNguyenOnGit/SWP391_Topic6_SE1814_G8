@@ -23,7 +23,7 @@ export default function RegistrationForm() {
   const [errors, setErrors] = useState({});
   const [formMessage, setFormMessage] = useState("");
   const [showOTP, setShowOTP] = useState(false);
-  const [otp, setOtp] = useState("");
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]); // Mảng 6 ô OTP
   const [otpMessage, setOtpMessage] = useState("");
   const [countdown, setCountdown] = useState(0);
   const navigate = useNavigate();
@@ -71,7 +71,6 @@ export default function RegistrationForm() {
     };
 
   }, []);
-
 
   const validateField = (name, value) => {
     let error = "";
@@ -176,10 +175,49 @@ export default function RegistrationForm() {
     }
   };
 
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) return; // Chỉ cho phép 1 ký tự
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Tự động chuyển sang ô tiếp theo
+    if (value && index < 5) {
+      const nextInput = document.querySelector(`input[name="otp-${index + 1}"]`);
+      if (nextInput) nextInput.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    // Xử lý phím Backspace
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      const prevInput = document.querySelector(`input[name="otp-${index - 1}"]`);
+      if (prevInput) prevInput.focus();
+    }
+  };
+
+  const handleOtpPaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text').slice(0, 6);
+    const newOtp = [...otp];
+
+    for (let i = 0; i < pastedData.length && i < 6; i++) {
+      newOtp[i] = pastedData[i];
+    }
+    setOtp(newOtp);
+  };
+
   const handleVerify = async () => {
+    const otpString = otp.join('');
+    if (otpString.length !== 6) {
+      setOtpMessage("Vui lòng nhập đầy đủ 6 số OTP.");
+      return;
+    }
+
     try {
       const res = await axios.post(
-        `/api/user/confirm-email?email=${formData.email}&code=${otp}`
+        `/api/user/confirm-email?email=${formData.email}&code=${otpString}`
       );
       setOtpMessage("Xác minh thành công!");
       setTimeout(() => navigate("/registrationpending"), 1500);
@@ -194,6 +232,7 @@ export default function RegistrationForm() {
       try {
         await axios.post(`/api/user/generate-code?email=${formData.email}`);
         setCountdown(30);
+        setOtp(["", "", "", "", "", ""]); // Reset OTP
         setOtpMessage("Mã xác nhận mới đã được gửi đến email của bạn!");
       } catch (err) {
         setOtpMessage("Không thể gửi lại mã xác nhận.");
@@ -228,366 +267,468 @@ export default function RegistrationForm() {
   return (
     <div className="registration-bg">
       <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-lg-9 col-xl-7">
-            <div className="card shadow-sm border-0">
-              <div className="card-body p-4 p-md-5">
-                <h3 className="card-title text-center mb-4 fw-bold text-primary">
-                  Đăng ký
-                </h3>
+        {/* Chỉ hiển thị form đăng ký khi không có OTP */}
+        {!showOTP && (
+          <div className="row justify-content-center">
+            <div className="col-lg-9 col-xl-7">
+              <div className="card shadow-sm border-0">
+                <div className="card-body p-4 p-md-5">
+                  <h3 className="card-title text-center mb-4 fw-bold text-primary">
+                    Đăng ký
+                  </h3>
 
-                <form onSubmit={handleSubmit} noValidate>
-                  {/* --- Thông tin cá nhân --- */}
-                  <div className="p-3 mb-4 rounded border bg-light-subtle">
-                    <h5 className="text-primary mb-3">Thông tin cá nhân</h5>
-                    <div className="row g-3">
-                      {/* fullName */}
-                      <div className="col-md-6">
-                        <label className="form-label">Họ tên</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-user"></i>
-                          </span>
-                          <input
-                            name="fullName"
-                            value={formData.fullName}
-                            onChange={handleChange}
-                            type="text"
-                            className={`form-control ${errors.fullName ? "is-invalid" : ""}`}
-                          />
-                          {errors.fullName && (
-                            <div className="invalid-feedback">{errors.fullName}</div>
-                          )}
+                  <form onSubmit={handleSubmit} noValidate>
+                    {/* --- Thông tin cá nhân --- */}
+                    <div className="p-3 mb-4 rounded border bg-light-subtle">
+                      <h5 className="text-primary mb-3">Thông tin cá nhân</h5>
+                      <div className="row g-3">
+                        {/* fullName */}
+                        <div className="col-md-6">
+                          <label className="form-label">Họ tên</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-user"></i>
+                            </span>
+                            <input
+                              name="fullName"
+                              value={formData.fullName}
+                              onChange={handleChange}
+                              type="text"
+                              className={`form-control ${errors.fullName ? "is-invalid" : ""}`}
+                            />
+                            {errors.fullName && (
+                              <div className="invalid-feedback">{errors.fullName}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* phone */}
+                        <div className="col-md-6">
+                          <label className="form-label">Số điện thoại</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-phone"></i>
+                            </span>
+                            <input
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleChange}
+                              type="tel"
+                              className={`form-control ${errors.phone ? "is-invalid" : ""}`}
+                            />
+                            {errors.phone && (
+                              <div className="invalid-feedback">{errors.phone}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* email */}
+                        <div className="col-md-6">
+                          <label className="form-label">Email</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-envelope"></i>
+                            </span>
+                            <input
+                              name="email"
+                              value={formData.email}
+                              onChange={handleChange}
+                              type="email"
+                              className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                            />
+                            {errors.email && (
+                              <div className="invalid-feedback">{errors.email}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* password */}
+                        <div className="col-md-6">
+                          <label className="form-label">Mật khẩu</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-lock"></i>
+                            </span>
+                            <input
+                              name="password"
+                              value={formData.password}
+                              onChange={handleChange}
+                              type="password"
+                              className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                            />
+                            {errors.password && (
+                              <div className="invalid-feedback">{errors.password}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* confirmPassword */}
+                        <div className="col-md-6">
+                          <label className="form-label">Nhập lại mật khẩu</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-lock"></i>
+                            </span>
+                            <input
+                              name="confirmPassword"
+                              value={formData.confirmPassword}
+                              onChange={handleChange}
+                              type="password"
+                              className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
+                            />
+                            {errors.confirmPassword && (
+                              <div className="invalid-feedback">
+                                {errors.confirmPassword}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
+                    </div>
 
-                      {/* phone */}
-                      <div className="col-md-6">
-                        <label className="form-label">Số điện thoại</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-phone"></i>
-                          </span>
+                    {/* --- Thông tin định danh --- */}
+                    <div className="p-3 mb-4 rounded border bg-light-subtle">
+                      <h5 className="text-primary mb-3">Thông tin định danh</h5>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">CCCD</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-id-card"></i>
+                            </span>
+                            <input
+                              name="cccd"
+                              value={formData.cccd}
+                              onChange={handleChange}
+                              type="text"
+                              className={`form-control ${errors.cccd ? "is-invalid" : ""}`}
+                            />
+                            {errors.cccd && (
+                              <div className="invalid-feedback">{errors.cccd}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="w-100"></div>
+
+                        <div className="col-md-6">
+                          <label className="form-label">Ảnh CCCD (Mặt trước)</label>
                           <input
-                            name="phone"
-                            value={formData.phone}
+                            type="file"
+                            name="cccdFront"
+                            accept="image/*"
+                            className="form-control"
                             onChange={handleChange}
-                            type="tel"
-                            className={`form-control ${errors.phone ? "is-invalid" : ""}`}
                           />
-                          {errors.phone && (
-                            <div className="invalid-feedback">{errors.phone}</div>
+                          {fileName(formData.cccdFront) && (
+                            <small className="text-muted">{fileName(formData.cccdFront)}</small>
                           )}
                         </div>
-                      </div>
 
-                      {/* email */}
-                      <div className="col-md-6">
-                        <label className="form-label">Email</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-envelope"></i>
-                          </span>
+                        <div className="col-md-6">
+                          <label className="form-label">Ảnh CCCD (Mặt sau)</label>
                           <input
-                            name="email"
-                            value={formData.email}
+                            type="file"
+                            name="cccdBack"
+                            accept="image/*"
+                            className="form-control"
                             onChange={handleChange}
-                            type="email"
-                            className={`form-control ${errors.email ? "is-invalid" : ""}`}
                           />
-                          {errors.email && (
-                            <div className="invalid-feedback">{errors.email}</div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* password */}
-                      <div className="col-md-6">
-                        <label className="form-label">Mật khẩu</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-lock"></i>
-                          </span>
-                          <input
-                            name="password"
-                            value={formData.password}
-                            onChange={handleChange}
-                            type="password"
-                            className={`form-control ${errors.password ? "is-invalid" : ""}`}
-                          />
-                          {errors.password && (
-                            <div className="invalid-feedback">{errors.password}</div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* confirmPassword */}
-                      <div className="col-md-6">
-                        <label className="form-label">Nhập lại mật khẩu</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-lock"></i>
-                          </span>
-                          <input
-                            name="confirmPassword"
-                            value={formData.confirmPassword}
-                            onChange={handleChange}
-                            type="password"
-                            className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
-                          />
-                          {errors.confirmPassword && (
-                            <div className="invalid-feedback">
-                              {errors.confirmPassword}
-                            </div>
+                          {fileName(formData.cccdBack) && (
+                            <small className="text-muted">{fileName(formData.cccdBack)}</small>
                           )}
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* --- Thông tin định danh --- */}
-                  <div className="p-3 mb-4 rounded border bg-light-subtle">
-                    <h5 className="text-primary mb-3">Thông tin định danh</h5>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">CCCD</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-id-card"></i>
-                          </span>
+                    {/* --- Thông tin bằng lái --- */}
+                    <div className="p-3 mb-4 rounded border bg-light-subtle">
+                      <h5 className="text-primary mb-3">Thông tin bằng lái</h5>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Giấy phép lái xe</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-id-badge"></i>
+                            </span>
+                            <input
+                              name="license"
+                              value={formData.license}
+                              onChange={handleChange}
+                              type="text"
+                              className={`form-control ${errors.license ? "is-invalid" : ""}`}
+                            />
+                            {errors.license && (
+                              <div className="invalid-feedback">{errors.license}</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="w-100"></div>
+
+                        <div className="col-md-6">
+                          <label className="form-label">Ảnh bằng lái (Mặt trước)</label>
                           <input
-                            name="cccd"
-                            value={formData.cccd}
+                            type="file"
+                            name="licenseFront"
+                            accept="image/*"
+                            className="form-control"
                             onChange={handleChange}
-                            type="text"
-                            className={`form-control ${errors.cccd ? "is-invalid" : ""}`}
                           />
-                          {errors.cccd && (
-                            <div className="invalid-feedback">{errors.cccd}</div>
+                          {fileName(formData.licenseFront) && (
+                            <small className="text-muted">{fileName(formData.licenseFront)}</small>
                           )}
                         </div>
-                      </div>
 
-                      <div className="w-100"></div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Ảnh CCCD (Mặt trước)</label>
-                        <input
-                          type="file"
-                          name="cccdFront"
-                          accept="image/*"
-                          className="form-control"
-                          onChange={handleChange}
-                        />
-                        {fileName(formData.cccdFront) && (
-                          <small className="text-muted">{fileName(formData.cccdFront)}</small>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Ảnh CCCD (Mặt sau)</label>
-                        <input
-                          type="file"
-                          name="cccdBack"
-                          accept="image/*"
-                          className="form-control"
-                          onChange={handleChange}
-                        />
-                        {fileName(formData.cccdBack) && (
-                          <small className="text-muted">{fileName(formData.cccdBack)}</small>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* --- Thông tin bằng lái --- */}
-                  <div className="p-3 mb-4 rounded border bg-light-subtle">
-                    <h5 className="text-primary mb-3">Thông tin bằng lái</h5>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Giấy phép lái xe</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-id-badge"></i>
-                          </span>
+                        <div className="col-md-6">
+                          <label className="form-label">Ảnh bằng lái (Mặt sau)</label>
                           <input
-                            name="license"
-                            value={formData.license}
+                            type="file"
+                            name="licenseBack"
+                            accept="image/*"
+                            className="form-control"
                             onChange={handleChange}
-                            type="text"
-                            className={`form-control ${errors.license ? "is-invalid" : ""}`}
                           />
-                          {errors.license && (
-                            <div className="invalid-feedback">{errors.license}</div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="w-100"></div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Ảnh bằng lái (Mặt trước)</label>
-                        <input
-                          type="file"
-                          name="licenseFront"
-                          accept="image/*"
-                          className="form-control"
-                          onChange={handleChange}
-                        />
-                        {fileName(formData.licenseFront) && (
-                          <small className="text-muted">{fileName(formData.licenseFront)}</small>
-                        )}
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Ảnh bằng lái (Mặt sau)</label>
-                        <input
-                          type="file"
-                          name="licenseBack"
-                          accept="image/*"
-                          className="form-control"
-                          onChange={handleChange}
-                        />
-                        {fileName(formData.licenseBack) && (
-                          <small className="text-muted">{fileName(formData.licenseBack)}</small>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* --- Thông tin ngân hàng --- */}
-                  <div className="p-3 mb-4 rounded border bg-light-subtle">
-                    <h5 className="text-primary mb-3">Thông tin ngân hàng</h5>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label">Tên ngân hàng</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-university"></i>
-                          </span>
-                          <input
-                            name="bankName"
-                            value={formData.bankName}
-                            onChange={handleChange}
-                            type="text"
-                            className={`form-control ${errors.bankName ? "is-invalid" : ""}`}
-                          />
-                          {errors.bankName && (
-                            <div className="invalid-feedback">{errors.bankName}</div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="col-md-6">
-                        <label className="form-label">Số tài khoản</label>
-                        <div className="input-group">
-                          <span className="input-group-text">
-                            <i className="fa fa-credit-card"></i>
-                          </span>
-                          <input
-                            name="bankNumber"
-                            value={formData.bankNumber}
-                            onChange={handleChange}
-                            type="text"
-                            className={`form-control ${errors.bankNumber ? "is-invalid" : ""}`}
-                          />
-                          {errors.bankNumber && (
-                            <div className="invalid-feedback">{errors.bankNumber}</div>
+                          {fileName(formData.licenseBack) && (
+                            <small className="text-muted">{fileName(formData.licenseBack)}</small>
                           )}
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* --- Buttons --- */}
-                  <div className="d-flex justify-content-center gap-2 mt-4">
-                    <button type="submit" className="btn btn-primary px-4">
-                      Đăng ký
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-outline-secondary px-4"
-                      onClick={handleCancel}
-                    >
-                      Hủy
-                    </button>
-                  </div>
+                    {/* --- Thông tin ngân hàng --- */}
+                    <div className="p-3 mb-4 rounded border bg-light-subtle">
+                      <h5 className="text-primary mb-3">Thông tin ngân hàng</h5>
+                      <div className="row g-3">
+                        <div className="col-md-6">
+                          <label className="form-label">Tên ngân hàng</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-university"></i>
+                            </span>
+                            <input
+                              name="bankName"
+                              value={formData.bankName}
+                              onChange={handleChange}
+                              type="text"
+                              className={`form-control ${errors.bankName ? "is-invalid" : ""}`}
+                            />
+                            {errors.bankName && (
+                              <div className="invalid-feedback">{errors.bankName}</div>
+                            )}
+                          </div>
+                        </div>
 
-                  {formMessage && (
-                    <div
-                      className={`mt-3 text-center ${formMessage.includes("thành công") ? "text-success" : "text-danger"
-                        }`}
-                    >
-                      {formMessage}
+                        <div className="col-md-6">
+                          <label className="form-label">Số tài khoản</label>
+                          <div className="input-group">
+                            <span className="input-group-text">
+                              <i className="fa fa-credit-card"></i>
+                            </span>
+                            <input
+                              name="bankNumber"
+                              value={formData.bankNumber}
+                              onChange={handleChange}
+                              type="text"
+                              className={`form-control ${errors.bankNumber ? "is-invalid" : ""}`}
+                            />
+                            {errors.bankNumber && (
+                              <div className="invalid-feedback">{errors.bankNumber}</div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </form>
-              </div>
 
-              <div className="card-footer text-center small text-muted">
-                © EV Share
+                    {/* --- Buttons --- */}
+                    <div className="d-flex justify-content-center gap-2 mt-4">
+                      <button type="submit" className="btn btn-primary px-4">
+                        Đăng ký
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-outline-secondary px-4"
+                        onClick={handleCancel}
+                      >
+                        Hủy
+                      </button>
+                    </div>
+
+                    {formMessage && (
+                      <div
+                        className={`mt-3 text-center ${formMessage.includes("thành công") ? "text-success" : "text-danger"
+                          }`}
+                      >
+                        {formMessage}
+                      </div>
+                    )}
+                  </form>
+                </div>
+
+                <div className="card-footer text-center small text-muted">
+                  © EV Share
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* OTP Modal giữ nguyên */}
+        {/* OTP Modal với thiết kế mới - toàn màn hình */}
         {showOTP && (
-          <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0,0,0,0.5)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <div
-              style={{
-                background: "#fff",
-                padding: "20px",
-                borderRadius: "8px",
-                textAlign: "center",
-              }}
-            >
-              <h3>Xác minh email</h3>
-              <p>{formData.email}</p>
-              <input
-                type="number"
-                placeholder="Nhập mã OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-              />
-              {otpMessage && (
-                <p
-                  style={{
-                    color: otpMessage.startsWith("X") ? "green" : "red",
-                    marginTop: "8px",
-                  }}
-                >
-                  {otpMessage}
-                </p>
-              )}
+          <div className="d-flex justify-content-center align-items-center" style={{
+            minHeight: '100vh',
+            padding: '20px'
+          }}>
+            <div className="col-lg-5 col-xl-4">
+              <div className="card shadow-lg border-0" style={{
+                borderRadius: '20px',
+                overflow: 'hidden',
+                animation: 'fadeInUp 0.5s ease-out'
+              }}>
+                {/* Header */}
+                <div className="card-header text-center py-4" style={{
+                  background: 'linear-gradient(45deg, #4CAF50, #45a049)',
+                  color: 'white',
+                  border: 'none'
+                }}>
+                  <div className="mb-3">
+                    <i className="fa fa-shield-alt" style={{ fontSize: '3rem' }}></i>
+                  </div>
+                  <h4 className="card-title mb-0 fw-bold">Xác minh email</h4>
+                  <p className="mb-0 mt-2 opacity-90">Nhập mã OTP đã được gửi đến email của bạn</p>
+                </div>
 
-              <button onClick={handleVerify}>Xác minh</button>
-              <button
-                onClick={resendCode}
-                disabled={countdown > 0}
-                style={{
-                  color: countdown > 0 ? "gray" : "blue",
-                  background: "none",
-                  border: "none",
-                }}
-              >
-                {countdown > 0
-                  ? `Gửi lại mã sau ${countdown}s`
-                  : "Gửi lại mã xác minh"}
-              </button>
+                {/* Body */}
+                <div className="card-body text-center p-5">
+                  <div className="mb-4">
+                    <p className="text-muted mb-2">Mã xác minh đã được gửi đến:</p>
+                    <p className="fw-bold text-primary fs-5">{formData.email}</p>
+                  </div>
+
+                  {/* OTP Input Fields */}
+                  <div className="mb-4">
+                    <label className="form-label fw-bold mb-3">Nhập mã OTP (6 số)</label>
+                    <div className="d-flex justify-content-center gap-2 mb-3">
+                      {otp.map((digit, index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          name={`otp-${index}`}
+                          value={digit}
+                          onChange={(e) => handleOtpChange(index, e.target.value)}
+                          onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                          onPaste={index === 0 ? handleOtpPaste : undefined}
+                          className="form-control text-center fw-bold"
+                          style={{
+                            width: '50px',
+                            height: '60px',
+                            fontSize: '1.5rem',
+                            borderRadius: '10px',
+                            border: '2px solid #e0e0e0',
+                            transition: 'all 0.3s ease',
+                            backgroundColor: digit ? '#f8f9fa' : 'white'
+                          }}
+                          maxLength="1"
+                          onFocus={(e) => {
+                            e.target.style.borderColor = '#4CAF50';
+                            e.target.style.boxShadow = '0 0 0 0.2rem rgba(76, 175, 80, 0.25)';
+                          }}
+                          onBlur={(e) => {
+                            e.target.style.borderColor = '#e0e0e0';
+                            e.target.style.boxShadow = 'none';
+                          }}
+                        />
+                      ))}
+                    </div>
+                    <small className="text-muted">
+                      <i className="fa fa-info-circle me-1"></i>
+                      Bạn có thể dán toàn bộ mã OTP vào ô đầu tiên
+                    </small>
+                  </div>
+
+                  {/* Messages */}
+                  {otpMessage && (
+                    <div
+                      className={`alert ${otpMessage.includes("thành công") ? "alert-success" : "alert-danger"} mb-4`}
+                      style={{ borderRadius: '10px' }}
+                    >
+                      <i className={`fa ${otpMessage.includes("thành công") ? "fa-check-circle" : "fa-exclamation-triangle"} me-2`}></i>
+                      {otpMessage}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="d-flex flex-column gap-3">
+                    <button
+                      onClick={handleVerify}
+                      disabled={otp.some(digit => !digit)}
+                      className="btn btn-success btn-lg fw-bold"
+                      style={{
+                        borderRadius: '10px',
+                        background: otp.some(digit => !digit) ? '#ccc' : 'linear-gradient(45deg, #4CAF50, #45a049)',
+                        border: 'none',
+                        padding: '12px 30px',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <i className="fa fa-check me-2"></i>
+                      Xác minh
+                    </button>
+
+                    <button
+                      onClick={resendCode}
+                      disabled={countdown > 0}
+                      className="btn btn-outline-primary fw-bold"
+                      style={{
+                        borderRadius: '10px',
+                        padding: '10px 30px',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <i className="fa fa-refresh me-2"></i>
+                      {countdown > 0 ? `Gửi lại sau ${countdown}s` : "Gửi lại mã"}
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setShowOTP(false);
+                        setOtp(["", "", "", "", "", ""]);
+                        setOtpMessage("");
+                      }}
+                      className="btn btn-outline-secondary"
+                      style={{ borderRadius: '10px' }}
+                    >
+                      <i className="fa fa-arrow-left me-2"></i>
+                      Quay lại
+                    </button>
+                  </div>
+
+                  <div className="mt-4 pt-3 border-top">
+                    <small className="text-muted">
+                      <i className="fa fa-clock me-1"></i>
+                      Mã OTP có hiệu lực trong 10 phút
+                    </small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* CSS Animation */}
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
