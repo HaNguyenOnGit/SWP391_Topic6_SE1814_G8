@@ -47,9 +47,6 @@ export default function LandingPage() {
                             <Link to="/register" className="btn btn-primary btn-large">
                                 Bắt đầu ngay
                             </Link>
-                            <Link to="/vehicles" className="btn btn-outline btn-large">
-                                Xem xe có sẵn
-                            </Link>
                         </div>
                     </div>
                     <div className="hero-image">

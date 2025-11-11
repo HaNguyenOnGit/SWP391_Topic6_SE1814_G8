@@ -163,6 +163,7 @@
 
 .landing-page .hero-buttons {
     display: flex;
+    margin-left: 140px;
     gap: 1rem;
     flex-wrap: wrap;
 }
