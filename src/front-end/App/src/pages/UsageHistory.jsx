@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../NavBar";
+import Navbar from "../Navbar";
 import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./UsageHistory.css";

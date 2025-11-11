@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../NavBar";
+import Navbar from "../Navbar";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
@@ -47,7 +47,7 @@ export default function Schedule() {
                         vehicles.map((v) => (
                             <Link
                                 key={v.contractId}
-                                to={`/vehicle/${v.contractId}`}
+                                to={`/vehicle/${v.contractId}/schedule`}
                                 className="vehicle-card"
                             >
                                 <div className="vehicle-card-header">

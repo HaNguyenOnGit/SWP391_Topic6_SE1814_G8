@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../NavBar";
+import Navbar from "../Navbar";
 import { useParams, Link } from "react-router-dom";
 import { FaCalendarAlt, FaDoorOpen, FaFileInvoiceDollar, FaExclamationCircle, FaMoneyBillWave, FaHistory, FaChevronLeft } from "react-icons/fa";
 import VehicleInfo from "../VehicleInfo";
