@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
 
+import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/Login";
 import RegistrationForm from "./pages/Registration";
 import Vehicles from "./pages/Vehicles";
@@ -30,7 +31,7 @@ export default function App() {
     <BrowserRouter>
 
       <Routes>
-        <Route path="/" element={<Navigate to="/vehicles" replace />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/newContract" element={<NewContract />} />
         <Route path="/register" element={<RegistrationForm />} />
