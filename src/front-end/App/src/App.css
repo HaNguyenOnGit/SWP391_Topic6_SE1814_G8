@@ -1,0 +1,89 @@
+/* Navbar dropdown styles */
+.username-container {
+    position: relative;
+}
+
+.username {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.dropdown-arrow {
+    transition: transform 0.2s ease;
+}
+
+.dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    z-index: 1000;
+}
+
+.dropdown-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background-color: #f5f5f5;
+}
+
+.dropdown-item svg {
+    margin-right: 8px;
+}
+
+.dropdown-item.logout {
+    color: #dc3545;
+}
+
+/* Responsive behavior for 16:9 aspect ratio screens */
+@media screen and (aspect-ratio: 16/9),
+screen and (min-aspect-ratio: 16/9) {
+    .username-container .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin-bottom: 5px;
+    }
+
+    .username-container.mobile .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin-bottom: 5px;
+    }
+}
+
+/* Additional responsive adjustments for wide screens */
+@media screen and (min-width: 1920px) and (min-height: 1080px) {
+    .username-container .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin-bottom: 5px;
+    }
+}
+
+/* For ultrawide monitors */
+@media screen and (min-aspect-ratio: 21/9) {
+    .username-container .dropdown-menu {
+        top: auto;
+        bottom: 100%;
+        margin-bottom: 8px;
+    }
+}

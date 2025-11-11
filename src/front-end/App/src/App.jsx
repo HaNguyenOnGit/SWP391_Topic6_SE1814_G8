@@ -31,7 +31,7 @@ export default function App() {
     <BrowserRouter>
 
       <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/land" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/newContract" element={<NewContract />} />
         <Route path="/register" element={<RegistrationForm />} />
