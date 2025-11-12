@@ -75,7 +75,7 @@ export default function RegistrationForm() {
         if (!/^[0-9]{12}$/.test(value)) error = "CCCD phải gồm 12 số";
         break;
       case "license":
-        if (!value.trim()) error = "Số giấy phép lái xe là bắt buộc";
+        if (!/^[0-9]{12}$/.test(value)) error = "Giấy phép lái xe phải gồm 12 số";
         break;
       case "bankName":
         if (!value.trim()) error = "Tên ngân hàng là bắt buộc";
