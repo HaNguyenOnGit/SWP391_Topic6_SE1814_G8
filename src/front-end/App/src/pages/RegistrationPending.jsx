@@ -3,6 +3,13 @@ import { Link } from "react-router-dom";
 import "./Registration.css" // Sử dụng chung CSS với Registration
 
 export default function RegistrationPending() {
+    const oldPadding = document.body.style.padding;
+    const oldMargin = document.body.style.margin;
+
+    // Gán padding/margin = 0
+    document.body.style.padding = "0";
+    document.body.style.margin = "0";
+
     return (
         <div className="registration-page">
             <div className="registration-background"></div>

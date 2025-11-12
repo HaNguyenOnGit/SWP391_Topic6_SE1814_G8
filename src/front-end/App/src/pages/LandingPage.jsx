@@ -44,7 +44,7 @@ export default function LandingPage() {
                             chia sẻ chi phí mua xe, bảo trì và vận hành một cách minh bạch và công bằng.
                         </p>
                         <div className="hero-buttons">
-                            <Link to="/register" className="btn btn-primary btn-large">
+                            <Link to="/login" className="btn btn-primary btn-large">
                                 Bắt đầu ngay
                             </Link>
                         </div>

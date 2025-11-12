@@ -227,12 +227,19 @@ export default function RegistrationForm() {
       bankName: "",
       bankNumber: "",
     });
+    
+    // Clear tất cả errors
     setErrors({});
+    
+    // Clear form message
     setFormMessage("");
+    
+    // Reset loading state
     setIsLoading(false);
+    
+    // Navigate về trang login
     navigate("/login");
   };
-
 
   const fileName = (file) => (file ? file.name || "" : "");
 
