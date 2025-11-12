@@ -13,6 +13,13 @@ export default function LoginPage({ apiUrl }) {
     const navigate = useNavigate();
     const { setAuth } = useAuth();
 
+    const oldPadding = document.body.style.padding;
+    const oldMargin = document.body.style.margin;
+
+    // Gán padding/margin = 0
+    document.body.style.padding = "0";
+    document.body.style.margin = "0";
+
     // Validate 1 field
     const validateField = (name, value) => {
         let error = "";
@@ -115,63 +122,90 @@ export default function LoginPage({ apiUrl }) {
 
     return (
         <div className="login-page">
-            <form onSubmit={handleSubmit} noValidate>
-                <h2>Đăng Nhập</h2>
+            <div className="login-background"></div>
+            <div className="login-container">
+                <div className="login-card">
+                    <div className="login-header">
+                        <div className="login-logo">
+                            <i className="fas fa-car-alt"></i>
+                        </div>
+                        <h2>Chào mừng trở lại!</h2>
+                        <p>Đăng nhập vào tài khoản EV Share của bạn</p>
+                    </div>
 
-                <div style={{ marginBottom: "10px" }}>
-                    <label>Số điện thoại</label>
-                    <input
-                        type="text"
-                        name="phone"
-                        value={phone}
-                        onChange={handleChange}
-                        style={{
-                            width: "100%",
-                            padding: "8px",
-                            marginTop: "5px",
-                            borderColor: errors.phone ? "red" : "#ccc",
-                        }}
-                        required
-                    />
-                    {errors.phone && (
-                        <p style={{ color: "red", fontSize: "12px" }}>{errors.phone}</p>
-                    )}
+                    <form onSubmit={handleSubmit} noValidate className="login-form">
+                        <div className="input-group">
+                            <label>Số điện thoại</label>
+                            <div className="input-wrapper">
+                                <i className="fas fa-phone"></i>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={phone}
+                                    onChange={handleChange}
+                                    placeholder="Nhập số điện thoại"
+                                    className={errors.phone ? "error" : ""}
+                                    required
+                                />
+                            </div>
+                            {errors.phone && (
+                                <span className="error-message">{errors.phone}</span>
+                            )}
+                        </div>
+
+                        <div className="input-group">
+                            <label>Mật khẩu</label>
+                            <div className="input-wrapper">
+                                <i className="fas fa-lock"></i>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    value={password}
+                                    onChange={handleChange}
+                                    placeholder="Nhập mật khẩu"
+                                    className={errors.password ? "error" : ""}
+                                    required
+                                />
+                            </div>
+                            {errors.password && (
+                                <span className="error-message">{errors.password}</span>
+                            )}
+                        </div>
+
+                        {message && (
+                            <div className={`message ${message.includes("thành công") ? "success" : "error"}`}>
+                                <i className={`fas ${message.includes("thành công") ? "fa-check-circle" : "fa-exclamation-circle"}`}></i>
+                                {message}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="login-button"
+                        >
+                            {loading ? (
+                                <>
+                                    <i className="fas fa-spinner fa-spin"></i>
+                                    Đang xử lý...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fas fa-sign-in-alt"></i>
+                                    Đăng nhập
+                                </>
+                            )}
+                        </button>
+
+                        <div className="login-footer">
+                            <p>
+                                Chưa có tài khoản?
+                                <Link to="/register"> Đăng ký ngay</Link>
+                            </p>
+                        </div>
+                    </form>
                 </div>
-
-                <div style={{ marginBottom: "10px" }}>
-                    <label>Mật khẩu</label>
-                    <input
-                        type="password"
-                        name="password"
-                        value={password}
-                        onChange={handleChange}
-                        style={{
-                            width: "100%",
-                            padding: "8px",
-                            marginTop: "5px",
-                            borderColor: errors.password ? "red" : "#ccc",
-                        }}
-                        required
-                    />
-                    {errors.password && (
-                        <p style={{ color: "red", fontSize: "12px" }}>{errors.password}</p>
-                    )}
-                </div>
-
-                {message && <p style={{ color: "red", marginBottom: "10px" }}>{message}</p>}
-
-                <button
-                    type="submit"
-                    disabled={loading}
-                    style={{ width: "100%", padding: "10px" }}
-                >
-                    {loading ? "Đang xử lý..." : "Đăng nhập"}
-                </button>
-
-                <p style={{ marginTop: "10px", textAlign: "center" }}>
-                    Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
-                </p>
-            </form>
+            </div>
         </div>
     );
 }
