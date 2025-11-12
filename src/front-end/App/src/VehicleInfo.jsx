@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
+import { FaCar, FaUsers } from "react-icons/fa";
 
 export default function VehicleInfo() {
     const { id } = useParams(); // id lấy từ URL /vehicle/:id
@@ -73,7 +74,27 @@ export default function VehicleInfo() {
     return (
         <div className="vehicle-info">
             <div>
-                <h1 style={{ color: "black" }}>{vehicle.name}</h1>
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "0 0 10px 0"
+                }}>
+                    <div style={{
+                        color: "#2196F3",
+                        marginRight: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "20px",
+                        justifyContent: "center"
+                    }}>
+                        <FaCar />
+                    </div>
+                    <div>
+                        <h1 style={{ color: "black", margin: 0 }}>
+                            {vehicle.name}
+                        </h1>
+                    </div>
+                </div>
                 <p>{vehicle.plate}</p>
                 <br />
                 <div>
@@ -83,7 +104,7 @@ export default function VehicleInfo() {
                             fontWeight: "bold",
                         }}
                     >
-                        ● {vehicle.status}
+                        {vehicle.status}
                     </span>
                 </div>
 
@@ -101,7 +122,27 @@ export default function VehicleInfo() {
             </div>
 
             <div>
-                <h4>Người đồng sở hữu</h4>
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    margin: "20px 0 15px 0"
+                }}>
+                    <div style={{
+                        color: "#4CAF50",
+                        marginRight: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        width: "20px",
+                        justifyContent: "center"
+                    }}>
+                        <FaUsers />
+                    </div>
+                    <div>
+                        <h4 style={{ color: "black", margin: 0 }}>
+                            Người đồng sở hữu
+                        </h4>
+                    </div>
+                </div>
                 {coowners.length > 0 ? (
                     coowners.map((c, index) => (
                         <div
@@ -125,10 +166,13 @@ export default function VehicleInfo() {
                 )}
             </div>
 
-            <div>
+            <div style={{ marginTop: "30px" }}>
                 <Link
                     to={`/vehicle/${vehicle.id}/contract`}
-                    style={{ color: "#ff9800", textDecoration: "none" }}
+                    style={{
+                        color: "#ff9800",
+                        textDecoration: "none"
+                    }}
                 >
                     Xem hợp đồng →
                 </Link>

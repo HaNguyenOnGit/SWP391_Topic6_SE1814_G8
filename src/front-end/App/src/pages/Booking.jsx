@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../Navbar";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
+import { FaCar } from "react-icons/fa";
 import "./Booking.css";
 
 export default function Booking() {
@@ -162,7 +163,25 @@ export default function Booking() {
                     <div className="left-section">
                         {/* Luôn hiện thông tin xe */}
                         <div className="vehicle-header">
-                            <h1>{vehicle.name}</h1>
+                            <div style={{
+                                display: "flex",
+                                alignItems: "center",
+                                margin: "0 0 10px 0"
+                            }}>
+                                <div style={{
+                                    color: "#2196F3",
+                                    marginRight: "10px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    width: "20px",
+                                    justifyContent: "center"
+                                }}>
+                                    <FaCar />
+                                </div>
+                                <div>
+                                    <h1 style={{ margin: 0 }}>{vehicle.name}</h1>
+                                </div>
+                            </div>
                             <p>{vehicle.plate}</p>
                             <span
                                 style={{

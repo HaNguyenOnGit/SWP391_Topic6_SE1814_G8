@@ -4,6 +4,19 @@ import { useNavigate } from "react-router-dom";
 import "./Registration.css"
 
 export default function RegistrationForm() {
+  useEffect(() => {
+    const originalPadding = document.body.style.padding;
+    const originalMargin = document.body.style.margin;
+
+    document.body.style.padding = "0";
+    document.body.style.margin = "0";
+
+    return () => {
+      document.body.style.padding = originalPadding;
+      document.body.style.margin = originalMargin;
+    };
+  }, []);
+
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -227,19 +240,12 @@ export default function RegistrationForm() {
       bankName: "",
       bankNumber: "",
     });
-    
-    // Clear tất cả errors
     setErrors({});
-    
-    // Clear form message
     setFormMessage("");
-    
-    // Reset loading state
     setIsLoading(false);
-    
-    // Navigate về trang login
     navigate("/login");
   };
+
 
   const fileName = (file) => (file ? file.name || "" : "");
 

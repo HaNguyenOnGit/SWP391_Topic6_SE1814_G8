@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import "./Login.css";
@@ -13,12 +13,22 @@ export default function LoginPage({ apiUrl }) {
     const navigate = useNavigate();
     const { setAuth } = useAuth();
 
-    const oldPadding = document.body.style.padding;
-    const oldMargin = document.body.style.margin;
+    // Sử dụng useEffect để quản lý body styles
+    useEffect(() => {
+        // Lưu giá trị hiện tại
+        const originalPadding = document.body.style.padding;
+        const originalMargin = document.body.style.margin;
 
-    // Gán padding/margin = 0
-    document.body.style.padding = "0";
-    document.body.style.margin = "0";
+        // Áp dụng styles cho login page
+        document.body.style.padding = "0";
+        document.body.style.margin = "0";
+
+        // Cleanup function - khôi phục lại khi component unmount
+        return () => {
+            document.body.style.padding = originalPadding;
+            document.body.style.margin = originalMargin;
+        };
+    }, []);
 
     // Validate 1 field
     const validateField = (name, value) => {
