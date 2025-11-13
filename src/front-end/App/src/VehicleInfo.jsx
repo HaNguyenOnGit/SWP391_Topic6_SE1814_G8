@@ -31,7 +31,6 @@ export default function VehicleInfo() {
                     userId: m.userId,
                     username: m.fullName || m.phoneNumber,
                     share: m.sharePercent,
-                    // backend may call this field different names; try common ones, fallback to 'Confirmed'
                     status: (m.status || m.invitationStatus || m.memberStatus || m.statusName || 'Confirmed')
                 }));
                 setCoowners(members);
