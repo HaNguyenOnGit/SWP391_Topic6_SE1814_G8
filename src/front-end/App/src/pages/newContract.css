@@ -1,3 +1,25 @@
+@media (max-width: 930px) {
+    .main-inner {
+        padding: 20px;
+    }
+
+    .nc-layout {
+        flex-direction: column;
+        gap: 32px;
+    }
+
+    .nc-left,
+    .nc-right {
+        width: 100%;
+        flex: unset;
+        min-width: 0;
+    }
+}
+
+.main-inner {
+    padding: 50px;
+}
+
 .txtInput {
     margin-left: 0px;
 }
@@ -13,7 +35,7 @@ h2 {
     padding: 0;
     font-size: 27pt;
     font-weight: 700;
-    color: #D9D9D9;
+    color: #f5f5f5;
     background: linear-gradient(135deg, #8CC8E7, #C77DCE);
     border: none;
     margin-left: 20px;
@@ -31,7 +53,6 @@ h2 {
 .pTxtInput {
     width: 40px;
     text-align: right;
-    border: none;
     background: transparent;
     font-size: 25px;
     font-weight: 500;
@@ -44,5 +65,217 @@ h2 {
 .pTxtInput::-webkit-outer-spin-button,
 .pTxtInput::-webkit-inner-spin-button {
     -webkit-appearance: none;
+}
+
+/* New Contract enhanced layout */
+.nc-steps {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0 20px 0;
+    background: #eef3f7;
+    /* subtle band to separate the header */
+    padding: 12px 18px;
+    border-radius: 10px;
+}
+
+.nc-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.nc-step span {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #d0d7de;
+    background: #f6f8fa;
+    color: #57606a;
+    font-weight: 600;
+}
+
+.nc-step p {
     margin: 0;
+    font-size: 12px;
+    color: #57606a;
+}
+
+.nc-step.active span {
+    border-color: #6aa6ff;
+    background: #e7f0ff;
+    color: #0969da;
+}
+
+.nc-step.done span {
+    border-color: #2da44e;
+    background: #dafbe1;
+    color: #1a7f37;
+}
+
+.nc-line {
+    height: 2px;
+    flex: 1;
+    background: #cbd5e1;
+}
+
+.nc-line.done {
+    background: #2da44e;
+}
+
+.nc-layout {
+    display: flex;
+    align-items: stretch;
+    gap: 20px;
+    margin: 20px 0 32px;
+    min-height: 420px;
+    width: 100%;
+    box-sizing: border-box;
+    /* force both children to have at least this height */
+}
+
+.nc-left {
+    flex: 1.5 1 0;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.nc-right {
+    flex: 1 1 0;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+
+.nc-section {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 22px 24px;
+    box-shadow: 0 4px 18px rgba(11, 22, 33, 0.06);
+    border: 1px solid #e6eef6;
+    width: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.nc-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(11, 22, 33, 0.06);
+    padding: 22px 24px;
+    border: 1px solid #e6eef6;
+    width: auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.nc-card-header {
+    margin-bottom: 8px;
+}
+
+.nc-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+    background: #dbeafe;
+    /* stronger visible blue */
+    color: #054a91;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.nc-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0b1220;
+}
+
+.nc-card-sub {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.nc-card-body {
+    margin-top: 0;
+    flex-grow: 1;
+}
+
+.nc-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #eef3f7;
+}
+
+.nc-row:last-child {
+    border-bottom: none;
+}
+
+.nc-label {
+    color: #374151;
+    font-size: 13px;
+}
+
+.nc-value {
+    font-weight: 700;
+    color: #0b1220;
+}
+
+.nc-value.warn {
+    color: #b54708;
+}
+
+.nc-miniowners {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.nc-chip {
+    background: #f6f8fa;
+    border: 1px solid #d0d7de;
+    color: #24292f;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.nc-card-footer {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.nc-status-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.nc-status-pill.ok {
+    background: #dafbe1;
+    color: #1a7f37;
+}
+
+.nc-status-pill.error {
+    background: #fff1e5;
+    color: #b54708;
+}
+
+.nc-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #6b7280;
 }

@@ -49,11 +49,11 @@ export default function Navbar() {
 
             <div className="nvbr-main">
                 <div className="navigate">
-                    <NavLink to="/vehicles" style={{ marginBottom: '30px' }}><span className="nav-icon"><FaCar /></span><span className="nav-label">Xe của bạn</span></NavLink>
-                    <NavLink to="/schedule" style={{ marginBottom: '30px' }}><span className="nav-icon"><FaCalendarAlt /></span><span className="nav-label">Đặt lịch</span></NavLink>
-                    <NavLink to="/usageHistory" style={{ marginBottom: '30px' }}><span className="nav-icon"><FaHistory /></span><span className="nav-label">Lịch sử</span></NavLink>
-                    <NavLink to="/notification" style={{ marginBottom: '30px' }}><span className="nav-icon"><FaBell /></span><span className="nav-label">Thông báo</span></NavLink>
-                    <NavLink to="/support" style={{ marginBottom: '30px' }}><span className="nav-icon"><FaHeadset /></span><span className="nav-label">Hỗ trợ</span></NavLink>
+                    <NavLink to="/vehicles"><span className="nav-icon"><FaCar /></span><span className="nav-label">Xe của bạn</span></NavLink>
+                    <NavLink to="/schedule"><span className="nav-icon"><FaCalendarAlt /></span><span className="nav-label">Đặt lịch</span></NavLink>
+                    <NavLink to="/usageHistory"><span className="nav-icon"><FaHistory /></span><span className="nav-label">Lịch sử</span></NavLink>
+                    <NavLink to="/notification"><span className="nav-icon"><FaBell /></span><span className="nav-label">Thông báo</span></NavLink>
+                    <NavLink to="/support"><span className="nav-icon"><FaHeadset /></span><span className="nav-label">Hỗ trợ</span></NavLink>
                 </div>
                 <div className="username-container">
                     <div className="username" onClick={toggleDropdown}>

@@ -209,6 +209,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                     {
                         contract.ContractId,
                         contract.VehicleName,
+                        contract.LicensePlate,
                         contract.Status
                     });
                 }

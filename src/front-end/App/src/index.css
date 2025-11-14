@@ -14,7 +14,7 @@ html {
 body {
     padding: 30px;
     height: 100%;
-    background-color: #D9D9D9;
+    background-color: #f5f5f5;
 }
 
 a {
@@ -28,6 +28,7 @@ a {
 /* ========== LAYOUT CONTAINERS ========== */
 .main-container {
     display: flex;
+    flex-direction: column;
     height: 100%;
     width: 100%;
 }
@@ -41,32 +42,43 @@ a {
 /* ========== NAVBAR STYLES ========== */
 .Navbar {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
     border: 1px solid #000000;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-    margin-right: 15px;
-    width: 20%;
-    height: 100%;
+    margin-bottom: 10px;
+    width: 100%;
+    height: 50px;
 }
 
 .nvbr-main {
-    height: 80%;
+    height: auto;
     display: flex;
     justify-content: space-between;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
 }
 
 .username {
-    margin: 15px;
-    padding: 10px;
+    margin: 0 15px 0 0;
+    padding: 5px 10px;
     border: 1px solid #000000;
     display: flex;
     align-items: center;
+    font-size: 10pt;
 }
 
 .username span {
-    padding-left: 10px;
+    padding-left: 2px;
+}
+
+.username-container {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    margin-right: 10px;
 }
 
 .menu-btn {
@@ -79,29 +91,37 @@ a {
 }
 
 .color-box {
-    width: 100%;
-    height: 100px;
+    width: 50px;
+    height: 50px;
     background: linear-gradient(135deg, #8CC8E7, #C77DCE);
 }
 
 /* ========== NAVIGATION MENU ========== */
 .navigate {
-    margin: 15px;
+    margin: 0;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     overflow: hidden;
+    justify-content: center;
+    /* center between color-box and userbox */
+    align-items: center;
+    height: 100%;
+    flex: 1;
+    /* take remaining space to center content */
 }
 
 .navigate a {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     white-space: nowrap;
     box-sizing: border-box;
-    padding: 10px 5px;
-    font-size: 18pt;
+    padding: 10px;
+    font-size: 10pt;
     position: relative;
     z-index: 10;
+    height: 100%;
     transition: color 0.2s ease, transform 0.18s ease;
 }
 
@@ -119,9 +139,9 @@ a {
 .navigate a::after {
     content: "";
     position: absolute;
-    left: 8px;
-    right: 8px;
-    bottom: 6px;
+    left: 6px;
+    right: 6px;
+    bottom: 4px;
     height: 3px;
     width: 0;
     background: linear-gradient(90deg, #0F6CAE, #8CC8E7);
@@ -200,9 +220,12 @@ a {
 .main-content {
     border: 1px solid #000000;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-    width: calc(80% - 30px);
-    padding: 30px;
-    margin-left: 30px;
+    flex: 1;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    padding: 10px;
+    margin-left: 0;
+    overflow-y: auto;
 }
 
 .main-content h1 {
@@ -229,7 +252,7 @@ a {
     border-radius: 10px;
     border: 2px solid #000;
     width: 450px;
-    background-color: #D9D9D9;
+    background-color: #f5f5f5;
 }
 
 .txtInput:focus {
@@ -243,13 +266,13 @@ a {
     background-color: #0F6CAE;
     border: none;
     border-radius: 10px;
-    color: #D9D9D9;
+    color: #f5f5f5;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .btnInput:disabled {
-    background-color: #D9D9D9;
+    background-color: #f5f5f5;
     border: 2px solid #0F6CAE;
     color: #0F6CAE;
     cursor: not-allowed;
@@ -257,7 +280,7 @@ a {
 }
 
 .btnReturn {
-    background-color: #D9D9D9;
+    background: none;
     text-decoration: underline;
     color: #ff9800;
     border: none;
@@ -280,7 +303,7 @@ a {
     width: 450px;
     height: 40px;
     border-radius: 10px;
-    background: #d9d9d9;
+    background: #f5f5f5;
     outline: none;
     cursor: pointer;
     overflow: hidden;
@@ -291,7 +314,7 @@ a {
 .slider::-webkit-slider-runnable-track {
     height: 30px;
     border-radius: 15px;
-    background: #d9d9d9;
+    background: #f5f5f5;
 }
 
 .slider::-webkit-slider-thumb {
@@ -306,7 +329,7 @@ a {
 .slider::-moz-range-track {
     height: 30px;
     border-radius: 15px;
-    background: #d9d9d9;
+    background: #f5f5f5;
 }
 
 .slider::-moz-range-progress {
@@ -329,23 +352,22 @@ a {
 }
 
 .vehicle-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 25px;
-    justify-content: start;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-left: 30px;
 }
 
 .vehicle-card {
-    margin-left: 30px;
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 12px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     justify-content: space-between;
-    aspect-ratio: 1 / 1;
-    width: 200px;
-    height: auto;
-    padding: 15px 20px;
+    width: calc(100% - 60px);
+    min-height: 72px;
+    padding: 12px 20px;
     box-sizing: border-box;
     overflow: hidden;
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
@@ -379,7 +401,11 @@ a {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding-bottom: 8px;
+}
+
+.vehicle-card-header {
+    flex: 1;
+    /* take remaining space so status and chevron align right */
 }
 
 .vehicle-card-left {
@@ -388,11 +414,26 @@ a {
     gap: 12px;
 }
 
+/* make car icon slightly larger inside list */
+.vehicle-card-left .nav-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
 .vehicle-card-title {
     margin: 0;
-    font-size: 20px;
+    font-size: 16px;
+    /* slightly smaller */
     font-weight: 800;
     color: #1b0033;
+}
+
+.vehicle-plate {
+    font-size: 14px;
+    /* larger plate */
+    color: #222;
+    margin-top: 6px;
+    font-weight: 700;
 }
 
 .vehicle-card .nav-icon svg {
@@ -408,6 +449,9 @@ a {
     justify-content: center;
     color: rgba(0, 0, 0, 0.45);
     transition: transform 0.18s cubic-bezier(.2, .8, .2, 1), color 0.18s ease;
+    margin-left: 12px;
+    /* small gap from status */
+    flex-shrink: 0;
 }
 
 .vehicle-card:hover .chevron {
@@ -451,6 +495,12 @@ a {
 
 .status.inactive {
     color: #f44336 !important;
+}
+
+/* position status close to chevron */
+.vehicle-card .status {
+    margin-right: 8px;
+    white-space: nowrap;
 }
 
 .status.inactive::before {
@@ -535,95 +585,7 @@ a {
 
 /* ========== RESPONSIVE DESIGN ========== */
 
-/* Medium screens */
-@media (max-width: 1048px) {
-    .navigate a::after {
-        bottom: 4px;
-        left: 6px;
-        right: 6px;
-    }
-
-    .Navbar {
-        flex-direction: row;
-        width: 100%;
-        height: 50px;
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-
-    .nvbr-main {
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
-        height: auto;
-    }
-
-    .navigate {
-        flex-direction: row;
-        margin: 0;
-    }
-
-    .navigate a {
-        font-size: 10pt;
-        padding: 10px;
-    }
-
-    .color-box {
-        display: block;
-        width: 50px;
-        height: 50px;
-    }
-
-    .username {
-        font-size: 10pt;
-        margin: 0 15px 0 0;
-        padding: 5px 10px;
-    }
-
-    .username span {
-        padding-left: 2px;
-    }
-
-    .main-container {
-        flex-direction: column;
-    }
-
-    .main-content {
-        flex: 1;
-        margin-left: 0;
-        width: calc(100% - 20px);
-        height: calc(100% - 20px);
-        padding: 10px;
-        overflow-y: auto;
-    }
-
-    .vehicle-info {
-        height: 100%;
-        padding: 0;
-        margin: 0 10px;
-        justify-content: space-evenly;
-    }
-
-    .vehicle-info h1 {
-        font-size: 20pt;
-    }
-
-    .vehicle-info p {
-        font-size: 18pt;
-        margin-bottom: 5px;
-    }
-
-    .vehicle-info h4 {
-        font-size: 14pt;
-    }
-
-    .vehicle-info span {
-        font-size: 12pt;
-        margin-bottom: 10px;
-    }
-}
-
-/* Small screens */
+/* Small screens - mobile menu */
 @media (max-width: 750px) {
     .nvbr-main {
         display: none;

@@ -53,14 +53,18 @@ export default function Vehicles() {
                                 <div className="vehicle-card-header">
                                     <div className="vehicle-card-left">
                                         <span className="nav-icon"><FaCar /></span>
-                                        <h3 className="vehicle-card-title">{v.vehicleName}</h3>
+                                        <div>
+                                            <h3 className="vehicle-card-title">{v.vehicleName}</h3>
+                                            <div className="vehicle-plate">{v.licensePlate ?? v.LicensePlate}</div>
+                                        </div>
                                     </div>
-                                    <span className="chevron"><FaChevronRight /></span>
                                 </div>
 
                                 <div className={`status ${getStatusClass(v.status)}`}>
                                     {translateStatus(v.status)}
                                 </div>
+
+                                <span className="chevron"><FaChevronRight /></span>
                             </Link>
                         ))
                     ) : (

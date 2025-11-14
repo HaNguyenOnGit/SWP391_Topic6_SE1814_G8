@@ -108,222 +108,301 @@ export default function NewContract() {
     <div className="main-container">
       <Navbar username="Username" />
       <div className="main-content">
-        <h1>Tạo hợp đồng</h1>
+        <div className="main-inner">
+          <h1>Tạo hợp đồng</h1>
 
-        {step === 1 && (
-          <div>
-            <h2>Thông tin phương tiện</h2>
-            <div>
-              <label>Tên phương tiện</label>
-              <br></br>
-              <input
-                className="txtInput"
-                type="text"
-                value={vehicle.name}
-                onChange={e => {
-                  setVehicle({ ...vehicle, name: e.target.value });
-                  validateField("name", e.target.value);
-                }}
-              />
-              {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+          {/* Stepper */}
+          <div className="nc-steps">
+            <div className={`nc-step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'done' : ''}`}>
+              <span>1</span>
+              <p>Phương tiện</p>
             </div>
-            <div>
-              <label>Biển kiểm soát</label>
-              <br></br>
-              <input
-                className="txtInput"
-                type="text"
-                value={vehicle.license}
-                placeholder="VD: 30A-12345"
-                onChange={e => {
-                  setVehicle({ ...vehicle, license: e.target.value });
-                  validateField("license", e.target.value);
-                }}
-              />
-              {errors.license && <p style={{ color: "red" }}>{errors.license}</p>}
+            <div className={`nc-line ${step > 1 ? 'done' : ''}`}></div>
+            <div className={`nc-step ${step >= 2 ? 'active' : ''} ${step > 2 ? 'done' : ''}`}>
+              <span>2</span>
+              <p>Đồng sở hữu</p>
             </div>
-            <div>
-              <label>Model</label>
-              <br></br>
-              <input
-                className="txtInput"
-                type="text"
-                value={vehicle.model}
-                onChange={e => {
-                  setVehicle({ ...vehicle, model: e.target.value });
-                  validateField("model", e.target.value);
-                }}
-              />
-              {errors.model && <p style={{ color: "red" }}>{errors.model}</p>}
+            <div className={`nc-line ${step > 2 ? 'done' : ''}`}></div>
+            <div className={`nc-step ${step >= 3 ? 'active' : ''} ${step > 3 ? 'done' : ''}`}>
+              <span>3</span>
+              <p>Điều khoản</p>
             </div>
-            <button
-              className="btnInput"
-              disabled={
-                !vehicle.name.trim() ||
-                !vehicle.license.trim() ||
-                !vehicle.model.trim() ||
-                errors.name ||
-                errors.license ||
-                errors.model
-              }
-              onClick={() => setStep(2)}
-            >
-              Tiếp theo
-            </button>
+            <div className={`nc-line ${step > 3 ? 'done' : ''}`}></div>
+            <div className={`nc-step ${step >= 4 ? 'active' : ''}`}>
+              <span>4</span>
+              <p>Hoàn tất</p>
+            </div>
           </div>
-        )}
 
-        {step === 2 && (
-          <div>
-            <h2>Thêm người đồng sở hữu</h2>
-            <input
-              className="txtInput"
-              type="text"
-              placeholder="Nhập số điện thoại"
-              value={phone}
-              onChange={e => setPhone(e.target.value)}
-            />
-            <button className="addBtn" onClick={addOwner}>+</button>
-            {ownerError && <p style={{ color: "red" }}>{ownerError}</p>}
-            <div>
-              {owners.map((o, i) => (
-                <div key={i} className="pSlider" style={{ marginBottom: "12px" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                    <span className="pSlider-name" style={{ fontWeight: 500 }}>
-                      {o.fullName}
-                      {o.locked && (
-                        <span style={{ fontSize: 12, color: '#666', marginLeft: 6 }}>(Bạn)</span>
-                      )}
-                    </span>
-                    {!o.locked && (
-                      <span
-                        style={{
-                          cursor: "pointer",
-                          color: "red",
-                          fontWeight: "bold",
-                          fontSize: "16px",
-                          lineHeight: "1",
-                          marginTop: "-2px"
-                        }}
-                        onClick={() => setOwners(owners.filter((_, idx) => idx !== i))}
-                      >
-                        ✕
-                      </span>
-                    )}
-                  </div>
+          {/* Two-column layout: form + live preview */}
+          <div className="nc-layout">
+            <div className="nc-left">
 
-                  <div style={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
+              {step === 1 && (
+                <div className="nc-section">
+                  <h2>Thông tin phương tiện</h2>
+                  <div>
+                    <label>Tên phương tiện</label>
+                    <br></br>
                     <input
-                      className="slider"
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={o.ratio}
-                      onChange={e => updateRatio(i, Number(e.target.value))}
+                      className="txtInput"
+                      type="text"
+                      value={vehicle.name}
+                      onChange={e => {
+                        setVehicle({ ...vehicle, name: e.target.value });
+                        validateField("name", e.target.value);
+                      }}
                     />
-                    <div style={{ display: "flex", alignItems: "center", marginLeft: "8px", gap: "2px" }}>
-                      <input
-                        className="pTxtInput"
-                        type="number"
-                        min="0"
-                        max="100"
-                        value={o.ratio === 0 ? 0 : String(o.ratio).replace(/^0+(?=\d)/, "")}
-                        onChange={e => {
-                          let v = e.target.value.replace(/^0+(?=\d)/, "");
-                          if (v === "") v = "0";
-                          if (Number(v) > 100) v = "100";
-                          updateRatio(i, Number(v));
-                        }}
-                      />
-                      <span style={{ fontSize: "25px", fontWeight: 500 }}>%</span>
-                    </div>
+                    {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
+                  </div>
+                  <div>
+                    <label>Biển kiểm soát</label>
+                    <br></br>
+                    <input
+                      className="txtInput"
+                      type="text"
+                      value={vehicle.license}
+                      placeholder="VD: 30A-12345"
+                      onChange={e => {
+                        setVehicle({ ...vehicle, license: e.target.value });
+                        validateField("license", e.target.value);
+                      }}
+                    />
+                    {errors.license && <p style={{ color: "red" }}>{errors.license}</p>}
+                  </div>
+                  <div>
+                    <label>Model</label>
+                    <br></br>
+                    <input
+                      className="txtInput"
+                      type="text"
+                      value={vehicle.model}
+                      onChange={e => {
+                        setVehicle({ ...vehicle, model: e.target.value });
+                        validateField("model", e.target.value);
+                      }}
+                    />
+                    {errors.model && <p style={{ color: "red" }}>{errors.model}</p>}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <button
+                      className="btnInput"
+                      disabled={
+                        !vehicle.name.trim() ||
+                        !vehicle.license.trim() ||
+                        !vehicle.model.trim() ||
+                        errors.name ||
+                        errors.license ||
+                        errors.model
+                      }
+                      onClick={() => setStep(2)}
+                    >
+                      Tiếp theo
+                    </button>
                   </div>
                 </div>
-              ))}
+              )}
+
+              {step === 2 && (
+                <div className="nc-section">
+                  <h2>Thêm người đồng sở hữu</h2>
+                  <input
+                    className="txtInput"
+                    type="text"
+                    placeholder="Nhập số điện thoại"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                  />
+                  <button className="addBtn" onClick={addOwner}>+</button>
+                  {ownerError && <p style={{ color: "red" }}>{ownerError}</p>}
+                  <div>
+                    {owners.map((o, i) => (
+                      <div key={i} className="pSlider" style={{ marginBottom: "12px" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span className="pSlider-name" style={{ fontWeight: 500 }}>
+                            {o.fullName}
+                            {o.locked && (
+                              <span style={{ fontSize: 12, color: '#666', marginLeft: 6 }}>(Bạn)</span>
+                            )}
+                          </span>
+                          {!o.locked && (
+                            <span
+                              style={{
+                                cursor: "pointer",
+                                color: "red",
+                                fontWeight: "bold",
+                                fontSize: "16px",
+                                lineHeight: "1",
+                                marginTop: "-2px"
+                              }}
+                              onClick={() => setOwners(owners.filter((_, idx) => idx !== i))}
+                            >
+                              ✕
+                            </span>
+                          )}
+                        </div>
+
+                        <div style={{ display: "flex", alignItems: "center", marginTop: "5px" }}>
+                          <input
+                            className="slider"
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={o.ratio}
+                            onChange={e => updateRatio(i, Number(e.target.value))}
+                          />
+                          <div style={{ display: "flex", alignItems: "center", marginLeft: "8px", gap: "2px" }}>
+                            <input
+                              className="pTxtInput"
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={o.ratio === 0 ? 0 : String(o.ratio).replace(/^0+(?=\d)/, "")}
+                              onChange={e => {
+                                let v = e.target.value.replace(/^0+(?=\d)/, "");
+                                if (v === "") v = "0";
+                                if (Number(v) > 100) v = "100";
+                                updateRatio(i, Number(v));
+                              }}
+                            />
+                            <span style={{ fontSize: "25px", fontWeight: 500 }}>%</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  {ratioError && (
+                    <p style={{ color: "red" }}>Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)</p>
+                  )}
+
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-start' }}>
+                    <button className="btnReturn" onClick={() => setStep(1)}>Quay lại</button>
+                    <button
+                      className="btnInput"
+                      disabled={owners.length === 0 || ratioError}
+                      onClick={() => setStep(3)}
+                    >
+                      Tiếp theo
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {step === 3 && (
+                <div className="nc-section">
+                  <h2>Điều khoản hợp đồng</h2>
+                  <ul style={{ padding: "20px 0 30px 25px" }}>
+                    {terms.map((t, i) => (
+                      <li key={i}>{t}</li>
+                    ))}
+                  </ul>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-start' }}>
+                    <button className="btnReturn" onClick={() => setStep(2)}>Quay lại</button>
+                    <button
+                      className="btnInput"
+                      disabled={terms.length === 0 || owners.length === 0 || totalRatio !== 100}
+                      onClick={async () => {
+                        setSubmitMessage(""); // reset message
+                        try {
+                          // Build members exactly like teammate's JSON
+                          const members = owners.map(o => ({
+                            PhoneNumber: o.phone,
+                            SharePercent: o.ratio.toFixed(2) // string like "60.00"
+                          }));
+
+                          // Build contract JSON
+                          const contractData = {
+                            VehicleName: vehicle.name,
+                            LicensePlate: vehicle.license,
+                            Model: vehicle.model,
+                            StartDate: new Date().toISOString().split("T")[0], // "YYYY-MM-DD"
+                            Status: "Pending",
+                            Members: members
+                          };
+
+                          // Call backend API
+                          const res = await axios.post("/api/contract/contractRequest", contractData);
+
+                          console.log("Tạo hợp đồng thành công:", res.data);
+                          setSubmitMessage("Tạo hợp đồng thành công!");
+                          setStep(4); // move to confirmation step
+                        } catch (err) {
+                          console.error("Lỗi khi tạo hợp đồng:", err.response?.data || err.message);
+                          setSubmitMessage("Có lỗi khi tạo hợp đồng. Vui lòng thử lại!");
+                        }
+                      }}
+                    >
+                      Xác nhận
+                    </button>
+                  </div>
+                  {submitMessage && (
+                    <p
+                      style={{
+                        marginTop: "10px",
+                        color: submitMessage.includes("thành công") ? "green" : "red"
+                      }}
+                    >
+                      {submitMessage}
+                    </p>
+                  )}
+
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="nc-section">
+                  <h2 style={{ color: "#4caf50" }}>Hợp đồng đã được khởi tạo</h2>
+                  <p style={{ padding: "10px 0 30px 0" }}>
+                    Hợp đồng sẽ được kích hoạt khi các thành viên trong hợp đồng xác nhận.
+                  </p>
+                  <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                    <button className="btnInput" onClick={() => alert("Đã xác nhận!")}>Xác nhận</button>
+                  </div>
+                </div>
+              )}
+
             </div>
-            {ratioError && (
-              <p style={{ color: "red" }}>Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)</p>
-            )}
 
-            <button className="btnReturn" onClick={() => setStep(1)}>Quay lại</button>
-            <button
-              className="btnInput"
-              disabled={owners.length === 0 || ratioError}
-              onClick={() => setStep(3)}
-            >
-              Tiếp theo
-            </button>
+            {/* Live Preview */}
+            <aside className="nc-right">
+              <div className="nc-card">
+                <div className="nc-card-header">
+                  <div className="nc-badge">Xem trước</div>
+                  <div className="nc-card-title">{vehicle.name || 'Tên phương tiện'}</div>
+                  <div className="nc-card-sub">{vehicle.model || 'Model'}</div>
+                </div>
+                <div className="nc-card-body">
+                  <div className="nc-row">
+                    <span className="nc-label">Biển số</span>
+                    <span className="nc-value">{vehicle.license || 'VD: 30A-12345'}</span>
+                  </div>
+                  <div className="nc-row">
+                    <span className="nc-label">Số đồng sở hữu</span>
+                    <span className="nc-value">{owners.length}</span>
+                  </div>
+                  <div className="nc-row">
+                    <span className="nc-label">Tổng tỷ lệ</span>
+                    <span className={`nc-value ${ratioError ? 'warn' : ''}`}>{totalRatio}%</span>
+                  </div>
+                  <div className="nc-miniowners">
+                    {owners.slice(0, 4).map((o, i) => (
+                      <div key={i} className="nc-chip">{o.fullName.split(' ').slice(-1)[0]} • {o.ratio}%</div>
+                    ))}
+                    {owners.length > 4 && (
+                      <div className="nc-chip">+{owners.length - 4} nữa</div>
+                    )}
+                  </div>
+                  <br />
+                </div>
+                <div className="nc-card-footer">
+                  <div className={`nc-status-pill ${ratioError ? 'error' : 'ok'}`}>
+                    {ratioError ? 'Chưa hợp lệ' : 'Sẵn sàng tạo'}
+                  </div>
+                </div>
+              </div>
+            </aside>
           </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <h2>Điều khoản hợp đồng</h2>
-            <ul style={{ padding: "20px 0 30px 25px" }}>
-              {terms.map((t, i) => (
-                <li key={i}>{t}</li>
-              ))}
-            </ul>
-            <button className="btnReturn" onClick={() => setStep(2)}>Quay lại</button>
-            <button
-              className="btnInput"
-              disabled={terms.length === 0 || owners.length === 0 || totalRatio !== 100}
-              onClick={async () => {
-                setSubmitMessage(""); // reset message
-                try {
-                  // Build members exactly like teammate's JSON
-                  const members = owners.map(o => ({
-                    PhoneNumber: o.phone,
-                    SharePercent: o.ratio.toFixed(2) // string like "60.00"
-                  }));
-
-                  // Build contract JSON
-                  const contractData = {
-                    VehicleName: vehicle.name,
-                    LicensePlate: vehicle.license,
-                    Model: vehicle.model,
-                    StartDate: new Date().toISOString().split("T")[0], // "YYYY-MM-DD"
-                    Status: "Pending",
-                    Members: members
-                  };
-
-                  // Call backend API
-                  const res = await axios.post("/api/contract/contractRequest", contractData);
-
-                  console.log("Tạo hợp đồng thành công:", res.data);
-                  setSubmitMessage("Tạo hợp đồng thành công!");
-                  setStep(4); // move to confirmation step
-                } catch (err) {
-                  console.error("Lỗi khi tạo hợp đồng:", err.response?.data || err.message);
-                  setSubmitMessage("Có lỗi khi tạo hợp đồng. Vui lòng thử lại!");
-                }
-              }}
-            >
-              Xác nhận
-            </button>
-            {submitMessage && (
-              <p
-                style={{
-                  marginTop: "10px",
-                  color: submitMessage.includes("thành công") ? "green" : "red"
-                }}
-              >
-                {submitMessage}
-              </p>
-            )}
-
-          </div>
-        )}
-
-        {step === 4 && (
-          <div>
-            <h2 style={{ color: "#4caf50" }}>Hợp đồng đã được khởi tạo</h2>
-            <p style={{ padding: "10px 0 30px 0" }}>
-              Hợp đồng sẽ được kích hoạt khi các thành viên trong hợp đồng xác nhận.
-            </p>
-            <button className="btnInput" onClick={() => alert("Đã xác nhận!")}>Xác nhận</button>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
