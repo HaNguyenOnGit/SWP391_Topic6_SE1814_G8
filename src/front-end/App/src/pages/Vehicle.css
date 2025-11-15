@@ -1,27 +1,199 @@
-.main-content-layout {
+.main-content-layouttt {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 580px; /* giữ cấu hình bạn đã chỉnh */
+    align-items: stretch; /* để 2 cột kéo cao bằng nhau */
+    gap: 56px; /* khoảng cách 2 cột */
+    padding: 40px; /* khoảng trống đều 4 cạnh so với border main-content */
+    width: 100%;
+    height: 100%; /* để con có thể cao 100% */
+    box-sizing: border-box;
+}
+
+.vehicle-column {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 28px; /* dãn hàng theo chiều dọc */
+}
+
+.vehicle-header {
+    display: flex;
     align-items: center;
-    min-height: 600px;
+    gap: 14px;
+}
+
+.vehicle-header .icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    color: #0a0a0a;
+}
+
+.vehicle-name {
+    font-size: 32px;
+    margin: 0;
+}
+
+.vehicle-plate {
+    margin: 4px 0 0 0;
+    color: #555;
+    font-size: 16px;
+}
+
+.vehicle-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    /* 3 thẻ, kéo giãn full chiều ngang */
+    gap: 20px;
+}
+
+.stat {
+    border: 2px solid #d9e2f1;
+    border-radius: 14px;
+    padding: 18px 20px;
+    background: #fff;
+    min-height: 76px;
+    transition: box-shadow 0.2s ease, transform 0.12s ease, border-color 0.2s ease;
+}
+
+.stat .label {
+    display: block;
+    font-size: 14px;
+    /* chữ to hơn */
+    color: #5f6368;
+    margin-bottom: 8px;
+    /* cách xa hơn với nội dung */
+}
+
+.stat .value {
+    /* kích thước chữ ở mẫu xe, hợp đồng */
+    font-size: 17px;
+    font-weight: 600;
+    color: #202124;
+}
+
+.status-pill {
+    border: 1px solid currentColor;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-weight: 600;
+    background: #fafafa;
+    display: inline-block;
+    margin-top: 4px;
+    /* tách xa nhãn tình trạng hơn */
+}
+
+.contract-link {
+    color: #ff9800;
+    text-decoration: none;
+}
+
+.contract-link:hover {
+    text-decoration: underline;
+}
+
+.owners-section {
+    margin-top: 8px;
+}
+
+.owners-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.owners-title h4 {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.owners-title .users {
+    color: #4CAF50;
+}
+
+.owners-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(260px, 1fr));
+    /* fill theo bề ngang để không bị trống */
+    gap: 20px 22px; /* dãn hàng dọc hơn */
+}
+
+.owner-card {
+    background: #fff;
+    border: 2px solid #e0e6f0;
+    border-radius: 12px;
+    padding: 20px 22px;
+    transition: box-shadow 0.2s ease, transform 0.12s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.owner-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.owner-name {
+    font-weight: 700;
+    color: #111;
+    font-size: 20px;
+}
+
+.owner-share {
+    color: #0f6cae;
+    font-weight: 700;
+    font-size: 19px;
+}
+
+.owner-card:hover {
+    border-color: #e0ecf7;
+    background: #fbfdff;
+    box-shadow: 0 4px 14px rgba(15, 108, 174, 0.10);
+    transform: translateY(-1px);
+}
+
+.share-bar {
+    width: 100%;
+    height: 12px;
+    background: #f1f3f4;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.share-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    border-radius: inherit;
 }
 
 /* ========================= */
 /*     KHUNG HÀNH ĐỘNG      */
 /* ========================= */
+.menu-column {
+    display: flex;
+    justify-content: flex-end;
+    align-self: stretch; /* để cột phải cao full hàng */
+    height: 100%;
+}
+
 .action-menu {
-    border: 1px solid black;
-    padding: 60px 20px;
-    border-radius: 20px;
-    text-align: center;
-    max-width: 450px;
+    border: 2px solid #000; /* Changed to black for stronger emphasis */
+    padding: 30px 24px;
+    border-radius: 16px;
+    text-align: left;
     width: 100%;
+    /* max-width: 380px; */
+    /* sát layout mong muốn nhưng vẫn thoải mái */
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    margin-right: 50px;
+    gap: 14px; /* dãn các item */
+    height: 100%;
+    min-height: 100%; /* kéo card cao bằng cột */
     box-sizing: border-box;
-    max-height: 600px;
-    height: auto;
 }
 
 /* ========================= */
@@ -29,23 +201,44 @@
 /* ========================= */
 .action-item a {
     text-decoration: none;
-    color: #000;
-    font-weight: 700;
-    font-size: 20px;
-    padding: 20px 0;
-    display: block;
-    line-height: 1.4;
+    color: #333;
+    font-weight: 600;
+    font-size: 19px;
+    padding: 18px 14px; /* thêm padding trên dưới */
+    display: flex;
+    align-items: center;
+    border-radius: 12px;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.12s ease;
 }
 
 .action-item a:hover {
-    text-decoration: underline;
-    color: #3498db;
+    background: #e3f2fd; /* Brighter background for hover */
+    color: #0a74da; /* Stronger blue for text */
+    box-shadow: 0 6px 16px rgba(15, 108, 174, 0.2); /* More pronounced shadow */
+    transform: translateY(-2px); /* Slightly stronger lift */
 }
 
 
 @media (max-width: 1048px) {
-    .action-menu {
-        width: 300px;
+    .main-content-layout,
+    .main-content-layouttt {
+        grid-template-columns: 1fr;
+        padding: 20px 14px 28px;
+        gap: 24px;
+    }
+
+    .vehicle-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .owners-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 1600px) {
+    .main-content-layout {
+        max-width: 1240px;
     }
 }
 
@@ -95,4 +288,10 @@
 .action-link:hover .nav-icon {
     color: #3498db;
     transform: scale(1.1);
+}
+
+.stat:hover {
+    border-color: #d9e2f1;
+    box-shadow: 0 4px 14px rgba(15, 108, 174, 0.12);
+    transform: translateY(-1px);
 }
