@@ -53,37 +53,3 @@
 .dropdown-item.logout {
     color: #dc3545;
 }
-
-/* Responsive behavior for 16:9 aspect ratio screens */
-@media screen and (aspect-ratio: 16/9),
-screen and (min-aspect-ratio: 16/9) {
-    .username-container .dropdown-menu {
-        top: auto;
-        bottom: 100%;
-        margin-bottom: 5px;
-    }
-
-    .username-container.mobile .dropdown-menu {
-        top: auto;
-        bottom: 100%;
-        margin-bottom: 5px;
-    }
-}
-
-/* Additional responsive adjustments for wide screens */
-@media screen and (min-width: 1920px) and (min-height: 1080px) {
-    .username-container .dropdown-menu {
-        top: auto;
-        bottom: 100%;
-        margin-bottom: 5px;
-    }
-}
-
-/* For ultrawide monitors */
-@media screen and (min-aspect-ratio: 21/9) {
-    .username-container .dropdown-menu {
-        top: auto;
-        bottom: 100%;
-        margin-bottom: 8px;
-    }
-}
