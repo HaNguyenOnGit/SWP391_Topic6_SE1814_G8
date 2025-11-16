@@ -10,6 +10,7 @@ export default function Vehicle() {
     const [vehicle, setVehicle] = useState(null);
     const [errorMessage, setErrorMessage] = useState("");
     const [status, setStatus] = useState("");
+    const [usingBy, setUsingBy] = useState(null);
 
     useEffect(() => {
         const fetchVehicle = async () => {
@@ -20,6 +21,9 @@ export default function Vehicle() {
 
                 const rawStatus = data.status?.toLowerCase() || "";
                 setStatus(rawStatus);
+
+                // Ai đang sử dụng hiện tại
+                setUsingBy(data.usingBy || null);
 
                 // Kiểm tra nhiều khả năng status khác nhau
                 if (
@@ -42,10 +46,12 @@ export default function Vehicle() {
                     plate: data.licensePlate,
                     model: data.model,
                     status: translateStatus(data.status),
-                    coowners: data.members.map((m) => ({
-                        username: m.fullName,
+                    coowners: (data.members || []).map((m) => ({
+                        userId: m.userId,
+                        username: m.fullName || m.phoneNumber,
                         phone: m.phoneNumber,
                         share: m.sharePercent,
+                        status: m.status || m.invitationStatus || m.memberStatus || m.statusName || "Confirmed",
                     })),
                 });
             } catch (err) {
@@ -55,6 +61,7 @@ export default function Vehicle() {
         };
 
         fetchVehicle();
+
     }, [id]);
 
     const translateStatus = (status) => {
@@ -70,6 +77,18 @@ export default function Vehicle() {
             default:
                 return status;
         }
+    };
+
+    // Màu tên đồng sở hữu theo trạng thái + người đang sử dụng
+    const getMemberNameColor = (member) => {
+        if (!member) return "#111";
+        if (usingBy && member.userId === usingBy) return "green";
+        const s = String(member.status || "").toLowerCase();
+        if (!s) return "#111";
+        if (s === "confirmed") return "#111";
+        if (s === "pending" || s.includes("chờ")) return "goldenrod";
+        if (s === "rejected" || s.includes("từ chối")) return "red";
+        return "#111";
     };
 
     const getStatusColor = (st) => {
@@ -102,83 +121,79 @@ export default function Vehicle() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
+            <div className="main-contenttt">
                 <div className="main-content-layouttt">
-                    <div style={{ paddingLeft: "5vw" }}>
-                        <div className="vehicle-column">
-                            <header className="vehicle-header">
-                                <div className="icon"><FaCar /></div>
-                                <div className="titles">
-                                    <h1 className="vehicle-name">{vehicle.name}</h1>
-                                    <p className="vehicle-plate">{vehicle.plate}</p>
-                                </div>
-                            </header>
-
-                            <div className="vehicle-stats">
-                                <div className="stat">
-                                    <span className="label">Tình trạng</span>
-                                    <span className="status-pill" style={{ color: getStatusColor(vehicle.status), borderColor: getStatusColor(vehicle.status) }}>
-                                        {vehicle.status}
-                                    </span>
-                                </div>
-                                <div className="stat">
-                                    <span className="label">Mẫu xe</span>
-                                    <span className="value">{vehicle.model || "—"}</span>
-                                </div>
-                                <div className="stat">
-                                    <span className="label">Hợp đồng</span>
-                                    <span className="value"><Link to={`/vehicle/${vehicle.id}/contract`} className="contract-link">Xem hợp đồng →</Link></span>
-                                </div>
+                    <div className="vehicle-column">
+                        <header className="vehicle-header">
+                            <div className="icon"><FaCar /></div>
+                            <div className="titles">
+                                <h1 className="vehicle-name">{vehicle.name}</h1>
+                                <p className="vehicle-plate">{vehicle.plate}</p>
                             </div>
+                        </header>
 
-                            <section className="owners-section">
-                                <div className="owners-title">
-                                    <div className="icon users"><FaUsers /></div>
-                                    <h4>Người đồng sở hữu</h4>
-                                </div>
-                                {vehicle.coowners && vehicle.coowners.length > 0 ? (
-                                    <div className="owners-grid">
-                                        {vehicle.coowners.map((c, idx) => (
-                                            <div key={idx} className="owner-card">
-                                                <div className="owner-row">
-                                                    <span className="owner-name">{c.username}</span>
-                                                    <span className="owner-share">{c.share}%</span>
-                                                </div>
-                                                <div className="share-bar">
-                                                    <div className="share-fill" style={{ width: `${Math.min(Math.max(c.share || 0, 0), 100)}%` }} />
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p>Không có dữ liệu đồng sở hữu.</p>
-                                )}
-                            </section>
+                        <div className="vehicle-stats">
+                            <div className="stat">
+                                <span className="label">Tình trạng</span>
+                                <span className="status-pill" style={{ color: getStatusColor(vehicle.status), borderColor: getStatusColor(vehicle.status) }}>
+                                    {vehicle.status}
+                                </span>
+                            </div>
+                            <div className="stat">
+                                <span className="label">Mẫu xe</span>
+                                <span className="value">{vehicle.model || "—"}</span>
+                            </div>
+                            <div className="stat">
+                                <span className="label">Hợp đồng</span>
+                                <span className="value"><Link to={`/vehicle/${vehicle.id}/contract`} className="contract-link">Xem hợp đồng →</Link></span>
+                            </div>
                         </div>
-                    </div>
 
-                    <div style={{ paddingRight: "5vw" }}>
-                        <div className="menu-column">
-                            {shouldHideMenu ? (
-                                <div className="status-error">
-                                    <h3>{errorMessage || "Hợp đồng không khả dụng."}</h3>
+                        <section className="owners-section">
+                            <div className="owners-title">
+                                <div className="icon users"><FaUsers /></div>
+                                <h4>Người đồng sở hữu</h4>
+                            </div>
+                            {vehicle.coowners && vehicle.coowners.length > 0 ? (
+                                <div className="owners-grid">
+                                    {vehicle.coowners.map((c, idx) => (
+                                        <div key={idx} className="owner-card">
+                                            <div className="owner-row">
+                                                <span className="owner-name" style={{ color: getMemberNameColor(c) }}>{c.username}</span>
+                                                <span className="owner-share">{c.share}%</span>
+                                            </div>
+                                            <div className="share-bar">
+                                                <div className="share-fill" style={{ width: `${Math.min(Math.max(c.share || 0, 0), 100)}%` }} />
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             ) : (
-                                <div className="action-menu">
-                                    {actions.map((action, idx) => {
-                                        const Icon = action.icon;
-                                        return (
-                                            <div key={idx} className="action-item">
-                                                <Link to={action.path} className="action-link">
-                                                    <span className="nav-icon"><Icon /></span>
-                                                    <span className="action-label">{action.name}</span>
-                                                </Link>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
+                                <p>Không có dữ liệu đồng sở hữu.</p>
                             )}
-                        </div>
+                        </section>
+                    </div>
+
+                    <div className="menu-column">
+                        {shouldHideMenu ? (
+                            <div className="status-error">
+                                <h3>{errorMessage || "Hợp đồng không khả dụng."}</h3>
+                            </div>
+                        ) : (
+                            <div className="action-menu">
+                                {actions.map((action, idx) => {
+                                    const Icon = action.icon;
+                                    return (
+                                        <div key={idx} className="action-item">
+                                            <Link to={action.path} className="action-link">
+                                                <span className="nav-icon"><Icon /></span>
+                                                <span className="action-label">{action.name}</span>
+                                            </Link>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,3 +1,11 @@
+/* Prevent whole main-content from scrolling on this page; only right pane scrolls */
+.booking-shell {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
 /* ================================
    BỐ CỤC CHÍNH
 ================================ */
@@ -6,14 +14,64 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 40px;
-    padding: 0 40px;
+    padding: 0 8vw;
+    height: 100%;
     flex-wrap: nowrap;
     /* giữ 2 cột ngang, không xuống hàng */
     box-sizing: border-box;
 }
 
+/* Page layout with left sidebar */
+.page-with-sidebar {
+    display: flex;
+    align-items: stretch;
+    /* allow sidebar to match main height */
+    gap: 24px;
+    padding: 0 20px 20px;
+    max-height: 100%;
+    margin-block: auto;
+    /* center vertically when content is shorter */
+}
+
+.page-main {
+    flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow: auto;
+}
+
 .left-section {
-    margin-top: 30px;
+    height: 100%;
+    display: grid;
+    /* không dùng flex */
+    justify-items: start;
+    /* canh sát trái theo chiều ngang */
+    align-items: center;
+    /* giữ nội dung bắt đầu theo chiều dọc */
+}
+
+/* Override vehicle header layout on Booking page so <br> breaks/stacking work */
+.page-main .vehicle-header {
+    display: block;
+}
+
+.page-main .vehicle-header>br {
+    display: none;
+}
+
+.page-main .vehicle-header>div {
+    display: flex;
+    align-items: center;
+    margin: 0 0 8px 0;
+}
+
+.page-main .vehicle-header>p {
+    margin: 0;
+}
+
+.page-main .vehicle-header>span {
+    display: inline-block;
+    margin-top: 8px;
 }
 
 /* --- Cột lịch (bên trái) --- */
@@ -23,6 +81,10 @@
     padding: 25px 30px;
     min-width: 320px;
     width: 100%;
+    max-width: 720px;
+    /* giới hạn bề rộng để thấy canh giữa */
+    margin-inline: auto;
+    /* canh giữa khối */
     box-sizing: border-box;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
@@ -41,7 +103,7 @@
     width: 100%;
     box-sizing: border-box;
     margin-top: 2px;
-    max-width: 420px;
+    max-width: clamp(320px, 36vw, 520px);
     height: 610px;
 }
 
@@ -49,6 +111,28 @@
     display: flex;
     align-items: center;
     height: 100%;
+}
+
+/* Stack calendar and booking list vertically below 1370px */
+@media (max-width: 1370px) {
+    .calendar-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 24px;
+        padding: 0 20px;
+    }
+
+    .calendar-section,
+    .booking-right {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .booking-container {
+        width: 100%;
+        align-items: stretch;
+        justify-content: flex-start;
+    }
 }
 
 /* ================================
@@ -92,8 +176,13 @@ LỊCH NGÀY THÁNG
 }
 
 .day {
-    padding: 12px;
+    width: clamp(36px, 4.5vw, 48px);
+    height: clamp(36px, 4.5vw, 48px);
     border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
     cursor: pointer;
     font-size: 16px;
     transition: all 0.2s ease;
@@ -121,6 +210,8 @@ LỊCH NGÀY THÁNG
     justify-content: flex-start;
     margin-bottom: 20px;
     /* tạo khoảng cách với khung đặt lịch */
+    width: 100%;
+    max-width: 100%;
 }
 
 .booking-item {
@@ -129,9 +220,11 @@ LỊCH NGÀY THÁNG
     align-items: center;
     border: 1px solid #8d8080;
     border-radius: 8px;
-    padding: 8px 12px;
+    padding: 15px 12px;
     font-size: 14px;
     transition: all 0.2s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .booking-item:hover {
@@ -141,6 +234,12 @@ LỊCH NGÀY THÁNG
 .booking-item span {
     flex: 1;
     color: #333;
+    min-width: 0;
+    /* allow ellipsis */
+    overflow: visible;
+    text-overflow: unset;
+    /* Allow explicit <br> and \n to break lines and wrap text */
+    white-space: pre-line;
 }
 
 .booking-item b {
@@ -167,10 +266,15 @@ KHUNG “ĐẶT LỊCH CHO BẠN”
 .booking-bar {
     border: 1px solid #000;
     border-radius: 12px;
-    padding: 18px;
+    padding: clamp(14px, 2vw, 20px) clamp(16px, 2.5vw, 24px);
     margin-top: auto;
     /* ép khung nằm dưới cùng */
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    width: 80%;
+    position: relative;
+    /* anchor for absolute add button */
+    padding-right: calc(clamp(16px, 2.5vw, 24px) + 56px);
+    /* room for button */
 }
 
 .booking-bar .info {
@@ -204,6 +308,36 @@ KHUNG “ĐẶT LỊCH CHO BẠN”
 .time-inputs input:focus {
     border-color: #79c7ff;
     box-shadow: 0 0 4px rgba(121, 199, 255, 0.4);
+}
+
+/* Booking bar actions and text */
+.date-inputs {
+    display: flex;
+    align-items: center;
+}
+
+.date-inputs span {
+    min-width: 220px;
+    display: inline-block;
+}
+
+.addBtn {
+    margin-left: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    color: #fff;
+    font-size: 22px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: absolute;
+    right: clamp(12px, 2vw, 16px);
+    bottom: clamp(12px, 2vw, 16px);
 }
 
 
@@ -257,6 +391,12 @@ KHUNG “ĐẶT LỊCH CHO BẠN”
    📱 RESPONSIVE
 ================================ */
 @media (max-width: 900px) {
+    .page-with-sidebar {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+
     .calendar-wrapper {
         flex-wrap: wrap;
         justify-content: center;
@@ -273,6 +413,37 @@ KHUNG “ĐẶT LỊCH CHO BẠN”
     .booking-right {
         min-height: auto;
         padding: 24px;
+    }
+
+    .date-inputs {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .date-inputs span {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .addBtn {
+        margin-left: 0;
+    }
+
+    /* allow wrapping on small screens */
+    .booking-item span {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        word-break: break-word;
+    }
+}
+
+/* Very small widths: stack name/date and action button */
+@media (max-width: 520px) {
+    .booking-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
     }
 }
 
@@ -351,5 +522,23 @@ KHUNG “ĐẶT LỊCH CHO BẠN”
 
     .vehicle-unavailable p {
         font-size: 14px;
+    }
+}
+
+@media (max-width: 1637px) {
+    .calendar-wrapper {
+        padding: 0 5vw;
+    }
+}
+
+@media (max-width: 1532px) {
+    .calendar-wrapper {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 1410px) {
+    .calendar-wrapper {
+        padding: 0 10px;
     }
 }

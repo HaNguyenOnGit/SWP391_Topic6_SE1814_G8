@@ -1,18 +1,51 @@
 .main-content-layouttt {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 580px; /* giữ cấu hình bạn đã chỉnh */
-    align-items: stretch; /* để 2 cột kéo cao bằng nhau */
-    gap: 56px; /* khoảng cách 2 cột */
-    padding: 40px; /* khoảng trống đều 4 cạnh so với border main-content */
+    grid-template-columns: 1fr clamp(260px, 30vw, 520px);
+    align-items: start;
+    gap: clamp(20px, 4vw, 56px);
+    padding: clamp(16px, 4vw, 40px);
     width: 100%;
-    height: 100%; /* để con có thể cao 100% */
+    /* let content define height so parent can center it */
+    min-height: auto;
     box-sizing: border-box;
+    /* Center only when extra space exists */
+    margin-block: auto;
+}
+
+.main-contenttt {
+    border: 1px solid #000000;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+    flex: 1;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    padding: 10px;
+    margin-left: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-contenttt h1 {
+    font-size: 24pt;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+.main-contenttt>a {
+    display: inline-block;
+    font-weight: 600;
+    font-size: 17px;
+    color: #2e7d32;
+    text-decoration: none;
+    margin-bottom: 25px;
+    margin-left: 30px;
 }
 
 .vehicle-column {
     display: flex;
     flex-direction: column;
-    gap: 28px; /* dãn hàng theo chiều dọc */
+    gap: 28px;
+    /* dãn hàng theo chiều dọc */
 }
 
 .vehicle-header {
@@ -44,8 +77,7 @@
 
 .vehicle-stats {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    /* 3 thẻ, kéo giãn full chiều ngang */
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
 }
 
@@ -117,9 +149,8 @@
 
 .owners-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(260px, 1fr));
-    /* fill theo bề ngang để không bị trống */
-    gap: 20px 22px; /* dãn hàng dọc hơn */
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: clamp(14px, 2.5vw, 22px);
 }
 
 .owner-card {
@@ -130,23 +161,32 @@
     transition: box-shadow 0.2s ease, transform 0.12s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
+
+
 .owner-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin-bottom: 16px;
+    gap: 8px;
 }
 
 .owner-name {
     font-weight: 700;
     color: #111;
     font-size: 20px;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .owner-share {
     color: #0f6cae;
     font-weight: 700;
     font-size: 19px;
+    flex-shrink: 0;
 }
 
 .owner-card:hover {
@@ -174,26 +214,22 @@
 /*     KHUNG HÀNH ĐỘNG      */
 /* ========================= */
 .menu-column {
-    display: flex;
-    justify-content: flex-end;
-    align-self: stretch; /* để cột phải cao full hàng */
-    height: 100%;
+    display: block;
+    align-self: start;
 }
 
 .action-menu {
-    border: 2px solid #000; /* Changed to black for stronger emphasis */
+    border: 2px solid #000;
     padding: 30px 24px;
     border-radius: 16px;
     text-align: left;
     width: 100%;
-    /* max-width: 380px; */
-    /* sát layout mong muốn nhưng vẫn thoải mái */
     display: flex;
     flex-direction: column;
-    gap: 14px; /* dãn các item */
-    height: 100%;
-    min-height: 100%; /* kéo card cao bằng cột */
+    gap: 14px;
     box-sizing: border-box;
+    position: sticky;
+    top: 24px;
 }
 
 /* ========================= */
@@ -204,7 +240,8 @@
     color: #333;
     font-weight: 600;
     font-size: 19px;
-    padding: 18px 14px; /* thêm padding trên dưới */
+    padding: 18px 14px;
+    /* thêm padding trên dưới */
     display: flex;
     align-items: center;
     border-radius: 12px;
@@ -212,27 +249,51 @@
 }
 
 .action-item a:hover {
-    background: #e3f2fd; /* Brighter background for hover */
-    color: #0a74da; /* Stronger blue for text */
-    box-shadow: 0 6px 16px rgba(15, 108, 174, 0.2); /* More pronounced shadow */
-    transform: translateY(-2px); /* Slightly stronger lift */
+    background: #e3f2fd;
+
+    /* Brighter background for hover */
+    color: #0a74da;
+    /* Stronger blue for text */
+    box-shadow: 0 6px 16px rgba(15, 108, 174, 0.2);
+    /* More pronounced shadow */
+    transform: translateY(-2px);
+    /* Slightly stronger lift */
+}
+
+@media (max-width: 1399px) {
+    .action-menu {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 }
 
 
 @media (max-width: 1048px) {
+
     .main-content-layout,
     .main-content-layouttt {
         grid-template-columns: 1fr;
         padding: 20px 14px 28px;
         gap: 24px;
     }
+}
 
-    .vehicle-stats {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 1244px) {
+    .owner-card {
+        padding: 12px 10px;
+        width: 200px;
     }
 
-    .owners-grid {
-        grid-template-columns: 1fr;
+    .owner-row {
+        margin-bottom: 10px;
+    }
+
+    .owner-name {
+        font-size: 12pt;
+    }
+
+    .owner-share {
+        font-size: 9pt;
     }
 }
 
@@ -295,3 +356,5 @@
     box-shadow: 0 4px 14px rgba(15, 108, 174, 0.12);
     transform: translateY(-1px);
 }
+
+/* Auto-fit grids handle most breakpoints; no extra rules needed */

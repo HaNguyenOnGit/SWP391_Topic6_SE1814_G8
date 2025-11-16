@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../Navbar";
+import VehicleSidebar from "../VehicleSidebar";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
-import { FaCar } from "react-icons/fa";
+import { FaCar, FaLeaf } from "react-icons/fa";
 import "./Booking.css";
 
 export default function Booking() {
@@ -158,181 +159,187 @@ export default function Booking() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
-                <div className="calendar-wrapper">
-                    <div className="left-section">
-                        {/* Luôn hiện thông tin xe */}
-                        <div className="vehicle-header">
-                            <div style={{
-                                display: "flex",
-                                alignItems: "center",
-                                margin: "0 0 10px 0"
-                            }}>
-                                <div style={{
-                                    color: "#2196F3",
-                                    marginRight: "10px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    width: "20px",
-                                    justifyContent: "center"
-                                }}>
-                                    <FaCar />
-                                </div>
-                                <div>
-                                    <h1 style={{ margin: 0 }}>{vehicle.name}</h1>
-                                </div>
-                            </div>
-                            <p>{vehicle.plate}</p>
-                            <span
-                                style={{
-                                    color:
-                                        vehicle.status === "Đang sử dụng"
-                                            ? "green"
-                                            : vehicle.status === "Đang trống"
-                                                ? "orange"
-                                                : "red",
-                                }}
-                            >
-                                ● {vehicle.status}
-                            </span>
-                        </div>
-
-                        {/* Nếu khả dụng mới hiển thị lịch */}
-                        {!isUnavailable && (
-                            <>
-                                <div className="select-row">
-                                    <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))}>
-                                        {[...Array(12)].map((_, i) => (
-                                            <option key={i + 1} value={i + 1}>
-                                                Tháng {i + 1}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))}>
-                                        {[2024, 2025, 2026].map((y) => (
-                                            <option key={y} value={y}>
-                                                {y}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                <div className="calendar-section">
-                                    <div className="calendar-header">
-                                        {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
-                                            <div key={i}>{d}</div>
-                                        ))}
-                                    </div>
-                                    <div className="calendar-grid">
-                                        {Array.from({ length: getStartOffset() }).map((_, i) => (
-                                            <div key={`empty-${i}`} />
-                                        ))}
-                                        {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => {
-                                            const dayNum = i + 1;
-                                            const dateObj = new Date(selectedYear, selectedMonth - 1, dayNum);
-                                            const today = new Date();
-                                            const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                                            const minAllowed = new Date(todayStart);
-                                            minAllowed.setDate(minAllowed.getDate() + 1); // must book at least 1 day before
-
-                                            const isPast = dateObj < todayStart; // past dates
-                                            const isTooSoon = dateObj < minAllowed; // today (or within 24h) not allowed
-                                            const isBooked = bookedDays.includes(dayNum);
-                                            const isSelected = (selectedStartDay !== null && selectedEndDay !== null)
-                                                ? dayNum >= selectedStartDay && dayNum <= selectedEndDay
-                                                : (selectedStartDay !== null && selectedStartDay === dayNum);
-                                            return (
-                                                <div
-                                                    key={dayNum}
-                                                    className={`day${isSelected ? " active" : ""}${isBooked ? " booked" : ""}${isPast ? " past" : ""}`}
-                                                    style={{ pointerEvents: (isBooked || isPast) ? "none" : "auto", opacity: (isBooked || isPast) ? 0.5 : 1 }}
-                                                    onClick={() => {
-                                                        if (isBooked || isPast) return; // disallow clicking past or already booked
-
-                                                        // If the clicked date is too soon (must be at least next day), show error and cancel selection
-                                                        if (isTooSoon) {
-                                                            setSelectedStartDay(null);
-                                                            setSelectedEndDay(null);
-                                                            setBookingError("bạn phải đặt lịch trước 1 ngày");
-                                                            return;
-                                                        }
-
-                                                        // valid click, clear any previous error
-                                                        setBookingError("");
-
-                                                        if (!selectedStartDay) {
-                                                            setSelectedStartDay(dayNum);
-                                                            setSelectedEndDay(null);
-                                                        } else if (!selectedEndDay && dayNum > selectedStartDay) {
-                                                            // Kiểm tra có ngày đã đặt trong dải
-                                                            const hasBooked = bookedDays.some(d => d >= selectedStartDay && d <= dayNum);
-                                                            if (hasBooked) {
-                                                                setSelectedStartDay(null);
-                                                                setSelectedEndDay(null);
-                                                                setBookingError("Có ngày đã được đặt!");
-                                                                return;
-                                                            }
-                                                            setSelectedEndDay(dayNum);
-                                                        } else {
-                                                            setSelectedStartDay(dayNum);
-                                                            setSelectedEndDay(null);
-                                                        }
-                                                    }}
-                                                >
-                                                    {String(dayNum).padStart(2, "0")}
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Cột phải (ẩn nếu không khả dụng) */}
-                    {!isUnavailable && (
-                        <div className="booking-container">
-                            <div className="booking-right">
-                                <div className="booking-list">
-                                    {bookings.length === 0 ? (
-                                        <div className="empty-booking">Chưa có lịch đặt trong tháng này.</div>
-                                    ) : (
-                                        bookings.map((b) => (
-                                            <div style={{ height: "20px" }} key={b.reservationId} className="booking-item">
-                                                <span>
-                                                    <b>{b.userName}</b> {new Date(b.startTime).getDate()} - {new Date(b.endTime).getDate()}/{selectedMonth}/{selectedYear}
-                                                </span>
-                                                {b.userId === parseInt(userId) && (
-                                                    <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
-                                                )}
-                                            </div>
-                                        ))
-                                    )}
-                                </div>
-
-                                <div className="booking-bar" style={{ minWidth: 220 }}>
-                                    <b>Đặt lịch cho bạn</b>
-                                    <div className="date-inputs" style={{ display: 'flex', alignItems: 'center' }}>
-                                        <span style={{ minWidth: 220, display: 'inline-block' }}>
-                                            {selectedStartDay
-                                                ? selectedEndDay
-                                                    ? `${String(selectedStartDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear} - ${String(selectedEndDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear}`
-                                                    : `${String(selectedStartDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear}`
-                                                : "Chọn ngày bắt đầu và kết thúc"}
-                                        </span>
-                                        <button className="addBtn" onClick={handleAddBooking} style={{ marginLeft: 12 }}>
-                                            +
-                                        </button>
-                                    </div>
-                                    {bookingError && (
-                                        <div style={{ color: 'red', marginTop: 8, fontWeight: 500 }}>
-                                            {bookingError}
+            <div className="main-content booking-shell">
+                <div className="page-with-sidebar">
+                    <VehicleSidebar contractId={id} />
+                    <div className="page-main">
+                        <div className="calendar-wrapper">
+                            <div className="left-section">
+                                {/* Luôn hiện thông tin xe */}
+                                <div className="vehicle-header">
+                                    <div style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        margin: "0 0 10px 0"
+                                    }}>
+                                        <div style={{
+                                            color: "#2196F3",
+                                            marginRight: "10px",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            width: "20px",
+                                            justifyContent: "center"
+                                        }}>
+                                            <FaCar />
                                         </div>
-                                    )}
+                                        <div>
+                                            <h1 style={{ margin: 0 }}>{vehicle.name}</h1>
+                                        </div>
+                                    </div>
+                                    <br></br>
+                                    <p>{vehicle.plate}</p>
+                                    <br></br>
+                                    <span
+                                        style={{
+                                            color:
+                                                vehicle.status === "Đang sử dụng"
+                                                    ? "green"
+                                                    : vehicle.status === "Đang trống"
+                                                        ? "orange"
+                                                        : "red",
+                                        }}
+                                    >
+                                        ● {vehicle.status}
+                                    </span>
                                 </div>
+                                {/* Nếu khả dụng mới hiển thị lịch */}
+                                {!isUnavailable && (
+                                    <>
+                                        <div className="select-row">
+                                            <select value={selectedMonth} onChange={(e) => setSelectedMonth(parseInt(e.target.value))}>
+                                                {[...Array(12)].map((_, i) => (
+                                                    <option key={i + 1} value={i + 1}>
+                                                        Tháng {i + 1}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <select value={selectedYear} onChange={(e) => setSelectedYear(parseInt(e.target.value))}>
+                                                {[2024, 2025, 2026].map((y) => (
+                                                    <option key={y} value={y}>
+                                                        {y}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        <div className="calendar-section">
+                                            <div className="calendar-header">
+                                                {["T2", "T3", "T4", "T5", "T6", "T7", "CN"].map((d, i) => (
+                                                    <div key={i}>{d}</div>
+                                                ))}
+                                            </div>
+                                            <div className="calendar-grid">
+                                                {Array.from({ length: getStartOffset() }).map((_, i) => (
+                                                    <div key={`empty-${i}`} />
+                                                ))}
+                                                {Array.from({ length: daysInMonth(selectedMonth, selectedYear) }, (_, i) => {
+                                                    const dayNum = i + 1;
+                                                    const dateObj = new Date(selectedYear, selectedMonth - 1, dayNum);
+                                                    const today = new Date();
+                                                    const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                                                    const minAllowed = new Date(todayStart);
+                                                    minAllowed.setDate(minAllowed.getDate() + 1); // must book at least 1 day before
+
+                                                    const isPast = dateObj < todayStart; // past dates
+                                                    const isTooSoon = dateObj < minAllowed; // today (or within 24h) not allowed
+                                                    const isBooked = bookedDays.includes(dayNum);
+                                                    const isSelected = (selectedStartDay !== null && selectedEndDay !== null)
+                                                        ? dayNum >= selectedStartDay && dayNum <= selectedEndDay
+                                                        : (selectedStartDay !== null && selectedStartDay === dayNum);
+                                                    return (
+                                                        <div
+                                                            key={dayNum}
+                                                            className={`day${isSelected ? " active" : ""}${isBooked ? " booked" : ""}${isPast ? " past" : ""}`}
+                                                            style={{ pointerEvents: (isBooked || isPast) ? "none" : "auto", opacity: (isBooked || isPast) ? 0.5 : 1 }}
+                                                            onClick={() => {
+                                                                if (isBooked || isPast) return; // disallow clicking past or already booked
+
+                                                                // If the clicked date is too soon (must be at least next day), show error and cancel selection
+                                                                if (isTooSoon) {
+                                                                    setSelectedStartDay(null);
+                                                                    setSelectedEndDay(null);
+                                                                    setBookingError("bạn phải đặt lịch trước 1 ngày");
+                                                                    return;
+                                                                }
+
+                                                                // valid click, clear any previous error
+                                                                setBookingError("");
+
+                                                                if (!selectedStartDay) {
+                                                                    setSelectedStartDay(dayNum);
+                                                                    setSelectedEndDay(null);
+                                                                } else if (!selectedEndDay && dayNum > selectedStartDay) {
+                                                                    // Kiểm tra có ngày đã đặt trong dải
+                                                                    const hasBooked = bookedDays.some(d => d >= selectedStartDay && d <= dayNum);
+                                                                    if (hasBooked) {
+                                                                        setSelectedStartDay(null);
+                                                                        setSelectedEndDay(null);
+                                                                        setBookingError("Có ngày đã được đặt!");
+                                                                        return;
+                                                                    }
+                                                                    setSelectedEndDay(dayNum);
+                                                                } else {
+                                                                    setSelectedStartDay(dayNum);
+                                                                    setSelectedEndDay(null);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {String(dayNum).padStart(2, "0")}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
                             </div>
+
+                            {/* Cột phải (ẩn nếu không khả dụng) */}
+                            {!isUnavailable && (
+                                <div className="booking-container">
+                                    <div className="booking-right">
+                                        <div className="booking-list">
+                                            {bookings.length === 0 ? (
+                                                <div className="empty-booking">Chưa có lịch đặt trong tháng này.</div>
+                                            ) : (
+                                                bookings.map((b) => (
+                                                    <div style={{ height: "20px" }} key={b.reservationId} className="booking-item">
+                                                        <span>
+                                                            <b>{b.userName}</b> {new Date(b.startTime).getDate()} - {new Date(b.endTime).getDate()}/{selectedMonth}/{selectedYear}
+                                                        </span>
+                                                        {b.userId === parseInt(userId) && (
+                                                            <button onClick={() => handleDeleteBooking(b.reservationId)}>✕</button>
+                                                        )}
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+
+                                        <div className="booking-bar">
+                                            <b>Đặt lịch cho bạn</b>
+                                            <div className="date-inputs">
+                                                <span>
+                                                    {selectedStartDay
+                                                        ? selectedEndDay
+                                                            ? `${String(selectedStartDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear} - ${String(selectedEndDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear}`
+                                                            : `${String(selectedStartDay).padStart(2, "0")}/${String(selectedMonth).padStart(2, "0")}/${selectedYear}`
+                                                        : "Chọn ngày bắt đầu và kết thúc"}
+                                                </span>
+                                                <button className="addBtn" onClick={handleAddBooking}>
+                                                    +
+                                                </button>
+                                            </div>
+                                            {bookingError && (
+                                                <div style={{ color: 'red', marginTop: 8, fontWeight: 500 }}>
+                                                    {bookingError}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {isUnavailable && (

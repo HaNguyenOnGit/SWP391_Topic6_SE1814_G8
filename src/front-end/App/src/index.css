@@ -220,10 +220,10 @@ a {
 .main-content {
     border: 1px solid #000000;
     box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-    flex: 1;
-    width: calc(100% - 20px);
+    width: calc(100% - 30px);
     height: calc(100% - 20px);
-    padding: 10px;
+    padding: 30px;
+    padding-right: 0;
     margin-left: 0;
     overflow-y: auto;
 }
@@ -505,6 +505,10 @@ a {
 
 .status.inactive::before {
     color: #f44336;
+}
+
+.page-with-sidebar {
+    height: 95%;
 }
 
 /* ========== VEHICLE INFO PAGE ========== */

@@ -1,0 +1,88 @@
+.vehicle-sidebar {
+    align-self: stretch;
+    /* match parent column height */
+    height: 100%;
+    width: 240px;
+    min-width: 220px;
+    border-right: 2px solid #000;
+    /* only right border */
+    border-radius: 0;
+    /* no rounded corners */
+    background: #f5f5f5;
+    /* match app background */
+    padding: 16px 12px;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px 14px;
+    margin-bottom: 8px;
+}
+
+.sidebar-logo {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    color: #0f6cae;
+}
+
+.sidebar-title {
+    font-weight: 800;
+    font-size: 16px;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 10px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #222;
+    font-weight: 600;
+    transition: background-color .18s ease, box-shadow .18s ease, transform .12s ease, color .18s ease;
+}
+
+.sidebar-link:hover {
+    background: #f6f8fb;
+    color: #0f6cae;
+    box-shadow: 0 4px 12px rgba(15, 108, 174, 0.12);
+    transform: translateY(-1px);
+}
+
+.sidebar-link.active {
+    background: #eaf3ff;
+    color: #0f6cae;
+    border: 1px solid #d8e6fb;
+}
+
+.sidebar-icon {
+    font-size: 18px;
+    color: #0f6cae;
+}
+
+.sidebar-label {
+    font-size: 15px;
+}
+
+/* Responsive: stack sidebar on small screens */
+@media (max-width: 900px) {
+    .vehicle-sidebar {
+        width: 100%;
+        min-width: 0;
+        border-right: 0;
+        border-bottom: 2px solid #000;
+        /* divider when stacked */
+    }
+}
