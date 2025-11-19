@@ -186,121 +186,121 @@ export default function Proposal() {
             <div className="proposal-content">
               <VehicleInfo vehicle={vehicle} />
               <div className="proposal-right">
-            {/* Use Link to go to ProposalList (SPA navigation) */}
-            <Link style={{ color: "#ff9800", display: "inline-block", marginBottom: 12 }} to={`/vehicle/${id}/proposals`}>
-              Xem đề xuất
-            </Link>
+                {/* Use Link to go to ProposalList (SPA navigation) */}
+                <Link style={{ color: "#ff9800", display: "inline-block", marginBottom: 12 }} to={`/vehicle/${id}/proposals`}>
+                  Xem đề xuất
+                </Link>
 
-            {/* Giao diện nhập thông tin */}
-            {stage === "form" && (
-              <div>
-                <h1>Đề xuất khoản chi cho phương tiện</h1>
+                {/* Giao diện nhập thông tin */}
+                {stage === "form" && (
+                  <div>
+                    <h1>Đề xuất khoản chi cho phương tiện</h1>
 
-                <label>Tên chi phí</label><br />
-                <input
-                  className="txtInput"
-                  type="text"
-                  value={expenseName}
-                  onChange={(e) => setExpenseName(e.target.value)}
-                /><br /><br />
+                    <label>Tên chi phí</label><br />
+                    <input
+                      className="txtInput"
+                      type="text"
+                      value={expenseName}
+                      onChange={(e) => setExpenseName(e.target.value)}
+                    /><br /><br />
 
-                <label>Chi phí</label><br />
-                <input
-                  className="txtInput"
-                  type="text"
-                  value={amount}
-                  onChange={handleAmountChange}
-                  placeholder="Nhập số tiền"
-                /><br /><br />
+                    <label>Chi phí</label><br />
+                    <input
+                      className="txtInput"
+                      type="text"
+                      value={amount}
+                      onChange={handleAmountChange}
+                      placeholder="Nhập số tiền"
+                    /><br /><br />
 
-                <label>Cách thức</label><br />
-                <select className="txtInput" value={method} onChange={handleMethodChange}>
-                  <option value="">-- Chọn cách thức --</option>
-                  <option>Theo tỉ lệ sở hữu</option>
-                  <option>Tự chi trả</option>
-                  <option>Theo lượng sử dụng</option>
-                </select><br /><br />
+                    <label>Cách thức</label><br />
+                    <select className="txtInput" value={method} onChange={handleMethodChange}>
+                      <option value="">-- Chọn cách thức --</option>
+                      <option>Theo tỉ lệ sở hữu</option>
+                      <option>Tự chi trả</option>
+                      <option>Theo lượng sử dụng</option>
+                    </select><br /><br />
 
-                <button
-                  className="btnInput"
-                  onClick={handleSubmit}
-                  disabled={!isFormValid || loading}
-                  style={{
-                    opacity: isFormValid ? 1 : 0.5,
-                    cursor: isFormValid ? "pointer" : "not-allowed",
-                  }}
-                >
-                  {loading ? "Đang gửi..." : "Đề xuất"}
-                </button>
-              </div>
-            )}
-
-            {/* Chi tiết phân bổ */}
-            {stage === "detail" && (
-              <div>
-                <h1>{expenseName}</h1>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h2>Tỉ lệ chi phí</h2>
-                  <p style={{ color: "#4caf50", fontWeight: "700", margin: "10px 0 20px 0" }}>
-                    {total.toLocaleString("vi-VN")}đ
-                  </p>
-                </div>
-
-                {contributions.map((c, i) => {
-                  const pay = Math.round(((Number(c.percent) || 0) / 100) * total);
-                  const disabled = ["Theo tỉ lệ sở hữu", "Theo lượng sử dụng"].includes(method);
-                  return (
-                    <div key={i} className="pSlider">
-                      <p className="pSlider-name">{c.username}</p>
-                      <p>{pay.toLocaleString("vi-VN")}đ</p>
-                      <input
-                        className="slider"
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={c.percent}
-                        onChange={(e) => handleSlider(i, e.target.value)}
-                        disabled={disabled}
-                      />
-                      <input
-                        type="number"
-                        value={c.percent}
-                        onChange={(e) => handleSlider(i, e.target.value)}
-                        disabled={disabled}
-                        style={{ width: 60, marginLeft: 8 }}
-                      /> %
-                    </div>
-                  );
-                })}
-
-                {percentError && (
-                  <p style={{ color: "red", fontWeight: "bold", marginTop: 10 }}>
-                    {percentError}
-                  </p>
+                    <button
+                      className="btnInput"
+                      onClick={handleSubmit}
+                      disabled={!isFormValid || loading}
+                      style={{
+                        opacity: isFormValid ? 1 : 0.5,
+                        cursor: isFormValid ? "pointer" : "not-allowed",
+                      }}
+                    >
+                      {loading ? "Đang gửi..." : "Đề xuất"}
+                    </button>
+                  </div>
                 )}
 
-                <button className="btnReturn" onClick={() => setStage("form")}>
-                  Quay lại
-                </button>
-                <button
-                  className="btnInput"
-                  onClick={handleFinalSubmit}
-                  disabled={!!percentError || loading}
-                >
-                  {loading ? "Đang gửi..." : "Xác nhận đề xuất"}
-                </button>
-              </div>
-            )}
+                {/* Chi tiết phân bổ */}
+                {stage === "detail" && (
+                  <div>
+                    <h1>{expenseName}</h1>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <h2>Tỉ lệ chi phí</h2>
+                      <p style={{ color: "#4caf50", fontWeight: "700", margin: "10px 0 20px 0" }}>
+                        {total.toLocaleString("vi-VN")}đ
+                      </p>
+                    </div>
 
-            {/* Thành công */}
-            {stage === "success" && (
-              <div>
-                <h3 style={{ color: "#4caf50" }}>Đã tạo đề xuất thành công!</h3>
-                <Link to={`/vehicle/${id}/proposals`} style={{ color: "#ff9800", display: "block", marginTop: 12 }}>
-                  Xem danh sách đề xuất
-                </Link>
-              </div>
-            )}
+                    {contributions.map((c, i) => {
+                      const pay = Math.round(((Number(c.percent) || 0) / 100) * total);
+                      const disabled = ["Theo tỉ lệ sở hữu", "Theo lượng sử dụng"].includes(method);
+                      return (
+                        <div key={i} className="pSlider">
+                          <p className="pSlider-name">{c.username}</p>
+                          <p>{pay.toLocaleString("vi-VN")}đ</p>
+                          <input
+                            className="slider"
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={c.percent}
+                            onChange={(e) => handleSlider(i, e.target.value)}
+                            disabled={disabled}
+                          />
+                          <input
+                            type="number"
+                            value={c.percent}
+                            onChange={(e) => handleSlider(i, e.target.value)}
+                            disabled={disabled}
+                            style={{ width: 60, marginLeft: 8 }}
+                          /> %
+                        </div>
+                      );
+                    })}
+
+                    {percentError && (
+                      <p style={{ color: "red", fontWeight: "bold", marginTop: 10 }}>
+                        {percentError}
+                      </p>
+                    )}
+
+                    <button className="btnReturn" onClick={() => setStage("form")}>
+                      Quay lại
+                    </button>
+                    <button
+                      className="btnInput"
+                      onClick={handleFinalSubmit}
+                      disabled={!!percentError || loading}
+                    >
+                      {loading ? "Đang gửi..." : "Xác nhận đề xuất"}
+                    </button>
+                  </div>
+                )}
+
+                {/* Thành công */}
+                {stage === "success" && (
+                  <div>
+                    <h3 style={{ color: "#4caf50" }}>Đã tạo đề xuất thành công!</h3>
+                    <Link to={`/vehicle/${id}/proposals`} style={{ color: "#ff9800", display: "block", marginTop: 12 }}>
+                      Xem danh sách đề xuất
+                    </Link>
+                  </div>
+                )}
               </div>
             </div>
           </div>

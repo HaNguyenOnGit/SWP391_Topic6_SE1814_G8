@@ -38,8 +38,10 @@
 
 .proposal-list-content .All {
     flex: 1;
-    margin-left: 0; /* bỏ margin-left cũ để dùng gap */
-    max-width: none; /* cho phép nở rộng */
+    margin-left: 0;
+    /* bỏ margin-left cũ để dùng gap */
+    max-width: none;
+    /* cho phép nở rộng */
 }
 
 @media (max-width: 900px) {
@@ -48,6 +50,7 @@
         gap: 16px;
         padding: 0 14px 20px;
     }
+
     .proposal-list-content {
         flex-direction: column;
         gap: 16px;

@@ -68,60 +68,60 @@ export default function PaymentHistory() {
                         <div className="payment-content">
                             <VehicleInfo vehicle={vehicle} />
                             <div className="payment-container">
-                        <h2 className="payment-title">Lịch sử thanh toán của bạn</h2>
+                                <h2 className="payment-title">Lịch sử thanh toán của bạn</h2>
 
-                        <div
-                            className="scroll-box"
-                            style={{
-                                maxHeight: "calc(100vh - 280px)",
-                                overflowY: "auto",
-                                paddingRight: "8px",
-                                marginTop: "8px",
-                            }}
-                        >
-                            {payments.length === 0 ? (
-                                <p className="empty-message">
-                                    Chưa có lịch sử thanh toán nào.
-                                </p>
-                            ) : (
-                                <ul
-                                    className={`payment-list ${!isAnimating ? "fade-slide-in" : "fade-slide-out"
-                                        }`}
+                                <div
+                                    className="scroll-box"
+                                    style={{
+                                        maxHeight: "calc(100vh - 280px)",
+                                        overflowY: "auto",
+                                        paddingRight: "8px",
+                                        marginTop: "8px",
+                                    }}
                                 >
-                                    {payments.map((p) => (
-                                        <li key={p.settlementId} className="payment-item">
-                                            <div className="payment-info">
-                                                <div className="payment-name">
-                                                    {p.expenseName}
-                                                </div>
-                                                <div className="payment-meta">
-                                                    Ngày:{" "}
-                                                    {p.paymentDate
-                                                        ? new Date(p.paymentDate).toLocaleDateString(
-                                                            "vi-VN"
-                                                        )
-                                                        : "Chưa có"}
-                                                </div>
-                                                <div className="payment-meta">
-                                                    Người nhận: {p.receiverName}
-                                                </div>
-                                            </div>
+                                    {payments.length === 0 ? (
+                                        <p className="empty-message">
+                                            Chưa có lịch sử thanh toán nào.
+                                        </p>
+                                    ) : (
+                                        <ul
+                                            className={`payment-list ${!isAnimating ? "fade-slide-in" : "fade-slide-out"
+                                                }`}
+                                        >
+                                            {payments.map((p) => (
+                                                <li key={p.settlementId} className="payment-item">
+                                                    <div className="payment-info">
+                                                        <div className="payment-name">
+                                                            {p.expenseName}
+                                                        </div>
+                                                        <div className="payment-meta">
+                                                            Ngày:{" "}
+                                                            {p.paymentDate
+                                                                ? new Date(p.paymentDate).toLocaleDateString(
+                                                                    "vi-VN"
+                                                                )
+                                                                : "Chưa có"}
+                                                        </div>
+                                                        <div className="payment-meta">
+                                                            Người nhận: {p.receiverName}
+                                                        </div>
+                                                    </div>
 
-                                            <div className="payment-amount">
-                                                <div>
-                                                    Đã trả:{" "}
-                                                    {p.userPaidAmount?.toLocaleString("vi-VN")} ₫
-                                                </div>
-                                                <div>
-                                                    Tổng:{" "}
-                                                    {p.totalExpenseAmount?.toLocaleString("vi-VN")} ₫
-                                                </div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
+                                                    <div className="payment-amount">
+                                                        <div>
+                                                            Đã trả:{" "}
+                                                            {p.userPaidAmount?.toLocaleString("vi-VN")} ₫
+                                                        </div>
+                                                        <div>
+                                                            Tổng:{" "}
+                                                            {p.totalExpenseAmount?.toLocaleString("vi-VN")} ₫
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -103,109 +103,109 @@ export default function CostDetail() {
                         <div className="costs-content">
                             <VehicleInfo vehicle={vehicle} />
                             <div className="cost-section">
-                        <h3 className="cost-section-title">Thông tin chi phí</h3>
+                                <h3 className="cost-section-title">Thông tin chi phí</h3>
 
-                        {!selectedExpense ? (
-                            <div
-                                className="scroll-box"
-                                style={{
-                                    maxHeight: "calc(100vh - 280px)",
-                                    overflowY: "auto",
-                                    paddingRight: "8px",
-                                    marginTop: "8px",
-                                }}
-                            >
-                                <ul className={`cost-list ${!isAnimating ? "fade-slide-in" : "fade-slide-out"}`}>
-                                    {expenses.length === 0 && <li>Không có chi phí nào.</li>}
-                                    {expenses.map((exp, i) => (
-                                        <li key={i} className={`cost-item ${exp.status === "Paid" ? "paid" : ""}`}>
-                                            <div className="cost-left">
-                                                <span className="cost-type">{exp.expenseName}</span>
-                                                <span
-                                                    className={`cost-amount ${exp.status === "Paid" ? "green" : "red"}`}
-                                                >
-                                                    {exp.userAmount?.toLocaleString("vi-VN")} ₫
-                                                </span>
-                                            </div>
-                                            <a
-                                                href="#"
+                                {!selectedExpense ? (
+                                    <div
+                                        className="scroll-box"
+                                        style={{
+                                            maxHeight: "calc(100vh - 280px)",
+                                            overflowY: "auto",
+                                            paddingRight: "8px",
+                                            marginTop: "8px",
+                                        }}
+                                    >
+                                        <ul className={`cost-list ${!isAnimating ? "fade-slide-in" : "fade-slide-out"}`}>
+                                            {expenses.length === 0 && <li>Không có chi phí nào.</li>}
+                                            {expenses.map((exp, i) => (
+                                                <li key={i} className={`cost-item ${exp.status === "Paid" ? "paid" : ""}`}>
+                                                    <div className="cost-left">
+                                                        <span className="cost-type">{exp.expenseName}</span>
+                                                        <span
+                                                            className={`cost-amount ${exp.status === "Paid" ? "green" : "red"}`}
+                                                        >
+                                                            {exp.userAmount?.toLocaleString("vi-VN")} ₫
+                                                        </span>
+                                                    </div>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            handleShowDetail(exp);
+                                                        }}
+                                                        className="cost-detail-link"
+                                                    >
+                                                        Xem thông tin chi tiết
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ) : (
+
+                                    <div
+                                        className={`cost-detail-card ${!isAnimating ? "fade-slide-in" : "fade-slide-out"}`}
+                                    >
+                                        <h4 className="cost-detail-title">
+                                            {selectedExpense.detail.expenseName}
+                                        </h4>
+                                        <p className="cost-detail-desc">
+                                            {translateAllocationRule(selectedExpense.detail.allocationRule)}
+                                        </p>
+
+                                        <div className="cost-total">
+                                            <span>Tổng:</span>
+                                            <span className="total-value">
+                                                {selectedExpense.detail.totalAmount.toLocaleString("vi-VN")} ₫
+                                            </span>
+                                        </div>
+
+                                        <div className="your-amount">
+                                            <span>Số tiền của bạn:</span>
+                                            <span
+                                                className={`your-value ${selectedExpense.status === "Paid" ? "green" : "red"}`}
+                                            >
+                                                {selectedExpense.detail.userAmount.toLocaleString("vi-VN")} ₫
+                                            </span>
+                                        </div>
+
+                                        <h5 className="cost-method">Hình thức</h5>
+                                        <p className="cost-note">Theo tỉ lệ sở hữu</p>
+
+                                        <div className="share-list">
+                                            {selectedExpense.detail.owners.map((o, i) => (
+                                                <div key={i} className="share-item">
+                                                    <span>{o.fullName}</span>
+                                                    <div className="share-right">
+                                                        <div className="ratio">{o.percent}%</div>
+                                                        <div className="share-value">
+                                                            {o.amount.toLocaleString("vi-VN")} ₫
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {selectedExpense.status !== "Paid" && (
+                                            <Link to={`/vehicle/${id}/payment`} className="btn-pay">
+                                                Thanh toán
+                                            </Link>
+                                        )}
+
+                                        <div className="back-section">
+                                            <Link
+                                                to="#"
                                                 onClick={(e) => {
                                                     e.preventDefault();
-                                                    handleShowDetail(exp);
+                                                    handleBack();
                                                 }}
-                                                className="cost-detail-link"
+                                                className="back-link"
                                             >
-                                                Xem thông tin chi tiết
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ) : (
-
-                            <div
-                                className={`cost-detail-card ${!isAnimating ? "fade-slide-in" : "fade-slide-out"}`}
-                            >
-                                <h4 className="cost-detail-title">
-                                    {selectedExpense.detail.expenseName}
-                                </h4>
-                                <p className="cost-detail-desc">
-                                    {translateAllocationRule(selectedExpense.detail.allocationRule)}
-                                </p>
-
-                                <div className="cost-total">
-                                    <span>Tổng:</span>
-                                    <span className="total-value">
-                                        {selectedExpense.detail.totalAmount.toLocaleString("vi-VN")} ₫
-                                    </span>
-                                </div>
-
-                                <div className="your-amount">
-                                    <span>Số tiền của bạn:</span>
-                                    <span
-                                        className={`your-value ${selectedExpense.status === "Paid" ? "green" : "red"}`}
-                                    >
-                                        {selectedExpense.detail.userAmount.toLocaleString("vi-VN")} ₫
-                                    </span>
-                                </div>
-
-                                <h5 className="cost-method">Hình thức</h5>
-                                <p className="cost-note">Theo tỉ lệ sở hữu</p>
-
-                                <div className="share-list">
-                                    {selectedExpense.detail.owners.map((o, i) => (
-                                        <div key={i} className="share-item">
-                                            <span>{o.fullName}</span>
-                                            <div className="share-right">
-                                                <div className="ratio">{o.percent}%</div>
-                                                <div className="share-value">
-                                                    {o.amount.toLocaleString("vi-VN")} ₫
-                                                </div>
-                                            </div>
+                                                ← Quay lại danh sách chi phí
+                                            </Link>
                                         </div>
-                                    ))}
-                                </div>
-
-                                {selectedExpense.status !== "Paid" && (
-                                    <Link to={`/vehicle/${id}/payment`} className="btn-pay">
-                                        Thanh toán
-                                    </Link>
+                                    </div>
                                 )}
-
-                                <div className="back-section">
-                                    <Link
-                                        to="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            handleBack();
-                                        }}
-                                        className="back-link"
-                                    >
-                                        ← Quay lại danh sách chi phí
-                                    </Link>
-                                </div>
-                            </div>
-                        )}
                             </div>
                         </div>
                     </div>

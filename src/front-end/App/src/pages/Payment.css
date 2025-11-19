@@ -14,14 +14,16 @@
     gap: 24px;
     padding: 0 20px 20px;
     max-height: 100%;
-    margin-block: auto; /* center vertically when short */
+    margin-block: auto;
+    /* center vertically when short */
 }
 
 .page-main {
     flex: 1;
     min-width: 0;
     max-height: 100%;
-    overflow: auto; /* only right pane scrolls */
+    overflow: auto;
+    /* only right pane scrolls */
 }
 
 .payment-content {
@@ -46,12 +48,14 @@
         gap: 16px;
         padding: 0 14px 20px;
     }
+
     .payment-content {
         flex-direction: column;
         gap: 16px;
         padding: 0 14px 20px;
     }
 }
+
 /* --- Khối chính của Payment --- */
 .payment-section {
     flex: 1;
