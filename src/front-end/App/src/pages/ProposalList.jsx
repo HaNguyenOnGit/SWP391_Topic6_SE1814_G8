@@ -4,6 +4,7 @@ import Navbar from "../Navbar";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
 import VehicleInfo from "../VehicleInfo";
+import VehicleSidebar from "../VehicleSidebar";
 import "./ProposalList.css";
 
 export default function ProposalList() {
@@ -140,10 +141,13 @@ export default function ProposalList() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
-                <div className="main-content-layout">
-                    <VehicleInfo />
-                    <div className="All">
+            <div className="main-content proposal-list-shell">
+                <div className="page-with-sidebar">
+                    <VehicleSidebar contractId={id} />
+                    <div className="page-main">
+                        <div className="proposal-list-content">
+                            <VehicleInfo />
+                            <div className="All">
                         <h2>Đề xuất chi tiêu</h2>
 
                         {!selected ? (
@@ -310,8 +314,9 @@ export default function ProposalList() {
                                 )}
                             </div>
                         )}
+                            </div>
+                        </div>
                     </div>
-
                 </div>
             </div>
         </div>

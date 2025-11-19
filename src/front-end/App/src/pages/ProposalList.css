@@ -1,3 +1,60 @@
+/* ================================
+   LAYOUT GIỐNG BOOKING (layout only)
+================================ */
+.proposal-list-shell {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.page-with-sidebar {
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+    padding: 0 20px 20px;
+    max-height: 100%;
+    margin-block: auto;
+}
+
+.page-main {
+    flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow: auto;
+}
+
+.proposal-list-content {
+    padding: 0 5vw 24px 5vw;
+    display: flex;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: flex-start;
+}
+
+.proposal-list-content .vehicle-info {
+    flex: 0 0 clamp(300px, 32%, 420px);
+    max-width: 100%;
+}
+
+.proposal-list-content .All {
+    flex: 1;
+    margin-left: 0; /* bỏ margin-left cũ để dùng gap */
+    max-width: none; /* cho phép nở rộng */
+}
+
+@media (max-width: 900px) {
+    .page-with-sidebar {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+    .proposal-list-content {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+}
+
 /* ====== Danh sách đề xuất ====== */
 .proposal-list {
     max-height: 430px;

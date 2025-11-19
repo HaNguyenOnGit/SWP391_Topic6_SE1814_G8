@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import VehicleInfo from "../VehicleInfo";
+import VehicleSidebar from "../VehicleSidebar";
 import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./PaymentHistory.css";
@@ -60,10 +61,13 @@ export default function PaymentHistory() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
-                <div className="main-content-layout">
-                    <VehicleInfo vehicle={vehicle} />
-                    <div className="payment-container">
+            <div className="main-content payment-shell">
+                <div className="page-with-sidebar">
+                    <VehicleSidebar contractId={id} />
+                    <div className="page-main">
+                        <div className="payment-content">
+                            <VehicleInfo vehicle={vehicle} />
+                            <div className="payment-container">
                         <h2 className="payment-title">Lịch sử thanh toán của bạn</h2>
 
                         <div
@@ -117,6 +121,8 @@ export default function PaymentHistory() {
                                     ))}
                                 </ul>
                             )}
+                        </div>
+                            </div>
                         </div>
                     </div>
                 </div>

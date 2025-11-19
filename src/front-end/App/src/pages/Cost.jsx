@@ -2,6 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import VehicleInfo from "../VehicleInfo";
+import VehicleSidebar from "../VehicleSidebar";
 import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./Cost.css";
@@ -95,10 +96,13 @@ export default function CostDetail() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
-                <div className="main-content-layout">
-                    <VehicleInfo vehicle={vehicle} />
-                    <div className="cost-section">
+            <div className="main-content costs-shell">
+                <div className="page-with-sidebar">
+                    <VehicleSidebar contractId={id} />
+                    <div className="page-main">
+                        <div className="costs-content">
+                            <VehicleInfo vehicle={vehicle} />
+                            <div className="cost-section">
                         <h3 className="cost-section-title">Thông tin chi phí</h3>
 
                         {!selectedExpense ? (
@@ -202,6 +206,8 @@ export default function CostDetail() {
                                 </div>
                             </div>
                         )}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

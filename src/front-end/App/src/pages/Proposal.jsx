@@ -2,6 +2,8 @@ import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Navbar from "../Navbar";
 import VehicleInfo from "../VehicleInfo";
+import VehicleSidebar from "../VehicleSidebar";
+import "./Proposal.css";
 import axios from "axios";
 import { useAuth } from "../auth/AuthContext";
 export default function Proposal() {
@@ -177,10 +179,13 @@ export default function Proposal() {
   return (
     <div className="main-container">
       <Navbar username="Username" />
-      <div className="main-content">
-        <div className="main-content-layout">
-          <VehicleInfo vehicle={vehicle} />
-          <div>
+      <div className="main-content proposal-shell">
+        <div className="page-with-sidebar">
+          <VehicleSidebar contractId={id} />
+          <div className="page-main">
+            <div className="proposal-content">
+              <VehicleInfo vehicle={vehicle} />
+              <div className="proposal-right">
             {/* Use Link to go to ProposalList (SPA navigation) */}
             <Link style={{ color: "#ff9800", display: "inline-block", marginBottom: 12 }} to={`/vehicle/${id}/proposals`}>
               Xem đề xuất
@@ -296,6 +301,8 @@ export default function Proposal() {
                 </Link>
               </div>
             )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

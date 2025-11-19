@@ -1,17 +1,54 @@
+/* ================================
+   LAYOUT GIỐNG BOOKING
+================================ */
+.history-shell {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.page-with-sidebar {
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+    padding: 0 20px 20px;
+    max-height: 100%;
+    margin-block: auto;
+    /* center vertically when content shorter */
+}
+
+.page-main {
+    flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow: auto;
+    /* only right pane scrolls */
+}
+
+.history-content {
+    padding: 0 5vw 24px 5vw;
+}
+
+@media (max-width: 900px) {
+    .page-with-sidebar {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+}
+
 /* ------------------------------------------------------------------ */
 /* --- PHẦN TRIP SECTION (PROFESSIONAL & INTERACTIVE) --- */
 /* ------------------------------------------------------------------ */
 
 .trip-section {
-    flex-basis: 45%;
+    flex: 1;
     background-color: transparent;
     padding: 0;
     box-shadow: none;
-
-    /* 1. Hiệu ứng khi tải trang */
     animation: fadeInSlideUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
     opacity: 0;
-    /* Bắt buộc phải có opacity: 0 ban đầu */
 }
 
 /* --- Tiêu đề & Tổng quãng đường --- */
@@ -150,4 +187,32 @@
     pointer-events: none;
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* ================================
+   HORIZONTAL LAYOUT FOR TOP CONTENT
+================================ */
+.history-content {
+    display: flex;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: flex-start;
+}
+
+.history-content .vehicle-info {
+    flex: 0 0 clamp(300px, 32%, 420px);
+    max-width: 100%;
+}
+
+.history-content .trip-section {
+    flex: 1;
+}
+
+@media (max-width: 1048px) {
+    .history-content {
+        flex-direction: column;
+    }
+    .history-content .vehicle-info {
+        flex: 1 1 auto;
+        width: 100%;
+    }
 }

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Navbar from "../Navbar";
+import VehicleSidebar from "../VehicleSidebar";
+import "./ContractDetails.css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
@@ -95,140 +97,151 @@ export default function ContractDetails() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content" style={{ overflowY: "scroll" }}>
-                <h1>Chi tiết hợp đồng</h1>
+            <div className="main-content contract-shell">
+                <div className="page-with-sidebar">
+                    <VehicleSidebar contractId={id} />
+                    <div className="page-main">
+                        <h1>Chi tiết hợp đồng</h1>
+                        <div className="contract-content">
+                            {/* Left: Vehicle info */}
+                            <div className="contract-left">
+                                <section style={{ marginTop: "20px" }}>
+                                    <h2>Thông tin phương tiện</h2>
+                                    <p><strong>Tên:</strong> {contract.vehicle.name}</p>
+                                    <p><strong>Biển số:</strong> {contract.vehicle.license}</p>
+                                    <p><strong>Model:</strong> {contract.vehicle.model}</p>
+                                </section>
+                            </div>
 
-                {/* Vehicle info */}
-                <section style={{ marginTop: "20px" }}>
-                    <h2>Thông tin phương tiện</h2>
-                    <p><strong>Tên:</strong> {contract.vehicle.name}</p>
-                    <p><strong>Biển số:</strong> {contract.vehicle.license}</p>
-                    <p><strong>Model:</strong> {contract.vehicle.model}</p>
-                </section>
+                            {/* Right: Main details */}
+                            <div className="contract-right">
+                                {/* Owner list */}
+                                <section style={{ marginTop: "20px" }}>
+                                    <h2>Danh sách đồng sở hữu</h2>
 
-                {/* Owner list */}
-                <section style={{ marginTop: "20px" }}>
-                    <h2>Danh sách đồng sở hữu</h2>
+                                    {owners.map((o, i) => (
+                                        <div
+                                            key={i}
+                                            style={{
+                                                marginBottom: "10px",
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                width: "300px",
+                                            }}
+                                        >
+                                            <span>
+                                                <strong>{o.name}</strong> ({o.phone})
+                                            </span>
+                                            {editing ? (
+                                                <>
+                                                    <input
+                                                        type="range"
+                                                        min="0"
+                                                        max="100"
+                                                        value={o.ratio}
+                                                        onChange={(e) => updateRatio(i, e.target.value)}
+                                                        style={{ margin: "0 10px", flex: 1 }}
+                                                    />
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        max="100"
+                                                        value={o.ratio}
+                                                        onChange={(e) => updateRatio(i, e.target.value)}
+                                                        style={{ width: "50px", marginLeft: "8px" }}
+                                                    />
+                                                    <span>%</span>
+                                                    <button
+                                                        onClick={() => removeOwner(i)}
+                                                        style={{ marginLeft: "10px", color: "red" }}
+                                                    >
+                                                        Xóa
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <span style={{ color: "blue" }}>{o.ratio}%</span>
+                                            )}
+                                        </div>
+                                    ))}
 
-                    {owners.map((o, i) => (
-                        <div
-                            key={i}
-                            style={{
-                                marginBottom: "10px",
-                                display: "flex",
-                                justifyContent: "space-between",
-                                width: "300px",
-                            }}
-                        >
-                            <span>
-                                <strong>{o.name}</strong> ({o.phone})
-                            </span>
-                            {editing ? (
-                                <>
-                                    <input
-                                        type="range"
-                                        min="0"
-                                        max="100"
-                                        value={o.ratio}
-                                        onChange={(e) => updateRatio(i, e.target.value)}
-                                        style={{ margin: "0 10px", flex: 1 }}
-                                    />
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={o.ratio}
-                                        onChange={(e) => updateRatio(i, e.target.value)}
-                                        style={{ width: "50px", marginLeft: "8px" }}
-                                    />
-                                    <span>%</span>
-                                    <button
-                                        onClick={() => removeOwner(i)}
-                                        style={{ marginLeft: "10px", color: "red" }}
-                                    >
-                                        Xóa
-                                    </button>
-                                </>
-                            ) : (
-                                <span style={{ color: "blue" }}>{o.ratio}%</span>
-                            )}
+                                    {editing && (
+                                        <div style={{ marginTop: "10px" }}>
+                                            <input
+                                                type="text"
+                                                placeholder="Nhập số điện thoại mới"
+                                                value={newPhone}
+                                                onChange={(e) => setNewPhone(e.target.value)}
+                                            />
+                                            <button onClick={addOwner} style={{ marginLeft: "10px" }}>
+                                                Thêm thành viên
+                                            </button>
+                                        </div>
+                                    )}
+
+                                    {editing && ratioError && (
+                                        <p style={{ color: "red" }}>
+                                            Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)
+                                        </p>
+                                    )}
+                                </section>
+
+                                {/* Date */}
+                                <section style={{ marginTop: "20px" }}>
+                                    <h2>Ngày tạo hợp đồng</h2>
+                                    {editing ? (
+                                        <input
+                                            type="date"
+                                            value={createDate}
+                                            onChange={(e) => setCreateDate(e.target.value)}
+                                        />
+                                    ) : (
+                                        <p>{createDate}</p>
+                                    )}
+                                </section>
+
+                                {/* Status */}
+                                <section style={{ marginTop: "20px" }}>
+                                    <h2>Trạng thái</h2>
+                                    <p style={{ color: contract.status === "Đã kết thúc" ? "red" : "green" }}>
+                                        {contract.status}
+                                    </p>
+                                </section>
+
+                                {/* Buttons */}
+                                <div style={{ marginTop: "30px" }}>
+                                    {editing ? (
+                                        <>
+                                            <button onClick={handleSave}>Lưu thay đổi</button>
+                                            <button
+                                                style={{ marginLeft: "10px" }}
+                                                onClick={() => {
+                                                    setEditing(false);
+                                                    setOwners(contract.owners);
+                                                    setCreateDate(contract.createDate);
+                                                }}
+                                            >
+                                                Hủy
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {contract.status === "Đang sử dụng" && (
+                                                <>
+                                                    <button onClick={() => setEditing(true)}>Chỉnh sửa</button>
+                                                    <button
+                                                        style={{ marginLeft: "10px", color: "red" }}
+                                                        onClick={endContract}
+                                                    >
+                                                        Chấm dứt hợp đồng
+                                                    </button>
+                                                </>
+                                            )}
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    ))}
-
-                    {editing && (
-                        <div style={{ marginTop: "10px" }}>
-                            <input
-                                type="text"
-                                placeholder="Nhập số điện thoại mới"
-                                value={newPhone}
-                                onChange={(e) => setNewPhone(e.target.value)}
-                            />
-                            <button onClick={addOwner} style={{ marginLeft: "10px" }}>
-                                Thêm thành viên
-                            </button>
-                        </div>
-                    )}
-
-                    {editing && ratioError && (
-                        <p style={{ color: "red" }}>
-                            Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)
-                        </p>
-                    )}
-                </section>
-
-                {/* Date */}
-                <section style={{ marginTop: "20px" }}>
-                    <h2>Ngày tạo hợp đồng</h2>
-                    {editing ? (
-                        <input
-                            type="date"
-                            value={createDate}
-                            onChange={(e) => setCreateDate(e.target.value)}
-                        />
-                    ) : (
-                        <p>{createDate}</p>
-                    )}
-                </section>
-
-                {/* Status */}
-                <section style={{ marginTop: "20px" }}>
-                    <h2>Trạng thái</h2>
-                    <p style={{ color: contract.status === "Đã kết thúc" ? "red" : "green" }}>
-                        {contract.status}
-                    </p>
-                </section>
-
-                {/* Buttons */}
-                <div style={{ marginTop: "30px" }}>
-                    {editing ? (
-                        <>
-                            <button onClick={handleSave}>Lưu thay đổi</button>
-                            <button
-                                style={{ marginLeft: "10px" }}
-                                onClick={() => {
-                                    setEditing(false);
-                                    setOwners(contract.owners);
-                                    setCreateDate(contract.createDate);
-                                }}
-                            >
-                                Hủy
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            {contract.status === "Đang sử dụng" && (
-                                <>
-                                    <button onClick={() => setEditing(true)}>Chỉnh sửa</button>
-                                    <button
-                                        style={{ marginLeft: "10px", color: "red" }}
-                                        onClick={endContract}
-                                    >
-                                        Chấm dứt hợp đồng
-                                    </button>
-                                </>
-                            )}
-                        </>
-                    )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,9 +1,66 @@
+/* ================================
+   LAYOUT GIỐNG BOOKING
+================================ */
+.checkin-shell {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.page-with-sidebar {
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+    padding: 0 20px 20px;
+    max-height: 100%;
+    margin-block: auto;
+    /* center vertically when shorter */
+}
+
+.page-main {
+    flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow: auto;
+    /* scroll only right side */
+}
+
+.checkin-content {
+    padding: 0 5vw 24px 5vw;
+    display: flex;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: flex-start;
+}
+
+.checkin-content .vehicle-info {
+    flex: 0 0 clamp(300px, 32%, 420px);
+    max-width: 100%;
+}
+
+.check-form-content {
+    flex: 1;
+}
+
+@media (max-width: 900px) {
+    .page-with-sidebar {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+
+    .checkin-content {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+}
+
 /* ------------------------------------------------------------------ */
 /* --- CHECK-IN / CHECK-OUT SECTION — ĐỒNG BỘ PHONG CÁCH TRIP SECTION --- */
 /* ------------------------------------------------------------------ */
 
 .check-form-content {
-    flex-basis: 45%;
     background-color: transparent;
     padding: 0;
     box-shadow: none;

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import Navbar from "../Navbar";
 import VehicleInfo from "../VehicleInfo";
+import VehicleSidebar from "../VehicleSidebar";
 import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./CheckinHistory.css";
@@ -104,48 +105,53 @@ export default function CheckinHistory() {
   return (
     <div className="main-container">
       <Navbar username="Username" />
-      <div className="main-content">
-        <div className="main-content-layout">
-          <VehicleInfo vehicle={vehicle} />
+      <div className="main-content history-shell">
+        <div className="page-with-sidebar">
+          <VehicleSidebar contractId={id} />
+          <div className="page-main">
+            <div className="history-content">
+              <VehicleInfo vehicle={vehicle} />
 
-          <div className="trip-section">
-            <h3>Hành trình của bạn</h3>
+              <div className="trip-section">
+                <h3>Hành trình của bạn</h3>
 
-            {/* Tổng quãng đường */}
-            <p className="trip-total-distance">
-              <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
-            </p>
+                {/* Tổng quãng đường */}
+                <p className="trip-total-distance">
+                  <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
+                </p>
 
-            <p className="history-title">Lịch sử hành trình</p>
+                <p className="history-title">Lịch sử hành trình</p>
 
-            <div className="history-list">
-              {history.length > 0 ? (
-                history.map((h, i) => (
-                  <div key={i} className="history-item">
-                    <p className="history-time-range">
-                      {h.date} | {h.time}
-                    </p>
-                    <p className="history-distance">
-                      {h.distance.toLocaleString("vi-VN")} Km
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p>Chưa có lịch sử hành trình.</p>
-              )}
-            </div>
+                <div className="history-list">
+                  {history.length > 0 ? (
+                    history.map((h, i) => (
+                      <div key={i} className="history-item">
+                        <p className="history-time-range">
+                          {h.date} | {h.time}
+                        </p>
+                        <p className="history-distance">
+                          {h.distance.toLocaleString("vi-VN")} Km
+                        </p>
+                      </div>
+                    ))
+                  ) : (
+                    <p>Chưa có lịch sử hành trình.</p>
+                  )}
+                </div>
 
-            {/* Nút chuyển đến trang checkin/checkout */}
-            <div className="trip-button-container">
-              <Link
-                to={canCheckin ? `/vehicle/${id}/checkin` : "#"}
-                className={`start-checkin-btn ${!canCheckin ? "disabled" : ""}`}
-                onClick={(e) => {
-                  if (!canCheckin) e.preventDefault();
-                }}
-              >
-                {hasOngoingTrip ? "Tiếp tục checkout" : "Bắt đầu check-in"}
-              </Link>
+                {/* Nút chuyển đến trang checkin/checkout */}
+                <div className="trip-button-container">
+                  <Link
+                    to={canCheckin ? `/vehicle/${id}/checkin` : "#"}
+                    className={`start-checkin-btn ${!canCheckin ? "disabled" : ""}`}
+                    onClick={(e) => {
+                      if (!canCheckin) e.preventDefault();
+                    }}
+                  >
+                    {hasOngoingTrip ? "Tiếp tục checkout" : "Bắt đầu check-in"}
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

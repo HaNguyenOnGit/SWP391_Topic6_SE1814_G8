@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
 import VehicleInfo from "../VehicleInfo";
+import VehicleSidebar from "../VehicleSidebar";
 import { useAuth } from "../auth/AuthContext";
 import axios from "axios";
 import "./Checkin.css";
@@ -237,53 +238,55 @@ export default function Checkin() {
   return (
     <div className="main-container">
       <Navbar username="Username" />
-      <div className="main-content">
-        <div className="main-content-layout">
-          <VehicleInfo vehicle={vehicle} />
+      <div className="main-content checkin-shell">
+        <div className="page-with-sidebar">
+          <VehicleSidebar contractId={id} />
+          <div className="page-main">
+            <div className="checkin-content">
+              <VehicleInfo vehicle={vehicle} />
 
-          <div className="check-form-content">
-            {tripInfo && (
-              <>
-                <h3 className="check-form-title">Hành trình của xe</h3>
-                <p className="trip-total-distance">
-                  <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
-                </p>
-                {/* <p className="checkin-distance">
-                  <b>{tripInfo.distance} Km</b>
-                </p> */}
-              </>
-            )}
+              <div className="check-form-content">
+                {tripInfo && (
+                  <>
+                    <h3 className="check-form-title">Hành trình của xe</h3>
+                    <p className="trip-total-distance">
+                      <b>{(tripInfo?.distance ?? 0).toLocaleString("vi-VN")} Km</b>
+                    </p>
+                  </>
+                )}
 
-            {phase === "checkin" && (
-              <CheckForm
-                type="checkin"
-                data={checkinData}
-                setData={setCheckinData}
-                contractTotalKm={contractTotalKm}
-                onConfirm={handleCheckin}
-              />
-            )}
+                {phase === "checkin" && (
+                  <CheckForm
+                    type="checkin"
+                    data={checkinData}
+                    setData={setCheckinData}
+                    contractTotalKm={contractTotalKm}
+                    onConfirm={handleCheckin}
+                  />
+                )}
 
-            {phase === "checked" && (
-              <>
-                <CheckForm
-                  type="checkin"
-                  data={checkinData}
-                  setData={setCheckinData}
-                  disabled
-                  contractTotalKm={contractTotalKm}
-                  checkinTime={checkinTime}
-                />
-                <CheckForm
-                  type="checkout"
-                  data={checkoutData}
-                  setData={setCheckoutData}
-                  checkinKm={Number(checkinData.km.replace(/,/g, ""))}
-                  contractTotalKm={contractTotalKm}
-                  onConfirm={handleCheckout}
-                />
-              </>
-            )}
+                {phase === "checked" && (
+                  <>
+                    <CheckForm
+                      type="checkin"
+                      data={checkinData}
+                      setData={setCheckinData}
+                      disabled
+                      contractTotalKm={contractTotalKm}
+                      checkinTime={checkinTime}
+                    />
+                    <CheckForm
+                      type="checkout"
+                      data={checkoutData}
+                      setData={setCheckoutData}
+                      checkinKm={Number(checkinData.km.replace(/,/g, ""))}
+                      contractTotalKm={contractTotalKm}
+                      onConfirm={handleCheckout}
+                    />
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

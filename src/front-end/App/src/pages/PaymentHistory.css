@@ -1,3 +1,57 @@
+/* ================================
+   LAYOUT GIỐNG BOOKING (layout only)
+================================ */
+.payment-shell {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.page-with-sidebar {
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+    padding: 0 20px 20px;
+    max-height: 100%;
+    margin-block: auto; /* center vertically when short */
+}
+
+.page-main {
+    flex: 1;
+    min-width: 0;
+    max-height: 100%;
+    overflow: auto; /* only right pane scrolls */
+}
+
+.payment-content {
+    padding: 0 5vw 24px 5vw;
+    display: flex;
+    gap: clamp(24px, 4vw, 56px);
+    align-items: flex-start;
+}
+
+.payment-content .vehicle-info {
+    flex: 0 0 clamp(300px, 32%, 420px);
+    max-width: 100%;
+}
+
+.payment-content .payment-container {
+    flex: 1;
+}
+
+@media (max-width: 900px) {
+    .page-with-sidebar {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+    .payment-content {
+        flex-direction: column;
+        gap: 16px;
+        padding: 0 14px 20px;
+    }
+}
 .payment-container {
     flex-grow: 1;
     padding: 30px;
