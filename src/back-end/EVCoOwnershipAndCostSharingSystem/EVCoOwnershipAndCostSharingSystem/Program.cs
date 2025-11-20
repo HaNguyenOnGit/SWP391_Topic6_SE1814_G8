@@ -77,17 +77,6 @@ namespace EVCoOwnershipAndCostSharingSystem
 
             app.MapControllers();
 
-            // Ensure database exists (no migrations checked in)
-            try
-            {
-                using var ctx = new DataAccessLayer.Entities.EvcoOwnershipAndCostSharingSystemContext();
-                ctx.Database.EnsureCreated();
-            }
-            catch (Exception ex)
-            {
-                app.Logger.LogError(ex, "Failed to ensure database is created");
-            }
-
             app.Run();
         }
     }
