@@ -1,5 +1,19 @@
 /* ContractVerification.css - Based on Vehicle.css layout, icons, colors */
 
+.main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f5f5f5;
+}
+
+.main-content h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #202124;
+}
+
 .contract-info {
     background: #fff;
     border: 2px solid #d9e2f1;

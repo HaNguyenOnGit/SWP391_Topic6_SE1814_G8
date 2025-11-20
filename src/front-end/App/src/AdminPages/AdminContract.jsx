@@ -10,6 +10,8 @@ export default function AdminContracts() {
     const [error, setError] = useState("");
     const [selectedContract, setSelectedContract] = useState(null);
     const [search, setSearch] = useState("");
+    const [expenses, setExpenses] = useState([]);
+    const [showExpenses, setShowExpenses] = useState(false);
 
     useEffect(() => {
         const fetchContracts = async () => {
@@ -90,6 +92,40 @@ export default function AdminContracts() {
             alert("Đã xóa hợp đồng thành công.");
         } catch (e) {
             alert(e.message || "Xóa hợp đồng thất bại");
+        }
+    };
+
+    const handleExtractExpenses = async (contractId) => {
+        try {
+            const res = await axios.get(`/api/payment/contract/${contractId}/paid-expenses-details`);
+            setExpenses(res.data);
+            setShowExpenses(true);
+        } catch (e) {
+            alert(e.message || "Không thể tải chi tiết chi phí");
+        }
+    };
+
+    const translateAllocationRule = (rule) => {
+        switch (rule.toLowerCase()) {
+            case "byshare":
+                return "Theo tỉ lệ sở hữu";
+            case "selfpaid":
+                return "Tự chi trả";
+            case "byusage":
+                return "Theo lượng sử dụng";
+            default:
+                return rule;
+        }
+    };
+
+    const translateStatus = (status) => {
+        switch (status.toLowerCase()) {
+            case "paid":
+                return "đã thanh toán";
+            case "pending":
+                return "chưa thanh toán";
+            default:
+                return status;
         }
     };
 
@@ -185,7 +221,9 @@ export default function AdminContracts() {
                                     <button onClick={() => handlePauseContract(selectedContract.id)}>
                                         Dừng hợp đồng
                                     </button>
-                                    <button>Trích xuất chi tiêu</button>
+                                    <button onClick={() => handleExtractExpenses(selectedContract.id)}>
+                                        Trích xuất chi tiêu
+                                    </button>
                                     <button onClick={() => handleDeleteContract(selectedContract.id)}>
                                         Xóa
                                     </button>
@@ -199,6 +237,36 @@ export default function AdminContracts() {
                     </div>
                 </section>
             </main>
+
+            {showExpenses && (
+                <div className="modal-overlay" onClick={() => setShowExpenses(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h3>Trích xuất chi tiêu</h3>
+                        <button className="close-btn" onClick={() => setShowExpenses(false)}>×</button>
+                        {expenses.length > 0 ? (
+                            <div className="expenses-list">
+                                {expenses.map((expense) => (
+                                    <div key={expense.expenseId} className="expense-item">
+                                        <h4>{expense.expenseName}</h4>
+                                        <p><strong>Tổng chi phí:</strong> {expense.totalAmount.toLocaleString()} VND</p>
+                                        <p><strong>Cách thức chia:</strong> {translateAllocationRule(expense.allocationRule)}</p>
+                                        <h5>Chi tiết thanh toán:</h5>
+                                        <ul>
+                                            {expense.users.map((user) => (
+                                                <li key={user.userId}>
+                                                    <strong>{user.userName}:</strong> {user.allocatedAmount.toLocaleString()} VND - {user.payment ? `Đã thanh toán: ${user.payment.paidAmount.toLocaleString()} VND (${translateStatus(user.payment.status)}) - ${new Date(user.payment.paymentDate).toLocaleDateString("vi-VN")}` : 'Chưa thanh toán'}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p>Không có chi phí đã thanh toán nào.</p>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

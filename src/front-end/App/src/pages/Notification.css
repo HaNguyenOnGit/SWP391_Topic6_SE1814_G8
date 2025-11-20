@@ -1,5 +1,20 @@
 /* Notification.css - Based on Vehicle.css and ContractVerification.css */
 
+.main-content h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #202124;
+}
+
+.main-content h1 svg {
+    font-size: 36px;
+    color: #0f6cae;
+}
+
 .notification-list {
     display: flex;
     flex-direction: column;

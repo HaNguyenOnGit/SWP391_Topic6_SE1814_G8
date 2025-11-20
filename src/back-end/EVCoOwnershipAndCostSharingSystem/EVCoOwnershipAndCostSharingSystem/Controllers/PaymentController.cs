@@ -348,9 +348,10 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         {
             var db = new EvcoOwnershipAndCostSharingSystemContext();
 
-            // Lấy tất cả chi phí đã thanh toán trong hợp đồng
-            var paidExpenses = db.Expenses
-                .Where(e => e.ContractId == contractId && e.Status == "Completed")
+            // Lấy tất cả chi phí đã thanh toán (Completed) hoặc đã được đồng ý nhưng chưa thanh toán (AwaitingPayment)
+            var expenses = db.Expenses
+                .Where(e => e.ContractId == contractId
+                         && (e.Status == "Completed" || e.Status == "AwaitingPayment"))
                 .Select(e => new
                 {
                     expenseId = e.ExpenseId,
@@ -384,7 +385,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 })
                 .ToList();
 
-            return Ok(paidExpenses);
+            return Ok(expenses);
         }
     }
 }
