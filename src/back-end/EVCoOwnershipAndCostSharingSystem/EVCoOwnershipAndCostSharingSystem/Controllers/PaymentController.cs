@@ -241,6 +241,61 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             };
             return Ok(result);
         }
+        // API: Lấy toàn bộ thông tin User + lịch sử chi tiêu
+        [HttpGet("users-with-expense-history")]
+        public IActionResult GetAllUsersWithExpenseHistory()
+        {
+            var db = new EvcoOwnershipAndCostSharingSystemContext();
+
+            var users = db.Users.ToList(); // Tách khỏi expression tree
+
+            var result = new List<object>();
+
+            foreach (var u in users)
+            {
+                var allocations = db.ExpenseAllocations
+                    .Include(a => a.Expense)
+                        .ThenInclude(e => e.Contract)
+                    .Where(a => a.UserId == u.UserId)
+                    .ToList();
+
+                var expenses = allocations.Select(a =>
+                {
+                    var settlement = db.Settlements
+                        .Include(s => s.Receiver)
+                        .FirstOrDefault(s => s.AllocationId == a.AllocationId && s.PayerId == u.UserId);
+
+                    return new
+                    {
+                        expenseId = a.ExpenseId,
+                        expenseName = a.Expense.Description,
+                        totalExpenseAmount = a.Expense.Amount,
+                        userAmount = a.Amount,
+                        allocationRule = a.Expense.AllocationRule,
+                        contractId = a.Expense.ContractId,
+                        contractName = a.Expense.Contract.VehicleName,
+                        status = settlement != null ? settlement.Status : "Unpaid",
+                        settlementId = settlement?.SettlementId,
+                        paymentDate = settlement?.PaymentDate,
+                        receiver = settlement?.Receiver?.FullName,
+                        proofImageUrl = settlement?.ProofImageUrl
+                    };
+                }).OrderByDescending(e => e.paymentDate).ToList();
+
+                result.Add(new
+                {
+                    userId = u.UserId,
+                    fullName = u.FullName,
+                    email = u.Email,
+                    phone = u.PhoneNumber,
+                    bankName = u.BankName,
+                    bankAccount = u.BankAccount,
+                    expenses = expenses
+                });
+            }
+
+            return Ok(result);
+        }
 
     }
 }
