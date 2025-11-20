@@ -3,6 +3,8 @@ import Navbar from "../Navbar";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { FaFileContract, FaUsers, FaListUl } from "react-icons/fa";
+import "./ContractVerification.css";
 
 export default function ContractVerification() {
     const { contractId } = useParams();
@@ -56,36 +58,63 @@ export default function ContractVerification() {
     return (
         <div className="main-container">
             <Navbar username="Username" />
-            <div className="main-content">
+            <div className="main-content contract-verification">
                 <h1>Xác nhận hợp đồng</h1>
 
                 {contract ? (
                     <div>
-                        <h2>Thông tin hợp đồng</h2>
-                        <p><strong>Tên phương tiện:</strong> {contract.vehicleName}</p>
-                        <p><strong>Biển kiểm soát:</strong> {contract.licensePlate}</p>
-                        <p><strong>Model:</strong> {contract.model}</p>
-                        <p><strong>Ngày bắt đầu:</strong> {contract.startDate}</p>
-                        <p><strong>Trạng thái:</strong> {contract.status}</p>
+                        <div className="contract-info">
+                            <div className="section-title">
+                                <div className="icon"><FaFileContract /></div>
+                                <h2>Thông tin hợp đồng</h2>
+                            </div>
+                            <p><strong>Tên phương tiện:</strong> {contract.vehicleName}</p>
+                            <p><strong>Biển kiểm soát:</strong> {contract.licensePlate}</p>
+                            <p><strong>Model:</strong> {contract.model}</p>
+                            <p><strong>Ngày bắt đầu:</strong> {contract.startDate}</p>
+                            <p><strong>Trạng thái:</strong> {contract.status}</p>
+                        </div>
 
-                        <h3>Danh sách đồng sở hữu</h3>
-                        <ul>
-                            {contract.members.map((m, index) => (
-                                <li key={index}>
-                                    {m.fullName} - {m.phoneNumber} ({m.sharePercent}%) —
-                                    <i> {m.status}</i>
-                                </li>
-                            ))}
-                        </ul>
+                        <div className="members-list">
+                            <div className="section-title">
+                                <div className="icon users"><FaUsers /></div>
+                                <h3>Danh sách đồng sở hữu</h3>
+                            </div>
+                            {contract.members && contract.members.length > 0 ? (
+                                <div className="owners-grid">
+                                    {contract.members.map((m, index) => (
+                                        <div key={index} className="owner-card">
+                                            <div className="owner-row">
+                                                <span className="owner-name">{m.fullName} - {m.phoneNumber}</span>
+                                                <span className="owner-share">{m.sharePercent}%</span>
+                                            </div>
+                                            <div className="share-bar">
+                                                <div className="share-fill" style={{ width: `${Math.min(Math.max(m.sharePercent || 0, 0), 100)}%` }} />
+                                            </div>
+                                            <div className="owner-status">
+                                                <i>{m.status}</i>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p>Không có dữ liệu đồng sở hữu.</p>
+                            )}
+                        </div>
 
-                        <h3>Điều khoản</h3>
-                        <ul>
-                            {terms.map((term, i) => (
-                                <li key={i}>{term}</li>
-                            ))}
-                        </ul>
+                        <div className="terms-section">
+                            <div className="section-title">
+                                <div className="icon"><FaListUl /></div>
+                                <h3>Điều khoản</h3>
+                            </div>
+                            <ul>
+                                {terms.map((term, i) => (
+                                    <li key={i}>{term}</li>
+                                ))}
+                            </ul>
+                        </div>
 
-                        <div style={{ marginTop: "20px" }}>
+                        <div className="button-group">
                             <button
                                 className="btnInput"
                                 onClick={() => handleResponse(true)}
@@ -95,7 +124,6 @@ export default function ContractVerification() {
                             <button
                                 className="btnReturn"
                                 onClick={() => handleResponse(false)}
-                                style={{ marginLeft: "10px" }}
                             >
                                 Từ chối
                             </button>

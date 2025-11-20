@@ -187,9 +187,11 @@ export default function Proposal() {
               <VehicleInfo vehicle={vehicle} />
               <div className="proposal-right">
                 {/* Use Link to go to ProposalList (SPA navigation) */}
-                <Link style={{ color: "#ff9800", display: "inline-block", marginBottom: 12 }} to={`/vehicle/${id}/proposals`}>
-                  Xem đề xuất
-                </Link>
+                {stage !== "success" && (
+                  <Link style={{ color: "#ff9800", display: "inline-block", marginBottom: 12 }} to={`/vehicle/${id}/proposals`}>
+                    Xem đề xuất
+                  </Link>
+                )}
 
                 {/* Giao diện nhập thông tin */}
                 {stage === "form" && (
@@ -294,7 +296,7 @@ export default function Proposal() {
 
                 {/* Thành công */}
                 {stage === "success" && (
-                  <div>
+                  <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '50vh' }}>
                     <h3 style={{ color: "#4caf50" }}>Đã tạo đề xuất thành công!</h3>
                     <Link to={`/vehicle/${id}/proposals`} style={{ color: "#ff9800", display: "block", marginTop: 12 }}>
                       Xem danh sách đề xuất

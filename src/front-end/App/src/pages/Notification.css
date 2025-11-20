@@ -1,0 +1,120 @@
+/* Notification.css - Based on Vehicle.css and ContractVerification.css */
+
+.main-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #f5f5f5;
+}
+
+.main-content {
+    border: 1px solid #000000;
+    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+    flex: 1;
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    padding: 10px;
+    margin-left: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(16px, 4vw, 40px);
+    box-sizing: border-box;
+}
+
+.main-content h1 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 28px;
+    color: #202124;
+}
+
+.main-content h1 svg {
+    font-size: 36px;
+    color: #0f6cae;
+}
+
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.notification-item {
+    background: #fff;
+    border: 2px solid #e0e6f0;
+    border-radius: 12px;
+    padding: 20px 24px;
+    transition: box-shadow 0.2s ease, transform 0.12s ease, border-color 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.notification-item:hover {
+    border-color: #e0ecf7;
+    background: #fbfdff;
+    box-shadow: 0 4px 14px rgba(15, 108, 174, 0.10);
+    transform: translateY(-1px);
+}
+
+.notification-icon {
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    color: #0a0a0a;
+    font-size: 22px;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-content strong {
+    font-size: 20px;
+    font-weight: 700;
+    color: #202124;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.notification-content span {
+    font-size: 16px;
+    color: #5f6368;
+}
+
+.notification-link {
+    color: #0f6cae;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.notification-link:hover {
+    text-decoration: underline;
+}
+
+.no-notifications {
+    font-size: 18px;
+    color: #5f6368;
+    text-align: center;
+    padding: 40px;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 20px;
+    }
+
+    .notification-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+}

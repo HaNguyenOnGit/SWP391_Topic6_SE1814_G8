@@ -3,6 +3,8 @@ import Navbar from "../Navbar";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { FaBell } from "react-icons/fa";
+import "./Notification.css";
 
 export default function Notification() {
     const { user, isAuthenticated } = useAuth(); // ✅ lấy user từ context
@@ -49,31 +51,36 @@ export default function Notification() {
         <div className="main-container">
             <Navbar />
             <div className="main-content">
-                <h1>Thông báo</h1>
+                <h1><FaBell /> Thông báo</h1>
 
                 {contracts.length === 0 ? (
-                    <p>Không có thông báo nào.</p>
+                    <p className="no-notifications">Không có thông báo nào.</p>
                 ) : (
-                    <ul>
+                    <div className="notification-list">
                         {contracts.map((contract) => (
-                            <li key={contract.contractId}>
-                                <strong>{contract.vehicleName}</strong> — Trạng thái:{" "}
-                                <span style={{ fontWeight: 500 }}>{contract.status}</span>
-                                {contract.status === "Pending" && (
-                                    <span>
-                                        {" "}
-                                        -{" "}
-                                        <Link
-                                            to={`/contractVerify/${contract.contractId}`}
-                                            style={{ color: "blue" }}
-                                        >
-                                            Xác nhận hợp đồng
-                                        </Link>
-                                    </span>
-                                )}
-                            </li>
+                            <div key={contract.contractId} className="notification-item">
+                                <div className="notification-icon">
+                                    <FaBell />
+                                </div>
+                                <div className="notification-content">
+                                    <strong>{contract.vehicleName}</strong>
+                                    <span>Trạng thái: {contract.status}</span>
+                                    {contract.status === "Pending" && (
+                                        <span>
+                                            {" "}
+                                            -{" "}
+                                            <Link
+                                                to={`/contractVerify/${contract.contractId}`}
+                                                className="notification-link"
+                                            >
+                                                Xác nhận hợp đồng
+                                            </Link>
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 )}
             </div>
         </div>
