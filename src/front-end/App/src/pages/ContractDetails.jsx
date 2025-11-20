@@ -4,6 +4,7 @@ import VehicleSidebar from "../VehicleSidebar";
 import "./ContractDetails.css";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import { FaCar, FaIdCard, FaCogs, FaUsers, FaCalendarAlt, FaInfoCircle, FaSave, FaTimes, FaEdit, FaStop, FaSpinner } from "react-icons/fa";
 
 export default function ContractDetails() {
     const { id } = useParams(); // lấy id từ URL
@@ -54,8 +55,25 @@ export default function ContractDetails() {
         }
     };
 
-    if (loading) return <p>Đang tải dữ liệu...</p>;
-    if (!contract) return <p>Không tìm thấy hợp đồng.</p>;
+    if (loading) return (
+        <div className="main-container">
+            <Navbar username="Username" />
+            <div className="loading-container">
+                <FaSpinner className="spinner" />
+                <p>Đang tải dữ liệu...</p>
+            </div>
+        </div>
+    );
+    if (!contract) return (
+        <div className="main-container">
+            <Navbar username="Username" />
+            <div className="error-container">
+                <FaInfoCircle />
+                <h2>Không tìm thấy hợp đồng</h2>
+                <p>Vui lòng kiểm tra lại ID hợp đồng.</p>
+            </div>
+        </div>
+    );
 
     // tổng tỉ lệ
     const totalRatio = owners.reduce((a, b) => a + Number(b.ratio), 0);
@@ -101,138 +119,149 @@ export default function ContractDetails() {
                 <div className="page-with-sidebar">
                     <VehicleSidebar contractId={id} />
                     <div className="page-main">
-                        <h1>Chi tiết hợp đồng</h1>
+                        <h1 className="page-title">Chi tiết hợp đồng</h1>
                         <div className="contract-content">
                             {/* Left: Vehicle info */}
                             <div className="contract-left">
-                                <section style={{ marginTop: "20px" }}>
-                                    <h2>Thông tin phương tiện</h2>
-                                    <p><strong>Tên:</strong> {contract.vehicle.name}</p>
-                                    <p><strong>Biển số:</strong> {contract.vehicle.license}</p>
-                                    <p><strong>Model:</strong> {contract.vehicle.model}</p>
+                                <section className="info-section">
+                                    <h2><FaCar /> Thông tin phương tiện</h2>
+                                    <div className="info-item">
+                                        <FaCar />
+                                        <div>
+                                            <strong>Tên:</strong> {contract.vehicle.name}
+                                        </div>
+                                    </div>
+                                    <div className="info-item">
+                                        <FaIdCard />
+                                        <div>
+                                            <strong>Biển số:</strong> {contract.vehicle.license}
+                                        </div>
+                                    </div>
+                                    <div className="info-item">
+                                        <FaCogs />
+                                        <div>
+                                            <strong>Model:</strong> {contract.vehicle.model}
+                                        </div>
+                                    </div>
                                 </section>
                             </div>
 
                             {/* Right: Main details */}
                             <div className="contract-right">
                                 {/* Owner list */}
-                                <section style={{ marginTop: "20px" }}>
-                                    <h2>Danh sách đồng sở hữu</h2>
-
-                                    {owners.map((o, i) => (
-                                        <div
-                                            key={i}
-                                            style={{
-                                                marginBottom: "10px",
-                                                display: "flex",
-                                                justifyContent: "space-between",
-                                                width: "300px",
-                                            }}
-                                        >
-                                            <span>
-                                                <strong>{o.name}</strong> ({o.phone})
-                                            </span>
-                                            {editing ? (
-                                                <>
-                                                    <input
-                                                        type="range"
-                                                        min="0"
-                                                        max="100"
-                                                        value={o.ratio}
-                                                        onChange={(e) => updateRatio(i, e.target.value)}
-                                                        style={{ margin: "0 10px", flex: 1 }}
-                                                    />
-                                                    <input
-                                                        type="number"
-                                                        min="0"
-                                                        max="100"
-                                                        value={o.ratio}
-                                                        onChange={(e) => updateRatio(i, e.target.value)}
-                                                        style={{ width: "50px", marginLeft: "8px" }}
-                                                    />
-                                                    <span>%</span>
-                                                    <button
-                                                        onClick={() => removeOwner(i)}
-                                                        style={{ marginLeft: "10px", color: "red" }}
-                                                    >
-                                                        Xóa
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <span style={{ color: "blue" }}>{o.ratio}%</span>
-                                            )}
-                                        </div>
-                                    ))}
+                                <section className="info-section">
+                                    <h2><FaUsers /> Danh sách đồng sở hữu</h2>
+                                    <div className="owners-list">
+                                        {owners.map((o, i) => (
+                                            <div key={i} className="owner-item">
+                                                <div className="owner-info">
+                                                    <strong>{o.name}</strong> ({o.phone})
+                                                </div>
+                                                {editing ? (
+                                                    <div className="owner-edit">
+                                                        <input
+                                                            type="range"
+                                                            min="0"
+                                                            max="100"
+                                                            value={o.ratio}
+                                                            onChange={(e) => updateRatio(i, e.target.value)}
+                                                            className="ratio-slider"
+                                                        />
+                                                        <input
+                                                            type="number"
+                                                            min="0"
+                                                            max="100"
+                                                            value={o.ratio}
+                                                            onChange={(e) => updateRatio(i, e.target.value)}
+                                                            className="ratio-input"
+                                                        />
+                                                        <span>%</span>
+                                                        <button
+                                                            onClick={() => removeOwner(i)}
+                                                            className="btn-remove"
+                                                        >
+                                                            Xóa
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <span className="owner-ratio">{o.ratio}%</span>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
 
                                     {editing && (
-                                        <div style={{ marginTop: "10px" }}>
+                                        <div className="add-owner">
                                             <input
                                                 type="text"
                                                 placeholder="Nhập số điện thoại mới"
                                                 value={newPhone}
                                                 onChange={(e) => setNewPhone(e.target.value)}
+                                                className="input-text"
                                             />
-                                            <button onClick={addOwner} style={{ marginLeft: "10px" }}>
+                                            <button onClick={addOwner} className="btn-add">
                                                 Thêm thành viên
                                             </button>
                                         </div>
                                     )}
 
                                     {editing && ratioError && (
-                                        <p style={{ color: "red" }}>
+                                        <p className="ratio-error">
                                             Tổng tỉ lệ phải bằng 100% (hiện tại {totalRatio}%)
                                         </p>
                                     )}
                                 </section>
 
                                 {/* Date */}
-                                <section style={{ marginTop: "20px" }}>
-                                    <h2>Ngày tạo hợp đồng</h2>
+                                <section className="info-section">
+                                    <h2><FaCalendarAlt /> Ngày tạo hợp đồng</h2>
                                     {editing ? (
                                         <input
                                             type="date"
                                             value={createDate}
                                             onChange={(e) => setCreateDate(e.target.value)}
+                                            className="input-date"
                                         />
                                     ) : (
-                                        <p>{createDate}</p>
+                                        <p className="date-display">{createDate}</p>
                                     )}
                                 </section>
 
                                 {/* Status */}
-                                <section style={{ marginTop: "20px" }}>
-                                    <h2>Trạng thái</h2>
-                                    <p style={{ color: contract.status === "Đã kết thúc" ? "red" : "green" }}>
+                                <section className="info-section">
+                                    <h2><FaInfoCircle /> Trạng thái</h2>
+                                    <p className={`status ${contract.status === "Đã kết thúc" ? "status-ended" : "status-active"}`}>
                                         {contract.status}
                                     </p>
                                 </section>
 
                                 {/* Buttons */}
-                                <div style={{ marginTop: "30px" }}>
+                                <div className="action-buttons">
                                     {editing ? (
                                         <>
-                                            <button onClick={handleSave}>Lưu thay đổi</button>
+                                            <button onClick={handleSave} className="btn-save">
+                                                <FaSave /> Lưu thay đổi
+                                            </button>
                                             <button
-                                                style={{ marginLeft: "10px" }}
                                                 onClick={() => {
                                                     setEditing(false);
-                                                    setOwners(contract.owners);
+                                                    setOwners(contract.owners || []);
                                                     setCreateDate(contract.createDate);
                                                 }}
+                                                className="btn-cancel"
                                             >
-                                                Hủy
+                                                <FaTimes /> Hủy
                                             </button>
                                         </>
                                     ) : (
                                         <>
                                             {contract.status === "Đang sử dụng" && (
                                                 <>
-                                                    <button onClick={() => setEditing(true)}>Chỉnh sửa</button>
-                                                    <button
-                                                        style={{ marginLeft: "10px", color: "red" }}
-                                                        onClick={endContract}
-                                                    >
-                                                        Chấm dứt hợp đồng
+                                                    <button onClick={() => setEditing(true)} className="btn-edit">
+                                                        <FaEdit /> Chỉnh sửa
+                                                    </button>
+                                                    <button onClick={endContract} className="btn-end">
+                                                        <FaStop /> Chấm dứt hợp đồng
                                                     </button>
                                                 </>
                                             )}

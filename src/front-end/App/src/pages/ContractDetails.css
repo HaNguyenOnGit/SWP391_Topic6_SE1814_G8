@@ -1,10 +1,27 @@
+/* Import modern font for a professional look */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* Layout-only styles to mirror Booking; no component class names changed */
 
 .contract-shell {
+    font-family: 'Inter', sans-serif;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     height: 100%;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .page-with-sidebar {
@@ -35,10 +52,44 @@
 .contract-left {
     flex: 0 0 clamp(300px, 32%, 420px);
     max-width: 100%;
+    border: none;
+    border-radius: 20px;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInFromBottom 0.7s ease-out;
 }
 
 .contract-right {
     flex: 1;
+    border: none;
+    border-radius: 20px;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInFromBottom 0.7s ease-out;
+}
+
+.contract-left:hover,
+.contract-right:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes slideInFromBottom {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @media (max-width: 900px) {
@@ -52,5 +103,155 @@
         flex-direction: column;
         gap: 16px;
         padding: 0 14px 20px;
+    }
+}
+
+/* Additional styles to match other pages */
+
+.page-main h1 {
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #1e3a8a;
+}
+
+.contract-left h2,
+.contract-right h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #2b0ebd;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.contract-left p,
+.contract-right p {
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    color: #374151;
+}
+
+.contract-left strong,
+.contract-right strong {
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Owner list styles */
+.owner-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.owner-item:hover {
+    border-color: #cbd5e1;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.owner-info {
+    flex: 1;
+}
+
+.owner-ratio {
+    font-weight: 700;
+    color: #0f6cae;
+    font-size: 18px;
+}
+
+/* Inputs */
+.contract-right input[type="text"],
+.contract-right input[type="date"],
+.contract-right input[type="number"],
+.contract-right input[type="range"] {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-right: 8px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.contract-right input:focus {
+    border-color: #8CC8E7;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(140, 200, 231, 0.4);
+}
+
+/* Buttons */
+.contract-right button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #8CC8E7, #C77DCE);
+    color: white;
+    box-shadow: 0 4px 10px rgba(199, 125, 206, 0.4);
+    margin-right: 10px;
+}
+
+.contract-right button:hover {
+    background: linear-gradient(135deg, #C77DCE, #8CC8E7);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(199, 125, 206, 0.5);
+}
+
+.contract-right button:nth-child(2) {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    box-shadow: 0 4px 10px rgba(238, 90, 82, 0.4);
+}
+
+.contract-right button:nth-child(2):hover {
+    background: linear-gradient(135deg, #ee5a52, #ff6b6b);
+    box-shadow: 0 6px 15px rgba(238, 90, 82, 0.5);
+}
+
+/* Error message */
+.ratio-error {
+    color: #e74c3c;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+/* Status */
+.status-active {
+    color: #4CAF50;
+    font-weight: 600;
+}
+
+.status-ended {
+    color: #f44336;
+    font-weight: 600;
+}
+
+/* Enhanced responsive design */
+@media (max-width: 768px) {
+    .contract-content {
+        flex-direction: column;
+        gap: 2rem;
+        padding: 1rem;
+    }
+
+    .contract-left,
+    .contract-right {
+        padding: 1.5rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
     }
 }

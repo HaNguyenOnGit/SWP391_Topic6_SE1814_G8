@@ -39,7 +39,7 @@
 
 .proposal-content .proposal-right {
     flex: 1;
-    padding-top: 45px;
+    padding-top: 20px;
 }
 
 @media (max-width: 900px) {
