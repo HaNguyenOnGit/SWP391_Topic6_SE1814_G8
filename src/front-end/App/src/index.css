@@ -94,6 +94,7 @@ a {
     align-items: center;
     height: 100%;
     margin-right: 10px;
+    position: relative; /* Ensure dropdown positions relative to the user box */
 }
 
 .menu-btn {
