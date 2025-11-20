@@ -1,1 +1,0 @@
-$env:ASPNETCORE_ENVIRONMENT = "Development"; dotnet run --project "src\back-end\EVCoOwnershipAndCostSharingSystem\EVCoOwnershipAndCostSharingSystem\EVCoOwnershipAndCostSharingSystem.csproj"
