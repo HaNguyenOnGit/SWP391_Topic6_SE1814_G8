@@ -41,54 +41,22 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="Navbar">
-            <div className="color-box"></div>
-            <div className="menu-btn" onClick={() => setMenuOpen(true)}>
-                <FaBars />
-            </div>
-
-            <div className="nvbr-main">
-                <div className="navigate">
-                    <NavLink to="/vehicles"><span className="nav-icon"><FaCar /></span><span className="nav-label">Xe của bạn</span></NavLink>
-                    <NavLink to="/schedule"><span className="nav-icon"><FaCalendarAlt /></span><span className="nav-label">Đặt lịch</span></NavLink>
-                    <NavLink to="/usageHistory"><span className="nav-icon"><FaHistory /></span><span className="nav-label">Lịch sử</span></NavLink>
-                    <NavLink to="/notification"><span className="nav-icon"><FaBell /></span><span className="nav-label">Thông báo</span></NavLink>
-                    <NavLink to="/support"><span className="nav-icon"><FaHeadset /></span><span className="nav-label">Hỗ trợ</span></NavLink>
+        <div className="navbar-wrapper">
+            <nav className="Navbar">
+                <div className="color-box"></div>
+                <div className="menu-btn" onClick={() => setMenuOpen(true)}>
+                    <FaBars />
                 </div>
-                <div className="username-container">
-                    <div className="username" onClick={toggleDropdown}>
-                        <FaUserCircle size={28} />
-                        <span style={{ marginLeft: 8, marginRight: 8 }}>{username || "Tài khoản"}</span>
-                        <FaChevronDown size={12} className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`} />
+
+                <div className="nvbr-main">
+                    <div className="navigate">
+                        <NavLink to="/vehicles"><span className="nav-icon"><FaCar /></span><span className="nav-label">Xe của bạn</span></NavLink>
+                        <NavLink to="/schedule"><span className="nav-icon"><FaCalendarAlt /></span><span className="nav-label">Đặt lịch</span></NavLink>
+                        <NavLink to="/usageHistory"><span className="nav-icon"><FaHistory /></span><span className="nav-label">Lịch sử</span></NavLink>
+                        <NavLink to="/notification"><span className="nav-icon"><FaBell /></span><span className="nav-label">Thông báo</span></NavLink>
+                        <NavLink to="/support"><span className="nav-icon"><FaHeadset /></span><span className="nav-label">Hỗ trợ</span></NavLink>
                     </div>
-                    {dropdownOpen && (
-                        <div className="dropdown-menu">
-                            <div className="dropdown-item" onClick={handleProfileClick}>
-                                <FaUser size={16} />
-                                Thông tin cá nhân
-                            </div>
-                            <div className="dropdown-item logout" onClick={handleLogout}>
-                                <FaSignOutAlt size={16} />
-                                Đăng xuất
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {menuOpen && (
-                <div className="nvbr-overlay">
-                    <FaTimes
-                        size={30}
-                        style={{ position: "absolute", top: 20, right: 20, cursor: "pointer" }}
-                        onClick={() => setMenuOpen(false)}
-                    />
-                    <NavLink to="/vehicles" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaCar /></span><span className="nav-label">Xe của bạn</span></NavLink>
-                    <NavLink to="/schedule" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaCalendarAlt /></span><span className="nav-label">Đặt lịch</span></NavLink>
-                    <NavLink to="/usageHistory" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaHistory /></span><span className="nav-label">Lịch sử</span></NavLink>
-                    <NavLink to="/notification" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaBell /></span><span className="nav-label">Thông báo</span></NavLink>
-                    <NavLink to="/support" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaHeadset /></span><span className="nav-label">Hỗ trợ</span></NavLink>
-                    <div className="username-container mobile">
+                    <div className="username-container">
                         <div className="username" onClick={toggleDropdown}>
                             <FaUserCircle size={28} />
                             <span style={{ marginLeft: 8, marginRight: 8 }}>{username || "Tài khoản"}</span>
@@ -108,7 +76,41 @@ export default function Navbar() {
                         )}
                     </div>
                 </div>
-            )}
-        </nav>
+
+                {menuOpen && (
+                    <div className="nvbr-overlay">
+                        <FaTimes
+                            size={30}
+                            style={{ position: "absolute", top: 20, right: 20, cursor: "pointer" }}
+                            onClick={() => setMenuOpen(false)}
+                        />
+                        <NavLink to="/vehicles" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaCar /></span><span className="nav-label">Xe của bạn</span></NavLink>
+                        <NavLink to="/schedule" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaCalendarAlt /></span><span className="nav-label">Đặt lịch</span></NavLink>
+                        <NavLink to="/usageHistory" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaHistory /></span><span className="nav-label">Lịch sử</span></NavLink>
+                        <NavLink to="/notification" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaBell /></span><span className="nav-label">Thông báo</span></NavLink>
+                        <NavLink to="/support" onClick={() => setMenuOpen(false)}><span className="nav-icon"><FaHeadset /></span><span className="nav-label">Hỗ trợ</span></NavLink>
+                        <div className="username-container mobile">
+                            <div className="username" onClick={toggleDropdown}>
+                                <FaUserCircle size={28} />
+                                <span style={{ marginLeft: 8, marginRight: 8 }}>{username || "Tài khoản"}</span>
+                                <FaChevronDown size={12} className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`} />
+                            </div>
+                            {dropdownOpen && (
+                                <div className="dropdown-menu">
+                                    <div className="dropdown-item" onClick={handleProfileClick}>
+                                        <FaUser size={16} />
+                                        Thông tin cá nhân
+                                    </div>
+                                    <div className="dropdown-item logout" onClick={handleLogout}>
+                                        <FaSignOutAlt size={16} />
+                                        Đăng xuất
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+            </nav>
+        </div>
     );
 }

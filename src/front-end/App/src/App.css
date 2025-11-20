@@ -1,14 +1,4 @@
 /* Navbar dropdown styles */
-.username-container {
-    position: relative;
-}
-
-.username {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
 .dropdown-arrow {
     transition: transform 0.2s ease;
 }
