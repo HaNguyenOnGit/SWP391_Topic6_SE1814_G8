@@ -13,11 +13,9 @@
 }
 
 .main-contenttt {
-    border: 1px solid #000000;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
     flex: 1;
     width: calc(100% - 20px);
-    height: calc(100% - 20px);
+    height: 100%;
     padding: 10px;
     margin-left: 0;
     overflow-y: auto;

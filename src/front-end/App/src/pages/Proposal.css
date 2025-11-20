@@ -29,7 +29,8 @@
     padding: 0 5vw 24px 5vw;
     display: flex;
     gap: clamp(24px, 4vw, 56px);
-    align-items: flex-start;
+    align-items: center;
+    height: 100%;
 }
 
 .proposal-content .vehicle-info {

@@ -29,6 +29,7 @@
     display: flex;
     gap: clamp(24px, 4vw, 56px);
     align-items: flex-start;
+    height: 100%;
 }
 
 .proposal-list-content .vehicle-info {
@@ -60,12 +61,14 @@
 
 /* ====== Danh sách đề xuất ====== */
 .proposal-list {
-    max-height: 430px;
+    max-height: 730px;
     overflow-y: auto;
     padding-right: 10px;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    height: 100%;
+
 }
 
 .proposal-item {

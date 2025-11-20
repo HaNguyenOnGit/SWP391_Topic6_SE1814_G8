@@ -47,6 +47,7 @@
     display: flex;
     gap: clamp(24px, 4vw, 56px);
     align-items: flex-start;
+    height: 100%;
 }
 
 .contract-left {
@@ -108,10 +109,11 @@
 
 /* Additional styles to match other pages */
 
-.page-main h1 {
+.page-title {
     font-size: 32px;
     font-weight: 700;
     margin-bottom: 20px;
+    padding: 0 5vw;
 }
 
 .contract-left h2,

@@ -49,6 +49,9 @@
     box-shadow: none;
     animation: fadeInSlideUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
     opacity: 0;
+    height: calc(100% - 45px);
+    display: flex;
+    flex-direction: column;
 }
 
 /* --- Tiêu đề & Tổng quãng đường --- */
@@ -133,7 +136,8 @@
 
 /* --- Nút Bắt đầu Check-in/out (Đã có hiệu ứng gạch chân) --- */
 .trip-button-container {
-    margin-top: 45px;
+    margin-top: auto;
+    padding-top: 45px;
     text-align: left;
 }
 
@@ -196,6 +200,7 @@
     display: flex;
     gap: clamp(24px, 4vw, 56px);
     align-items: flex-start;
+    height: 100%;
 }
 
 .history-content .vehicle-info {
