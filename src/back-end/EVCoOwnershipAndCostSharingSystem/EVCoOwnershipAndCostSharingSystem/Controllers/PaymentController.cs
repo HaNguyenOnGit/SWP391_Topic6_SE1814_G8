@@ -342,5 +342,49 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
 
             return Ok(result);
         }
+        // API: Lấy chi tiết các chi phí đã thanh toán trong hợp đồng
+        [HttpGet("contract/{contractId}/paid-expenses-details")]
+        public IActionResult GetPaidExpensesDetails(int contractId)
+        {
+            var db = new EvcoOwnershipAndCostSharingSystemContext();
+
+            // Lấy tất cả chi phí đã thanh toán trong hợp đồng
+            var paidExpenses = db.Expenses
+                .Where(e => e.ContractId == contractId && e.Status == "Completed")
+                .Select(e => new
+                {
+                    expenseId = e.ExpenseId,
+                    expenseName = e.Description,
+                    totalAmount = e.Amount,
+                    allocationRule = e.AllocationRule,
+
+                    // Lấy danh sách các allocations (phân bổ cho từng user)
+                    users = db.ExpenseAllocations
+                        .Where(a => a.ExpenseId == e.ExpenseId)
+                        .Select(a => new
+                        {
+                            userId = a.UserId,
+                            userName = a.User.FullName,
+                            allocatedAmount = a.Amount,
+
+                            // Lấy thông tin thanh toán (Settlement)
+                            payment = db.Settlements
+                                .Where(s => s.AllocationId == a.AllocationId)
+                                .Select(s => new
+                                {
+                                    payerId = s.PayerId,
+                                    payerName = s.Payer.FullName,
+                                    paidAmount = s.Amount,
+                                    paymentDate = s.PaymentDate,
+                                    status = s.Status
+                                })
+                                .FirstOrDefault()
+                        })
+                        .ToList()
+                })
+                .ToList();
+
+            return Ok(paidExpenses);
+        }
     }
 }
