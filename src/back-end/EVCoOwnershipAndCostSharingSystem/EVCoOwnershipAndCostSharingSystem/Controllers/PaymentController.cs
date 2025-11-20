@@ -296,6 +296,51 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
 
             return Ok(result);
         }
+        // API: Lấy toàn bộ thông tin User + chi tiêu trong hợp đồng
+        [HttpGet("contract/{contractId}/users-expenses")]
+        public IActionResult GetAllUsersExpensesInContract(int contractId)
+        {
+            var db = new EvcoOwnershipAndCostSharingSystemContext();
 
+            // Lấy tất cả user trong hợp đồng
+            var usersInContract = db.ContractMembers
+                .Include(cm => cm.User)
+                .Where(cm => cm.ContractId == contractId)
+                .Select(cm => cm.User)
+                .ToList();
+
+            // Tạo danh sách kết quả
+            var result = usersInContract.Select(user =>
+            {
+                // Lấy tất cả expense allocations của user trong hợp đồng
+                var allocations = db.ExpenseAllocations
+                    .Include(a => a.Expense)
+                    .Where(a => a.Expense != null && a.Expense.ContractId == contractId && a.UserId == user.UserId)
+                    .ToList();
+
+                // Map dữ liệu chi tiêu
+                var expenseHistory = allocations.Select(a =>
+                {
+                    var settlement = db.Settlements.FirstOrDefault(s => s.AllocationId == a.AllocationId && s.PayerId == user.UserId);
+                    return new
+                    {
+                        expenseId = a.ExpenseId,
+                        expenseName = a.Expense.Description,
+                        userAmount = a.Amount,
+                        status = settlement != null ? settlement.Status : "Unpaid"
+                    };
+                }).ToList();
+
+                return new
+                {
+                    userId = user.UserId,
+                    fullName = user.FullName,
+                    email = user.Email,
+                    expenses = expenseHistory
+                };
+            }).ToList();
+
+            return Ok(result);
+        }
     }
 }
