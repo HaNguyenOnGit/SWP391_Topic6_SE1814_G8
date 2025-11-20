@@ -105,7 +105,7 @@ export default function Payment() {
 
                                 {step === "list" && (
                                     <div className="payment-section fade-slide-in">
-                                        <h3>Danh sách thanh toán</h3>
+                                        <h1>Danh sách thanh toán</h1>
 
                                         {/* ✅ CHƯA THANH TOÁN */}
                                         <h4 style={{ marginTop: 10 }}>Chưa thanh toán</h4>

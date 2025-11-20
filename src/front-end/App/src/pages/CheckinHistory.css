@@ -45,7 +45,7 @@
 .trip-section {
     flex: 1;
     background-color: transparent;
-    padding: 0;
+    padding-top: 45px;
     box-shadow: none;
     animation: fadeInSlideUp 0.7s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
     opacity: 0;
@@ -211,6 +211,7 @@
     .history-content {
         flex-direction: column;
     }
+
     .history-content .vehicle-info {
         flex: 1 1 auto;
         width: 100%;

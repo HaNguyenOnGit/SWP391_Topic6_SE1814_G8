@@ -103,7 +103,7 @@ export default function CostDetail() {
                         <div className="costs-content">
                             <VehicleInfo vehicle={vehicle} />
                             <div className="cost-section">
-                                <h3 className="cost-section-title">Thông tin chi phí</h3>
+                                <h1 className="cost-section-title">Thông tin chi phí</h1>
 
                                 {!selectedExpense ? (
                                     <div

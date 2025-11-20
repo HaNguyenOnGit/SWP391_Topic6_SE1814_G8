@@ -55,12 +55,13 @@ export default function Schedule() {
                                         <span className="nav-icon"><FaCar /></span>
                                         <h3 className="vehicle-card-title">{v.vehicleName}</h3>
                                     </div>
-                                    <span className="chevron"><FaChevronRight /></span>
                                 </div>
 
                                 <div className={`status ${getStatusClass(v.status)}`}>
                                     {translateStatus(v.status)}
                                 </div>
+
+                                <span className="chevron"><FaChevronRight /></span>
                             </Link>
                         ))
                     ) : (
