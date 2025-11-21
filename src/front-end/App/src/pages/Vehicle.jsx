@@ -72,7 +72,7 @@ export default function Vehicle() {
                 return "Đang trống";
             case "Inactive":
                 return "Chưa kích hoạt hợp đồng";
-            case "Canceled":
+            case "Cancelled":
                 return "Đã hủy";
             default:
                 return status;

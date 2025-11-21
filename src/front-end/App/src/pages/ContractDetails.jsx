@@ -51,6 +51,7 @@ export default function ContractDetails() {
             case "active": return "Đang sử dụng";
             case "available": return "Đang trống";
             case "pending": return "Chờ kích hoạt";
+            case "cancelled": return "Đã hủy";
             default: return status || "";
         }
     };
