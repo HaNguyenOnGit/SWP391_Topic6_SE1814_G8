@@ -34,7 +34,7 @@ namespace DataAccessLayer.Repositories
                       .Where(e => e.ContractId == contractId)
                       .ToList();
         }
-        
+
         public List<ExpenseAllocation> GetAllocationListByExpenseId(int expenseId)
         {
             return _db.ExpenseAllocations

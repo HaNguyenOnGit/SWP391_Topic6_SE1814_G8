@@ -78,7 +78,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 if (proposal == null)
                     return BadRequest("Proposal not found");
 
-                // Lấy danh sách thành viên của hợp đồng
+                // Lấy danh sách thành viên của hợp đồng và trạng thái vote của họ
                 var memberList = db.ContractMembers
                     .Where(m => m.ContractId == proposal.ContractId)
                     .ToList();
@@ -191,7 +191,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-        // ✅ API: Bình chọn (chấp nhận / từ chối) Đề Xuất đó của từng User trong hợp đồng
+        // ✅ API: Bình chọn (chấp nhận / từ chối) Đề Xuất của User đã tạo trong hợp đồng
         [HttpPost("{proposalId}/user/{userId}/vote")]
         public IActionResult VoteProposal(int proposalId, int userId, [FromBody] VoteRequest req)
         {

@@ -60,6 +60,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
             return Ok(result);
         }
+        // API: Thêm usage log
         [HttpPost("usageLogRequest")]
         public IActionResult AddUsageLog([FromBody] UsageLogRequest usageLogRequest)
         {
