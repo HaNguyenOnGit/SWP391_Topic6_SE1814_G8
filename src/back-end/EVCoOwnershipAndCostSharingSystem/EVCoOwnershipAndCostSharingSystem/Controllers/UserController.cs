@@ -27,7 +27,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _authService = authService;
         }
 
-        //Liet ke nguoi dung co role la co-owner
+        //Liet ke toan bo nguoi dung co role la co-owner
         //Chi hien thi ten, so dien thoai, email, role, status
         //Cho staff va admin xem
         [HttpGet("userSummary")]
@@ -51,7 +51,8 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok(summaries);
         }
 
-        //Hien thi tat ca thong tin cua 1 nguoi dung 
+        //Hien thi tat ca thong tin cua 1 nguoi dung
+        //Cho staff va admin xem
         [HttpGet("userDetail/{userId}")]
         public ActionResult<User> GetUserById([FromRoute] int userId)
         {
