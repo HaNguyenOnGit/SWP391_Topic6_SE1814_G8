@@ -15,7 +15,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _ps = new ProposalService();
         }
 
-        // ✅ 1. Tạo đề xuất chi tiêu
+        // ✅ API: Tạo đề xuất chi tiêu
         // ProposalController.cs
         [HttpPost("create")]
         public async Task<IActionResult> CreateProposal([FromBody] CreateProposalRequest req)
@@ -32,7 +32,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
         }
 
 
-        // ✅ 2. Lấy danh sách đề xuất của hợp đồng
+        // ✅ 2. Lấy danh sách đề xuất của hợp đồng của 1 user
         [HttpGet("contract/{contractId}/user/{userId}")]
         public IActionResult GetProposals(int contractId, int userId)
         {
@@ -47,7 +47,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-        // ✅ 3. Xem chi tiết đề xuất
+        // ✅ API: Xem chi tiết đề xuất
         [HttpGet("{proposalId}")]
         public IActionResult GetProposalDetails(int proposalId)
         {
@@ -120,6 +120,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                         Type = "ByShare"
                     }).ToList();
                 }
+                // Nếu là SelfPaid thì chỉ người đề xuất trả toàn bộ
                 else if (proposal.AllocationRule == "SelfPaid")
                 {
                     // Chỉ người đề xuất trả toàn bộ
@@ -141,6 +142,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                         }
                     }
                 }
+                // Nếu là ByUsage thì tính theo usage log
                 else if (proposal.AllocationRule == "ByUsage")
                 {
                     // Tính theo usage log 30 ngày gần nhất
@@ -189,7 +191,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-        // ✅ 4. Bình chọn (chấp nhận / từ chối)
+        // ✅ API: Bình chọn (chấp nhận / từ chối) Đề Xuất đó của từng User trong hợp đồng
         [HttpPost("{proposalId}/user/{userId}/vote")]
         public IActionResult VoteProposal(int proposalId, int userId, [FromBody] VoteRequest req)
         {

@@ -84,7 +84,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-        // ✅ API 4: Lấy thông tin người nhận (creator của expense)
+        // ✅ API 4: Lấy thông tin người nhận (Người tạo ra Đề Xuất)
         [HttpGet("settlement/{settlementId}/receiver-info")]
         public IActionResult GetReceiverInfo(int settlementId)
         {
@@ -98,6 +98,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        // API: lấy thông tin lịch sử chi tiêu của 1 user trong hợp đồng
         [HttpGet("contract/{contractId}/user/{userId}/history")]
         public IActionResult GetUserExpenseHistory(int contractId, int userId)
         {
@@ -111,6 +112,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        // API: Lấy danh sách các chi phí đề xuất trong hợp đồng
         [HttpGet("contract/{contractId}/expenses")]
         public IActionResult GetExpensesByContract(int contractId)
         {
