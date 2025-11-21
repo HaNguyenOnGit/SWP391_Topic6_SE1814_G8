@@ -68,11 +68,9 @@ namespace BusinessLogicLayer.Services
         public async Task SendNotificationToMember(int memberId, int contractId)
         {
             var member = _us.GetUserById(memberId);
-            string subject = "Bạn đã bị lùa gà";
+            string subject = "Xác nhận tham gia hợp đồng";
             string body = $@"<p>Xin chào {member.FullName},</p>
-                            <p>Bạn đã bị lùa gà vào hợp đồng có mã là #{contractId}</p>
-                            <p>Hãy sẵn sàng sử dụng số tiền đang có để cống hiến cho người mua xe</p>
-                            <p>Xài ké mà đòi chủ xe phải trả hết à</p>
+                            <p>Bạn đã được mời vào hợp đồng có mã là #{contractId}</p>
                             <p>Trân trọng,<br><b>EVCO System</b></p>
                             <p><a href =""http://localhost:5173/contractVerify/{contractId}"">Bấm vào đây để verify</a></p>";
             try
