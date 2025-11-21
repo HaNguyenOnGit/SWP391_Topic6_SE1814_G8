@@ -187,7 +187,7 @@ export default function Payment() {
                                             <div className="row-amount column">
                                                 <b>Số tiền cần trả</b>
                                                 <input
-                                                    className="txtInput"
+                                                    className="txtInput txtInput-payment"
                                                     type="text"
                                                     value={selectedPayment.amount?.toLocaleString("vi-VN") || "-"}
                                                     readOnly

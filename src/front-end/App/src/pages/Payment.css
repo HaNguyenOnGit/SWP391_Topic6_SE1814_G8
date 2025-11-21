@@ -266,10 +266,14 @@
     padding: 32px 40px;
     /* thêm không gian bên trong */
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    max-width: 560px;
+    max-width: 480px;
     /* rộng hơn so với 480px */
     margin: 0 auto;
     /* thêm nền trắng để nổi bật */
+}
+
+.txtInput-payment {
+    width: 100% !important;
 }
 
 /* Tiêu đề */
@@ -325,6 +329,7 @@
     justify-content: space-between;
     margin-top: 28px;
     gap: 14px;
+    width: 80%;
 }
 
 .payment-btn {
