@@ -9,12 +9,6 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     [Route("api/contract")]
     public class ContractController : ControllerBase
     {
-        public class UpdateMemberStatusRequest
-        {
-            public int ContractId { get; set; }
-            public int UserId { get; set; }
-            public string Status { get; set; }
-        }
         private readonly ContractService _cs;
         private readonly UserService _us;
         private readonly ContractMemberService _cms;
