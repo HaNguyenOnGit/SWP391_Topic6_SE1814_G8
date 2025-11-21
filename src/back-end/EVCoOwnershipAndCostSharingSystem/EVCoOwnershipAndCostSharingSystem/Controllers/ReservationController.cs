@@ -11,7 +11,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
     public class ReservationController : ControllerBase
     {
 
-        // DELETE api/reservation/{reservationId}
+        // API: Xóa đặt lịch theo ReservationId
         [HttpDelete("{reservationId}")]
         public IActionResult DeleteReservation(int reservationId)
         {
@@ -26,7 +26,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _reservationService = new ReservationService();
         }
 
-        // ✅ 1. Thêm lịch
+        // API: Tạo đặt lịch mới
         [HttpPost]
         public IActionResult CreateReservation([FromBody] ReservationRequest request)
         {
@@ -67,7 +67,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-        // ✅ 3. Xóa lịch
+        // ✅ API: Xóa lịch đã đặt theo contractId + datetime
         [HttpDelete("{contractId}/{datetime}")]
         public IActionResult DeleteReservation(int contractId, string datetime)
         {
@@ -81,7 +81,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(new { Error = ex.Message });
             }
         }
-
+        // API: Cập nhật trạng thái đặt lịch
         [HttpPut("{reservationId}/status")]
         public IActionResult UpdateReservationStatus(int reservationId, [FromQuery] string newStatus)
         {
@@ -96,7 +96,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             }
         }
 
-        // GET api/reservation/contract/{contractId}/month?month=MM&year=YYYY
+        // API: Lấy danh sách đặt lịch theo hợp đồng và tháng
         [HttpGet("contract/{contractId}/month")]
         public IActionResult GetReservationsByContractAndMonth(int contractId, [FromQuery] int month, [FromQuery] int year)
         {

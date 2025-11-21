@@ -145,7 +145,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             _us.UpdateUser(newPassword, userId);
             return Ok("User updated successfully");
         }
-
+        // API: Xác thực email thông qua code đã gửi qua email
         [HttpPost("confirm-email")]
         public IActionResult ConfirmEmail([FromQuery] string email, [FromQuery] string code)
         {
@@ -159,7 +159,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        // API: Thêm User mới
         [HttpPost("add")]
         public IActionResult AddUser([FromForm] RegisterRequest registerRequest)
         {
@@ -255,7 +255,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
             return Ok("User added successfully. Please check your email to confirm.");
         }
 
-        // Enable user account by ID
+        // API: Kích hoạt User
         [HttpPut("{userId}/enable")]
         public IActionResult EnableUser(int userId)
         {
@@ -269,7 +269,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
+        // API: tạo mã xác nhận mới và gửi lại email
         [HttpPost("generate-code")]
         public IActionResult GenerateCode([FromQuery] string email)
         {
