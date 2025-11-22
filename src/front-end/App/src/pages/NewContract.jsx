@@ -206,14 +206,16 @@ export default function NewContract() {
               {step === 2 && (
                 <div className="nc-section">
                   <h2>Thêm người đồng sở hữu</h2>
-                  <input
-                    className="txtInput"
-                    type="text"
-                    placeholder="Nhập số điện thoại"
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                  />
-                  <button className="addBtn" onClick={addOwner}>+</button>
+                  <div className="phone-row">
+                    <input
+                      className="txtInput"
+                      type="text"
+                      placeholder="Nhập số điện thoại"
+                      value={phone}
+                      onChange={e => setPhone(e.target.value)}
+                    />
+                    <button className="addBtn" onClick={addOwner}>+</button>
+                  </div>
                   {ownerError && <p style={{ color: "red" }}>{ownerError}</p>}
                   <div>
                     {owners.map((o, i) => (
