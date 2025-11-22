@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { FaUsers, FaFileContract, FaChartPie } from "react-icons/fa";
+import { FaUsers, FaFileContract, FaChartPie, FaUser, FaSignOutAlt, FaChevronDown } from "react-icons/fa";
 import { useAuth } from "../auth/AuthContext";
 import "./ANavbar.css";
 
 export default function AdminNavbar({ adminName }) {
     const navigate = useNavigate();
     const location = useLocation();
-    const { isAuthenticated, user } = useAuth();
+    const { isAuthenticated, user, logout } = useAuth();
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const getInitials = (name) => {
         if (!name) return "A";
@@ -16,9 +17,32 @@ export default function AdminNavbar({ adminName }) {
         return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
     };
 
+    const toggleDropdown = () => {
+        setShowDropdown(!showDropdown);
+    };
+
     const handleProfileClick = () => {
         navigate("/admin/profile");
+        setShowDropdown(false);
     };
+
+    const handleLogout = () => {
+        logout();
+        navigate("/login");
+    };
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (!event.target.closest('.admin-box')) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     // Ensure only admin users can access admin routes
     useEffect(() => {
@@ -51,9 +75,20 @@ export default function AdminNavbar({ adminName }) {
                 </Link>
             </div>
 
-            <div className="admin-box" onClick={handleProfileClick}>
+            <div className="admin-box" onClick={toggleDropdown}>
                 <div className="avatar">{getInitials(adminName)}</div>
                 <span>{adminName}</span>
+                <FaChevronDown className={`dropdown-arrow ${showDropdown ? 'open' : ''}`} />
+                {showDropdown && (
+                    <div className="dropdown-menu">
+                        <div className="dropdown-item" onClick={handleProfileClick}>
+                            <FaUser className="dropdown-icon" />Thông tin cá nhân
+                        </div>
+                        <div className="dropdown-item logout" onClick={handleLogout}>
+                            <FaSignOutAlt className="dropdown-icon" />Đăng xuất
+                        </div>
+                    </div>
+                )}
             </div>
         </nav>
     );
