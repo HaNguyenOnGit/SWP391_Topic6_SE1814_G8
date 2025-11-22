@@ -47,7 +47,10 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 string proofImageUrl = null;
                 if (proofImage != null)
                 {
-                    var fileName = $"{Guid.NewGuid()}_{proofImage.FileName}";
+                    // Lấy thời gian hiện tại theo định dạng yyyyMMddHHmmss
+                    var timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    var fileName = $"{timestamp}_{proofImage.FileName}";
+
                     var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ConfirmPaymentImage");
                     Directory.CreateDirectory(folderPath);
                     var fullPath = Path.Combine(folderPath, fileName);
@@ -59,6 +62,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
 
                     proofImageUrl = $"/ConfirmPaymentImage/{fileName}";
                 }
+
 
                 _ps.ConfirmPayment(settlementId, payerId, amount, method, proofImageUrl);
                 return Ok("Payment confirmed successfully");
