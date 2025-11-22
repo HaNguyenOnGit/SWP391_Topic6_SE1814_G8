@@ -34,7 +34,9 @@ h2 {
     color: #f5f5f5;
     background: linear-gradient(135deg, #8CC8E7, #C77DCE);
     border: none;
-    margin-left: 20px;
+    margin: 0;
+    flex-shrink: 0;
+    cursor: pointer;
 }
 
 .addBtn:hover {
@@ -274,4 +276,40 @@ h2 {
     margin-top: 10px;
     font-size: 12px;
     color: #6b7280;
+}
+
+/* Phone input row: keep + button beside input */
+.phone-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 460px;
+    /* keep same visual width as ratio row */
+}
+
+.phone-row .txtInput {
+    flex: 1;
+}
+
+/* Override global .addBtn from Booking.css so it doesn't stick bottom-right */
+.phone-row .addBtn {
+    position: static;
+    right: auto;
+    bottom: auto;
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+}
+
+/* Ensure owner ratio row uses same width for visual alignment */
+.pSlider {
+    max-width: 460px;
+}
+
+@media (max-width: 640px) {
+
+    .phone-row,
+    .pSlider {
+        max-width: 100%;
+    }
 }
