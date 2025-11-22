@@ -48,7 +48,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                 if (proofImage != null)
                 {
                     var fileName = $"{Guid.NewGuid()}_{proofImage.FileName}";
-                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "proofs");
+                    var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ConfirmPaymentImage");
                     Directory.CreateDirectory(folderPath);
                     var fullPath = Path.Combine(folderPath, fileName);
 
@@ -57,7 +57,7 @@ namespace EVCoOwnershipAndCostSharingSystem.Controllers
                         proofImage.CopyTo(fs);
                     }
 
-                    proofImageUrl = $"/proofs/{fileName}";
+                    proofImageUrl = $"/ConfirmPaymentImage/{fileName}";
                 }
 
                 _ps.ConfirmPayment(settlementId, payerId, amount, method, proofImageUrl);
